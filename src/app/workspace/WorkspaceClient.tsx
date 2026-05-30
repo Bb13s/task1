@@ -333,6 +333,26 @@ export default function WorkspaceClient({ initialFolders, initialNotes, initialF
     }
   }, [refreshFiles, previewFile]);
 
+  // 切换文件公开状态
+  const handleToggleFilePublic = useCallback(async (fileId: number, isPublic: boolean) => {
+    try {
+      const res = await fetch(`/api/files?id=${fileId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_public: isPublic ? 1 : 0 }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message);
+        await refreshFiles();
+      } else {
+        alert(data.error || '操作失败');
+      }
+    } catch (error) {
+      alert('操作出错');
+    }
+  }, [refreshFiles]);
+
   return (
     <div className="h-screen flex flex-col bg-white">
       {/* Header */}
@@ -397,6 +417,7 @@ export default function WorkspaceClient({ initialFolders, initialNotes, initialF
             onUploadFile={handleUploadFile}
             onDeleteFile={handleDeleteFile}
             onRefreshFiles={refreshFiles}
+            onToggleFilePublic={handleToggleFilePublic}
             onDownloadFolder={handleDownloadFolder}
           />
         </div>

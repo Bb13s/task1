@@ -30,6 +30,7 @@ interface FolderTreeProps {
   onUploadFile: (folderPath: string, file: File) => void;
   onDeleteFile: (fileId: number) => void;
   onRefreshFiles: () => void;
+  onToggleFilePublic?: (fileId: number, isPublic: boolean) => void;
   onDownloadFolder?: (folderPath: string) => void;
 }
 
@@ -60,6 +61,7 @@ export default function FolderTree({
   onUploadFile,
   onDeleteFile,
   onRefreshFiles,
+  onToggleFilePublic,
   onDownloadFolder,
 }: FolderTreeProps) {
   const [expandedFolders, setExpandedFolders] = useState<Set<number | null>>(new Set([null]));
@@ -424,7 +426,23 @@ export default function FolderTree({
                     file.mime_type.includes('sheet') ? '📊' : '📎'}
             </span>
             <span className="text-sm truncate flex-1">{file.original_name}</span>
-            <span className="text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+            {onToggleFilePublic && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleFilePublic(file.id, file.is_public !== 1);
+                }}
+                className={`text-xs px-1.5 py-0.5 rounded transition-opacity ${
+                  file.is_public === 1
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-gray-100 text-gray-500 opacity-0 group-hover:opacity-100'
+                }`}
+                title={file.is_public === 1 ? '点击取消公开' : '点击公开到广场'}
+              >
+                {file.is_public === 1 ? '🌐' : '🔒'}
+              </button>
+            )}
+            <span className="text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity ml-1">
               {formatFileSize(file.size)}
             </span>
           </div>
