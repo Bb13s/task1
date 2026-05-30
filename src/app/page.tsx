@@ -59,15 +59,12 @@ export default function HomePage() {
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            你的
             <span className="bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
-              知识管理
+              重建物院巴别塔
             </span>
-            中心
           </h1>
           <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-            用 GitHub 的方式管理笔记，支持 Markdown、双链引用、无限层级文件夹，
-            让知识有序生长。
+            由 Bb13s 尝试开发，支持 Markdown 及其公式渲染，PDF 文件的上传与发布正在测试。
           </p>
           <div className="flex items-center justify-center gap-4">
             <Link
@@ -97,9 +94,9 @@ export default function HomePage() {
               <p className="text-gray-600">支持 CodeMirror 6，语法高亮、实时预览，写作体验流畅</p>
             </div>
             <div className="p-6 rounded-xl bg-gray-50 hover:bg-purple-50 transition-colors">
-              <div className="text-4xl mb-4">🔗</div>
-              <h3 className="text-xl font-semibold mb-2">双链引用</h3>
-              <p className="text-gray-600">使用 [[ ]] 快速引用其他笔记，构建知识网络</p>
+              <div className="text-4xl mb-4">🌐</div>
+              <h3 className="text-xl font-semibold mb-2">可选公开</h3>
+              <p className="text-gray-600">让社区伙伴看到你的笔记与文件，方便资料流通，知识共享</p>
             </div>
             <div className="p-6 rounded-xl bg-gray-50 hover:bg-purple-50 transition-colors">
               <div className="text-4xl mb-4">📁</div>
@@ -147,7 +144,7 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 py-8">
         <div className="max-w-6xl mx-auto px-4 text-center text-gray-500">
-          <p>© 2026 NoteHub. 用 GitHub 的方式管理笔记。</p>
+          <p>© 2026 华中科技大学物理学院辩论队</p>
         </div>
       </footer>
     </div>
