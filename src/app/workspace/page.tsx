@@ -1,15 +1,34 @@
 import { redirect } from 'next/navigation';
-import { getAllFolders, getAllNotes, seedData, getNoteById, getFilesByUploader } from '@/lib/db';
-import { getCurrentUser } from '@/lib/auth';
+import { cookies } from 'next/headers';
+import { getAllFolders, getAllNotes, seedData, getNoteById, getFilesByUploader, getSessionById, getUserById } from '@/lib/db';
 import WorkspaceClient from './WorkspaceClient';
+
+export const dynamic = 'force-dynamic';
 
 interface WorkspacePageProps {
   searchParams: { note?: string };
 }
 
+function getCurrentUserFromCookies() {
+  const cookieStore = cookies();
+  const sessionId = cookieStore.get('session_id')?.value;
+
+  if (!sessionId) {
+    return null;
+  }
+
+  const session = getSessionById(sessionId);
+  if (!session) {
+    return null;
+  }
+
+  const user = getUserById(session.user_id);
+  return user || null;
+}
+
 export default function WorkspacePage({ searchParams }: WorkspacePageProps) {
   // 获取当前用户
-  const user = getCurrentUser();
+  const user = getCurrentUserFromCookies();
 
   // 未登录，重定向到登录页
   if (!user) {

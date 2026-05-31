@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getPublicNotes } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
+import UserNav from "./UserNav";
 
 export default function HomePage() {
   let notes: any[] = [];
@@ -9,7 +9,6 @@ export default function HomePage() {
   } catch (error) {
     console.error('Failed to fetch public notes:', error);
   }
-  const user = getCurrentUser();
   const recentNotes = notes.slice(0, 6);
 
   return (
@@ -28,29 +27,7 @@ export default function HomePage() {
             <Link href="/explore" className="text-gray-600 hover:text-gray-900">广场</Link>
             <Link href="/workspace" className="text-gray-600 hover:text-gray-900">工作区</Link>
             <div className="w-px h-4 bg-gray-300"></div>
-            {user ? (
-              <Link
-                href="/workspace"
-                className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
-              >
-                进入工作区
-              </Link>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Link
-                  href="/login"
-                  className="text-gray-600 hover:text-gray-900 px-3 py-2"
-                >
-                  登录
-                </Link>
-                <Link
-                  href="/register"
-                  className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
-                >
-                  注册
-                </Link>
-              </div>
-            )}
+            <UserNav />
           </nav>
         </div>
       </header>
