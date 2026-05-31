@@ -44,10 +44,12 @@ export async function POST(request: NextRequest) {
     createSession(sessionId, user.id, expiresAt);
 
     // 设置 Cookie
+    // 使用环境变量控制 secure，默认 HTTP 下为 false
+    const isSecure = process.env.COOKIE_SECURE === 'true' || (process.env.NODE_ENV === 'production' && process.env.COOKIE_SECURE !== 'false');
     const cookieStore = cookies();
     cookieStore.set('session_id', sessionId, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isSecure,
       sameSite: 'strict',
       expires: expiresAt,
       path: '/',
