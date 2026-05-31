@@ -378,12 +378,13 @@ export function createFileRecord(
   filePath: string,
   uploadedBy: string,
   folderPath: string = '/',
-  noteId: number | null = null
+  noteId: number | null = null,
+  isPublic: number = 0
 ): FileRecord {
   const stmt = db.prepare(
-    'INSERT INTO files (filename, original_name, mime_type, size, path, folder_path, uploaded_by, note_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+    'INSERT INTO files (filename, original_name, mime_type, size, path, folder_path, uploaded_by, note_id, is_public) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
   );
-  const result = stmt.run(filename, originalName, mimeType, size, filePath, folderPath, uploadedBy, noteId);
+  const result = stmt.run(filename, originalName, mimeType, size, filePath, folderPath, uploadedBy, noteId, isPublic);
   return {
     id: Number(result.lastInsertRowid),
     filename,
@@ -395,6 +396,7 @@ export function createFileRecord(
     uploaded_by: uploadedBy,
     note_id: noteId,
     uploaded_at: new Date().toISOString(),
+    is_public: isPublic,
   };
 }
 
@@ -438,10 +440,22 @@ export function getPublicFiles(): FileRecord[] {
 
 // 更新文件公开状态
 export function updateFilePublicStatus(id: number, isPublic: number, uploadedBy: string): boolean {
+  // 先检查文件是否存在且属于当前用户
+  const file = getFileById(id);
+  if (!file) {
+    console.log('File not found:', id);
+    return false;
+  }
+  if (file.uploaded_by !== uploadedBy) {
+    console.log('Permission denied:', file.uploaded_by, '!=', uploadedBy);
+    return false;
+  }
+
   const stmt = db.prepare(
-    'UPDATE files SET is_public = ? WHERE id = ? AND uploaded_by = ?'
+    'UPDATE files SET is_public = ? WHERE id = ?'
   );
-  const result = stmt.run(isPublic, id, uploadedBy);
+  const result = stmt.run(isPublic, id);
+  console.log('Update result:', result.changes, 'rows changed');
   return result.changes > 0;
 }
 

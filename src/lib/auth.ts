@@ -11,8 +11,7 @@ export function getCurrentUser(): User | null {
 
   const session = getSessionById(sessionId);
   if (!session) {
-    // Session 过期，清除 cookie
-    cookieStore.delete('session_id');
+    // Session 过期，不在这里清除 cookie（只能在 Server Action 或 Route Handler 中清除）
     return null;
   }
 

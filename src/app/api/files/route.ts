@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { unlink } from 'fs/promises';
 import path from 'path';
-import { getFilesByUploader, deleteFileRecord, getFileById, getFileByFilename, updateFilePublicStatus } from '@/lib/db';
+import { getFilesByUploader, deleteFileRecord, getFileById, getFileByFilename, updateFilePublicStatus, db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
 import { readFile } from 'fs/promises';
+
+export const dynamic = 'force-dynamic';
 
 const UPLOAD_DIR = path.join(process.cwd(), 'uploads');
 
@@ -11,6 +13,14 @@ const UPLOAD_DIR = path.join(process.cwd(), 'uploads');
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
+    const debug = searchParams.get('debug');
+
+    // 调试端点：检查数据库表结构
+    if (debug === 'schema') {
+      const columns = db.prepare('PRAGMA table_info(files)').all();
+      return NextResponse.json({ columns });
+    }
+
     const author = searchParams.get('author');
     const filename = searchParams.get('filename');
     const fileId = searchParams.get('id');
@@ -120,7 +130,7 @@ export async function PATCH(request: NextRequest) {
 
     if (!success) {
       return NextResponse.json(
-        { error: '文件不存在或无权限' },
+        { error: '文件不存在或无权限', debug: { fileId, username: user.username } },
         { status: 404 }
       );
     }
@@ -129,10 +139,10 @@ export async function PATCH(request: NextRequest) {
       success: true,
       message: is_public ? '文件已公开到广场' : '文件已取消公开',
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Update file error:', error);
     return NextResponse.json(
-      { error: '更新失败' },
+      { error: '更新失败', message: error.message },
       { status: 500 }
     );
   }

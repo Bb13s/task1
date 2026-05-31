@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, Fragment } from 'react';
 import Link from 'next/link';
 import FolderTree from './FolderTree';
 import MarkdownPreview from './MarkdownPreview';
@@ -104,7 +104,7 @@ export default function WorkspaceClient({ initialFolders, initialNotes, initialF
     const res = await fetch('/api/folders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, parentId, author: currentUser }),
+      body: JSON.stringify({ name, parentId, author: currentUser.username }),
     });
     const data = await res.json();
     if (data.folder) {
@@ -293,10 +293,13 @@ export default function WorkspaceClient({ initialFolders, initialNotes, initialF
   }, [notes, files]);
 
   // 上传文件
-  const handleUploadFile = useCallback(async (folderPath: string, file: File) => {
+  const handleUploadFile = useCallback(async (folderPath: string, file: File, isPublic?: boolean) => {
+    console.log('handleUploadFile called with isPublic:', isPublic);
     const formData = new FormData();
     formData.append('file', file);
     formData.append('folderPath', folderPath);
+    formData.append('isPublic', isPublic ? '1' : '0');
+    console.log('FormData isPublic:', formData.get('isPublic'));
 
     try {
       const res = await fetch('/api/upload', {
@@ -304,9 +307,10 @@ export default function WorkspaceClient({ initialFolders, initialNotes, initialF
         body: formData,
       });
       const data = await res.json();
+      console.log('Upload response:', data);
       if (data.success) {
         await refreshFiles();
-        alert(`文件 "${file.name}" 上传成功！`);
+        alert(`文件 "${file.name}" 上传成功！${isPublic ? '已公开到广场' : '仅自己可见'}`);
       } else {
         alert(`上传失败: ${data.error}`);
       }
@@ -346,7 +350,7 @@ export default function WorkspaceClient({ initialFolders, initialNotes, initialF
         alert(data.message);
         await refreshFiles();
       } else {
-        alert(data.error || '操作失败');
+        alert(data.error || '操作失败' + (data.debug ? JSON.stringify(data.debug) : ''));
       }
     } catch (error) {
       alert('操作出错');
@@ -422,11 +426,18 @@ export default function WorkspaceClient({ initialFolders, initialNotes, initialF
           />
         </div>
 
-        {/* Middle Column - Editor */}
-        <div className="flex-1 flex flex-col min-w-0">
-          {editingNote ? (
-            <>
-              <div className="px-4 py-3 border-b border-gray-200 bg-white">
+        {/* PDF Preview Mode - Takes remaining space */}
+        {previewMode === 'file' && previewFile ? (
+          <div className="flex-1 bg-white overflow-hidden">
+            <FilePreview file={previewFile} />
+          </div>
+        ) : (
+          <>
+            {/* Middle Column - Editor */}
+            <div className="flex-1 flex flex-col min-w-0">
+              {editingNote ? (
+                <>
+                  <div className="px-4 py-3 border-b border-gray-200 bg-white">
                 <div className="flex items-center justify-between">
                   <input
                     type="text"
@@ -501,23 +512,15 @@ export default function WorkspaceClient({ initialFolders, initialNotes, initialF
           )}
         </div>
 
-        {/* Right Column - Preview */}
-        {showPreview && (
+        {/* Right Column - Markdown Preview Only */}
+        {previewMode === 'note' && showPreview && editingNote ? (
           <div className="w-[45%] border-l border-gray-200 bg-white overflow-hidden">
-            {previewMode === 'note' && editingNote ? (
-              <div className="h-full overflow-auto">
-                <MarkdownPreview content={editorContent} />
-              </div>
-            ) : previewMode === 'file' && previewFile ? (
-              <FilePreview file={previewFile} />
-            ) : (
-              <div className="h-full flex flex-col items-center justify-center text-gray-400">
-                <div className="text-6xl mb-4">👁️</div>
-                <p className="text-lg">预览区</p>
-                <p className="text-sm mt-2">点击左侧笔记或文件查看预览</p>
-              </div>
-            )}
+            <div className="h-full overflow-auto">
+              <MarkdownPreview content={editorContent} />
+            </div>
           </div>
+        ) : null}
+      </>
         )}
       </div>
 

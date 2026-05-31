@@ -4,6 +4,7 @@ import { mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
 import { createFileRecord } from '@/lib/db';
+import { getCurrentUser } from '@/lib/auth';
 
 const UPLOAD_DIR = path.join(process.cwd(), 'uploads');
 
@@ -19,6 +20,15 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 export async function POST(request: NextRequest) {
   try {
+    // 获取当前用户
+    const user = getCurrentUser();
+    if (!user) {
+      return NextResponse.json(
+        { error: '未登录' },
+        { status: 401 }
+      );
+    }
+
     // 确保上传目录存在
     if (!existsSync(UPLOAD_DIR)) {
       await mkdir(UPLOAD_DIR, { recursive: true });
@@ -28,6 +38,7 @@ export async function POST(request: NextRequest) {
     const file = formData.get('file') as File;
     const noteId = formData.get('noteId') as string | null;
     const folderPath = (formData.get('folderPath') as string) || '/';
+    const isPublic = formData.get('isPublic') === '1';
 
     if (!file) {
       return NextResponse.json(
@@ -66,16 +77,19 @@ export async function POST(request: NextRequest) {
     await writeFile(filePath, buffer);
 
     // 保存到数据库
+    console.log('Uploading file with isPublic:', isPublic);
     const fileRecord = createFileRecord(
       filename,
       originalName,
       file.type,
       file.size,
       `/api/files/${filename}`,
-      'demo',
+      user.username,
       folderPath,
-      noteId ? parseInt(noteId) : null
+      noteId ? parseInt(noteId) : null,
+      isPublic ? 1 : 0
     );
+    console.log('File record created:', fileRecord);
 
     return NextResponse.json({
       success: true,
@@ -87,6 +101,7 @@ export async function POST(request: NextRequest) {
         size: fileRecord.size,
         url: fileRecord.path,
         uploadedAt: fileRecord.uploaded_at,
+        is_public: fileRecord.is_public,
       },
     });
   } catch (error) {

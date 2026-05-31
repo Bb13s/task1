@@ -27,7 +27,7 @@ interface FolderTreeProps {
   onDeleteFolder: (id: number) => void;
   onDeleteNote: (id: number) => void;
   onMoveNote: (noteId: number, folderPath: string) => void;
-  onUploadFile: (folderPath: string, file: File) => void;
+  onUploadFile: (folderPath: string, file: File, isPublic?: boolean) => void;
   onDeleteFile: (fileId: number) => void;
   onRefreshFiles: () => void;
   onToggleFilePublic?: (fileId: number, isPublic: boolean) => void;
@@ -79,6 +79,7 @@ export default function FolderTree({
   const [dragOverFolder, setDragOverFolder] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadTargetFolder, setUploadTargetFolder] = useState<string>('/');
+  const [uploadIsPublic, setUploadIsPublic] = useState<boolean>(false);
   const contextMenuRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -258,7 +259,8 @@ export default function FolderTree({
     e.preventDefault();
     const file = e.dataTransfer.files?.[0];
     if (file) {
-      onUploadFile(folderPath, file);
+      const isPublic = confirm(`上传文件 "${file.name}"\n\n是否同时公开到广场？\n\n确定 - 公开到广场\n取消 - 仅自己可见`);
+      onUploadFile(folderPath, file, isPublic);
     }
     setDragOverFolder(null);
   };
@@ -285,7 +287,10 @@ export default function FolderTree({
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      onUploadFile(uploadTargetFolder, file);
+      // 询问是否公开到广场
+      const isPublic = confirm(`上传文件 "${file.name}"\n\n是否同时公开到广场？\n\n确定 - 公开到广场\n取消 - 仅自己可见`);
+      console.log('User selected isPublic:', isPublic);
+      onUploadFile(uploadTargetFolder, file, isPublic);
     }
     e.target.value = '';
   };
@@ -369,10 +374,25 @@ export default function FolderTree({
                   setNewFolderName('');
                 }
               }}
-              onBlur={submitCreateFolder}
-              className="text-sm border border-purple-300 rounded px-2 py-0.5 w-32 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="text-sm border border-purple-300 rounded px-2 py-0.5 w-24 focus:outline-none focus:ring-2 focus:ring-purple-500"
               placeholder="文件夹名"
+              autoFocus
             />
+            <button
+              onClick={submitCreateFolder}
+              className="text-xs bg-purple-600 text-white px-1.5 py-0.5 rounded hover:bg-purple-700"
+            >
+              ✓
+            </button>
+            <button
+              onClick={() => {
+                setIsCreatingFolder(false);
+                setNewFolderName('');
+              }}
+              className="text-xs bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded hover:bg-gray-300"
+            >
+              ✕
+            </button>
           </div>
         )}
 
@@ -467,7 +487,7 @@ export default function FolderTree({
       />
 
       <div className="p-3 border-b border-gray-200">
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between">
           <span className="font-semibold text-gray-700">文件夹</span>
           <button
             onClick={() => {
@@ -479,8 +499,13 @@ export default function FolderTree({
             + 新建
           </button>
         </div>
+      </div>
+
+      <div className="py-2">
+        {/* Root level folder creation input */}
         {isCreatingFolder && creatingFolderParent === null && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 px-2 py-1.5 mx-2">
+            <span className="text-gray-400">▶</span>
             <span className="text-lg">📂</span>
             <input
               ref={inputRef}
@@ -494,15 +519,27 @@ export default function FolderTree({
                   setNewFolderName('');
                 }
               }}
-              onBlur={submitCreateFolder}
-              className="text-sm border border-purple-300 rounded px-2 py-1 flex-1 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              placeholder="文件夹名称"
+              className="text-sm border border-purple-300 rounded px-2 py-0.5 w-24 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              placeholder="文件夹名"
+              autoFocus
             />
+            <button
+              onClick={submitCreateFolder}
+              className="text-xs bg-purple-600 text-white px-1.5 py-0.5 rounded hover:bg-purple-700"
+            >
+              ✓
+            </button>
+            <button
+              onClick={() => {
+                setIsCreatingFolder(false);
+                setNewFolderName('');
+              }}
+              className="text-xs bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded hover:bg-gray-300"
+            >
+              ✕
+            </button>
           </div>
         )}
-      </div>
-
-      <div className="py-2">
         {renderTreeNode(tree)}
       </div>
 
