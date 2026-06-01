@@ -1,11 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { unlink } from 'fs/promises';
 import path from 'path';
-import { getFilesByUploader, deleteFileRecord, getFileById, getFileByFilename, updateFilePublicStatus, db } from '@/lib/db';
-import { getCurrentUser } from '@/lib/auth';
+import { cookies } from 'next/headers';
+import { getFilesByUploader, deleteFileRecord, getFileById, getFileByFilename, updateFilePublicStatus, getSessionById, getUserById, db } from '@/lib/db';
 import { readFile } from 'fs/promises';
 
 export const dynamic = 'force-dynamic';
+
+// 在 API Route 中获取当前用户
+function getCurrentUserFromCookies() {
+  const cookieStore = cookies();
+  const sessionId = cookieStore.get('session_id')?.value;
+
+  if (!sessionId) {
+    return null;
+  }
+
+  const session = getSessionById(sessionId);
+  if (!session) {
+    return null;
+  }
+
+  const user = getUserById(session.user_id);
+  return user || null;
+}
 
 const UPLOAD_DIR = path.join(process.cwd(), 'uploads');
 
@@ -63,7 +81,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 获取当前用户
-    const user = getCurrentUser();
+    const user = getCurrentUserFromCookies();
     if (!user) {
       return NextResponse.json(
         { error: '未登录' },
