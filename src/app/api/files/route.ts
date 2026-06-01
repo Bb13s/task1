@@ -119,7 +119,16 @@ export async function GET(request: NextRequest) {
 
     // 否则返回文件列表
     const files = getFilesByUploader(user.username);
-    return NextResponse.json({ files });
+    return NextResponse.json(
+      { files },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        },
+      }
+    );
   } catch (error) {
     console.error('Get files error:', error);
     return NextResponse.json(

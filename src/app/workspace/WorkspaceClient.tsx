@@ -48,7 +48,10 @@ export default function WorkspaceClient({ initialFolders, initialNotes, initialF
 
   const refreshFiles = useCallback(async () => {
     try {
-      const res = await fetch('/api/files');
+      const res = await fetch(`/api/files?_t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' }
+      });
       const data = await res.json();
       if (data.files) {
         setFiles(data.files);
