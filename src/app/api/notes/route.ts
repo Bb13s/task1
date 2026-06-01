@@ -10,7 +10,16 @@ export async function GET(request: NextRequest) {
 
     if (isPublic === 'true') {
       const notes = getPublicNotes();
-      return NextResponse.json({ notes });
+      return NextResponse.json(
+        { notes },
+        {
+          headers: {
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+          },
+        }
+      );
     }
 
     const author = searchParams.get('author') || 'demo';

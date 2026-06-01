@@ -47,7 +47,16 @@ export async function GET(request: NextRequest) {
     // 获取公开文件列表（无需登录）
     if (isPublic === 'true') {
       const files = getPublicFiles();
-      return NextResponse.json({ files });
+      return NextResponse.json(
+        { files },
+        {
+          headers: {
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+          },
+        }
+      );
     }
 
     // 如果提供了文件名，返回文件内容（下载）

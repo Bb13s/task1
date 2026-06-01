@@ -28,9 +28,17 @@ export default function ExploreClient() {
 
   const fetchData = async () => {
     try {
+      // 添加时间戳和缓存控制，确保获取最新数据
+      const timestamp = Date.now();
       const [notesRes, filesRes] = await Promise.all([
-        fetch('/api/notes?public=true'),
-        fetch('/api/files?public=true')
+        fetch(`/api/notes?public=true&_t=${timestamp}`, {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache' }
+        }),
+        fetch(`/api/files?public=true&_t=${timestamp}`, {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache' }
+        })
       ]);
 
       const notesData = await notesRes.json();
