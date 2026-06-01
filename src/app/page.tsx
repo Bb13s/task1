@@ -37,11 +37,11 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
             <span className="bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
-              重建物院巴别塔
+              欢迎来到——物院巴别塔
             </span>
           </h1>
           <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-            由 Bb13s 尝试开发，支持 Markdown 及其公式渲染，PDF 文件的上传与发布正在测试。
+            个人知识库管理、物院资源共享平台。现已支持新建Markdown、上传PDF以及所有工作区文件的公开！
           </p>
           <div className="flex items-center justify-center gap-4">
             <Link
@@ -78,7 +78,7 @@ export default function HomePage() {
             <div className="p-6 rounded-xl bg-gray-50 hover:bg-purple-50 transition-colors">
               <div className="text-4xl mb-4">📁</div>
               <h3 className="text-xl font-semibold mb-2">文件夹管理</h3>
-              <p className="text-gray-600">无限层级嵌套，拖拽移动，Obsidian 风格树状导航</p>
+              <p className="text-gray-600">无限层级嵌套，Obsidian 风格树状导航</p>
             </div>
           </div>
         </div>
