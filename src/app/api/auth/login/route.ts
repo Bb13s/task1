@@ -47,8 +47,8 @@ export async function POST(request: NextRequest) {
     const cookieStore = cookies();
     cookieStore.set('session_id', sessionId, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: false,
+      sameSite: 'lax',
       expires: expiresAt,
       path: '/',
     });
