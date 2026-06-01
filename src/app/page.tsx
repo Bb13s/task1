@@ -1,127 +1,202 @@
 import Link from "next/link";
-import { getPublicNotes } from "@/lib/db";
-import UserNav from "./UserNav";
+import Image from "next/image";
 
-export default function HomePage() {
-  let notes: any[] = [];
-  try {
-    notes = getPublicNotes();
-  } catch (error) {
-    console.error('Failed to fetch public notes:', error);
-  }
-  const recentNotes = notes.slice(0, 6);
-
+export default function DebateTeamHomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">N</span>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100">
+              <Image
+                src="/team-logo.svg"
+                alt="辩论队队徽"
+                width={40}
+                height={40}
+                className="w-full h-full object-cover"
+              />
             </div>
-            <span className="font-bold text-xl text-gray-800">NoteHub</span>
+            <span className="font-bold text-lg text-gray-800">华中科技大学物理学院辩论队</span>
           </div>
-          <nav className="flex items-center gap-4">
-            <Link href="/" className="text-purple-600 font-medium">首页</Link>
-            <Link href="/explore" className="text-gray-600 hover:text-gray-900">广场</Link>
-            <Link href="/workspace" className="text-gray-600 hover:text-gray-900">工作区</Link>
-            <div className="w-px h-4 bg-gray-300"></div>
-            <UserNav />
+          <nav className="flex items-center gap-6 text-sm">
+            <a href="#about" className="text-gray-600 hover:text-[#9e1b32] transition-colors">关于我们</a>
+            <a href="#gallery" className="text-gray-600 hover:text-[#9e1b32] transition-colors">队伍风采</a>
+            <a href="#achievements" className="text-gray-600 hover:text-[#9e1b32] transition-colors">赛事成绩</a>
+            <a href="#recruitment" className="text-gray-600 hover:text-[#9e1b32] transition-colors">招新信息</a>
+            <Link href="/app" className="text-gray-400 hover:text-gray-600 transition-colors text-xs">
+              知识库
+            </Link>
           </nav>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            <span className="bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
-              欢迎来到——物院巴别塔
-            </span>
+      <section className="relative h-[600px] flex items-center justify-center overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#9e1b32]/10 via-white to-gray-100">
+          {/* Abstract geometric shapes */}
+          <div className="absolute top-20 left-10 w-64 h-64 bg-[#9e1b32]/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#9e1b32]/5 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-[#9e1b32]/10 rounded-full"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-[#9e1b32]/10 rounded-full"></div>
+        </div>
+
+        <div className="relative z-10 text-center px-4">
+          <h1 className="text-6xl font-bold text-gray-900 mb-6 tracking-wider">
+            辩以明物，论以穷理
           </h1>
-          <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-            个人知识库管理、物院资源共享平台。现已支持新建Markdown、上传PDF以及所有工作区文件的公开！
+          <p className="text-2xl text-[#9e1b32] mb-10 font-medium">
+            问候在座各位！
           </p>
           <div className="flex items-center justify-center gap-4">
-            <Link
-              href="/workspace"
-              className="bg-purple-600 text-white px-8 py-3 rounded-xl hover:bg-purple-700 transition-colors font-medium text-lg"
+            <a
+              href="#about"
+              className="bg-[#9e1b32] text-white px-8 py-3 rounded-lg hover:bg-[#7a1527] transition-colors font-medium"
             >
-              开始使用
-            </Link>
-            <Link
-              href="/explore"
-              className="bg-white text-purple-600 border-2 border-purple-600 px-8 py-3 rounded-xl hover:bg-purple-50 transition-colors font-medium text-lg"
+              了解我们
+            </a>
+            <a
+              href="#recruitment"
+              className="bg-white text-[#9e1b32] border-2 border-[#9e1b32] px-8 py-3 rounded-lg hover:bg-[#9e1b32]/5 transition-colors font-medium"
             >
-              浏览广场
-            </Link>
+              加入招新群
+            </a>
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-16 bg-white">
+      {/* About Section */}
+      <section id="about" className="py-20 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">关于我们</h2>
+          <div className="bg-white rounded-xl shadow-sm p-8 space-y-6">
+            <p className="text-gray-600 leading-relaxed">
+              啦啦啦
+            </p>
+            <p className="text-gray-600 leading-relaxed">
+              啦啦啦
+            </p>
+            <div className="grid grid-cols-3 gap-6 pt-6 border-t border-gray-100">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-[#9e1b32] mb-2">2018</div>
+                <div className="text-gray-500 text-sm">成立时间</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-[#9e1b32] mb-2">50+</div>
+                <div className="text-gray-500 text-sm">现役队员</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-[#9e1b32] mb-2">20+</div>
+                <div className="text-gray-500 text-sm">荣誉奖项</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Gallery Section */}
+      <section id="gallery" className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">功能特性</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="p-6 rounded-xl bg-gray-50 hover:bg-purple-50 transition-colors">
-              <div className="text-4xl mb-4">📝</div>
-              <h3 className="text-xl font-semibold mb-2">Markdown 编辑器</h3>
-              <p className="text-gray-600">支持 CodeMirror 6，语法高亮、实时预览，写作体验流畅</p>
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">队伍风采</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <div
+                key={i}
+                className="aspect-square rounded-lg bg-gray-200 hover:bg-gray-300 transition-colors cursor-pointer"
+                style={{
+                  backgroundColor: i % 2 === 0 ? '#f3f4f6' : '#e5e7eb'
+                }}
+              ></div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Achievements Section */}
+      <section id="achievements" className="py-20 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">赛事成绩</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-[#9e1b32]">
+              <div className="text-sm text-gray-500 mb-2">2025年</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">校级辩论赛</h3>
+              <p className="text-[#9e1b32] font-medium">冠军</p>
             </div>
-            <div className="p-6 rounded-xl bg-gray-50 hover:bg-purple-50 transition-colors">
-              <div className="text-4xl mb-4">🌐</div>
-              <h3 className="text-xl font-semibold mb-2">可选公开</h3>
-              <p className="text-gray-600">让社区伙伴看到你的笔记与文件，方便资料流通，知识共享</p>
+            <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-[#9e1b32]">
+              <div className="text-sm text-gray-500 mb-2">2024年</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">院系杯</h3>
+              <p className="text-[#9e1b32] font-medium">亚军 · 最佳辩手</p>
             </div>
-            <div className="p-6 rounded-xl bg-gray-50 hover:bg-purple-50 transition-colors">
-              <div className="text-4xl mb-4">📁</div>
-              <h3 className="text-xl font-semibold mb-2">文件夹管理</h3>
-              <p className="text-gray-600">无限层级嵌套，Obsidian 风格树状导航</p>
+            <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-[#9e1b32]">
+              <div className="text-sm text-gray-500 mb-2">2024年</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">新生赛</h3>
+              <p className="text-[#9e1b32] font-medium">四强</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Recent Notes */}
-      <section className="py-16 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold text-gray-900">最新公开笔记</h2>
-            <Link href="/explore" className="text-purple-600 hover:text-purple-700 font-medium">
-              查看全部 →
-            </Link>
-          </div>
-
-          {recentNotes.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">暂无公开笔记</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {recentNotes.map((note) => (
-                <Link
-                  key={note.id}
-                  href={`/notes/${note.id}`}
-                  className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow block"
-                >
-                  <h3 className="font-semibold text-lg text-gray-800 mb-2 line-clamp-1">
-                    {note.title}
-                  </h3>
-                  <p className="text-sm text-gray-500 mb-3">👤 {note.author}</p>
-                  <p className="text-sm text-gray-600 line-clamp-2">
-                    {note.content || "暂无内容摘要"}
-                  </p>
-                </Link>
-              ))}
+      {/* Recruitment Section */}
+      <section id="recruitment" className="py-20 bg-white">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">招新信息</h2>
+          <div className="bg-gradient-to-br from-[#9e1b32] to-[#7a1527] rounded-xl shadow-lg p-8 text-white">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+              <div>
+                <h3 className="text-2xl font-bold mb-4">加入我们</h3>
+                <p className="text-white/90 mb-6 leading-relaxed">
+                  无论你是辩论新手还是经验丰富的辩手，物理学院辩论队都欢迎你的加入！在这里，你将收获逻辑思维、表达能力和一群志同道合的朋友。
+                </p>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <span className="text-white/70">招新时间：</span>
+                    <span>每年9月</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-white/70">报名方式：</span>
+                    <span>扫码加入招新群</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-48 h-48 bg-white rounded-lg flex items-center justify-center mb-4">
+                  <span className="text-gray-400 text-sm">招新群二维码</span>
+                </div>
+                <p className="text-white/70 text-sm">QQ群：123456789</p>
+              </div>
             </div>
-          )}
+          </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-8">
-        <div className="max-w-6xl mx-auto px-4 text-center text-gray-500">
-          <p>© 2026 华中科技大学物理学院辩论队</p>
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div>
+              <h4 className="font-bold text-lg mb-4">联系我们</h4>
+              <p className="text-gray-400 text-sm">公众号：华科物院辩论队</p>
+              <p className="text-gray-400 text-sm">邮箱：debate@hust.edu.cn</p>
+            </div>
+            <div>
+              <h4 className="font-bold text-lg mb-4">友情链接</h4>
+              <div className="space-y-2 text-sm">
+                <a href="#" className="block text-gray-400 hover:text-white transition-colors">华中科技大学</a>
+                <a href="#" className="block text-gray-400 hover:text-white transition-colors">物理学院</a>
+                <a href="#" className="block text-gray-400 hover:text-white transition-colors">校辩论队</a>
+              </div>
+            </div>
+            <div>
+              <h4 className="font-bold text-lg mb-4">快速入口</h4>
+              <Link href="/app" className="text-gray-400 hover:text-white transition-colors text-sm">
+                知识库 →
+              </Link>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm">
+            <p>© 2026 华中科技大学物理学院辩论队 版权所有</p>
+          </div>
         </div>
       </footer>
     </div>

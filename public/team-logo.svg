@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="48" fill="white" stroke="black" stroke-width="2"/>
+  <path d="M50 2 L50 98" stroke="black" stroke-width="2"/>
+  <text x="25" y="60" font-size="35" font-weight="bold" fill="black" text-anchor="middle">辩</text>
+  <text x="75" y="60" font-size="35" font-weight="bold" fill="black" text-anchor="middle">论</text>
+  <text x="50" y="35" font-size="20" font-weight="bold" fill="#9e1b32" text-anchor="middle">HUST</text>
+</svg>
