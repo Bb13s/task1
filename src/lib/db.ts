@@ -432,6 +432,9 @@ export function getFileById(id: number): FileRecord | undefined {
 
 // 获取所有公开文件
 export function getPublicFiles(): FileRecord[] {
+  // 确保读取最新数据（WAL 模式同步）
+  db.prepare('PRAGMA wal_checkpoint(TRUNCATE)').run();
+
   const stmt = db.prepare(
     'SELECT * FROM files WHERE is_public = 1 ORDER BY uploaded_at DESC'
   );
