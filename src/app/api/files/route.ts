@@ -132,7 +132,7 @@ export async function GET(request: NextRequest) {
 // 更新文件（公开/取消公开）
 export async function PATCH(request: NextRequest) {
   try {
-    const user = getCurrentUser();
+    const user = getCurrentUserFromCookies();
     if (!user) {
       return NextResponse.json(
         { error: '未登录' },
@@ -185,7 +185,7 @@ export async function PATCH(request: NextRequest) {
 // 删除文件
 export async function DELETE(request: NextRequest) {
   try {
-    const user = getCurrentUser();
+    const user = getCurrentUserFromCookies();
     if (!user) {
       return NextResponse.json(
         { error: '未登录' },
