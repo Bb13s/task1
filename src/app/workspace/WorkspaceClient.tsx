@@ -61,6 +61,15 @@ export default function WorkspaceClient({ initialFolders, initialNotes, initialF
     }
   }, []);
 
+  // 页面重新获得焦点时刷新文件列表（确保状态同步）
+  useEffect(() => {
+    const handleFocus = () => {
+      refreshFiles();
+    };
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [refreshFiles]);
+
   // 选中笔记（进入编辑模式）
   const handleSelectNote = useCallback((note: Note) => {
     const latestNote = notes.find(n => n.id === note.id);
