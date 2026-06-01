@@ -1,6 +1,10 @@
 import { getPublicNotes, getPublicFiles } from "@/lib/db";
 import Link from "next/link";
 
+// 禁用缓存，确保每次请求都获取最新数据
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default function ExplorePage() {
   let notes: any[] = [];
   let files: any[] = [];
