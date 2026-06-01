@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { unlink } from 'fs/promises';
 import path from 'path';
 import { cookies } from 'next/headers';
-import { getFilesByUploader, deleteFileRecord, getFileById, getFileByFilename, updateFilePublicStatus, getSessionById, getUserById, db } from '@/lib/db';
+import { getFilesByUploader, deleteFileRecord, getFileById, getFileByFilename, updateFilePublicStatus, getSessionById, getUserById, getPublicFiles, db } from '@/lib/db';
 import { readFile } from 'fs/promises';
 
 export const dynamic = 'force-dynamic';
@@ -42,6 +42,13 @@ export async function GET(request: NextRequest) {
     const author = searchParams.get('author');
     const filename = searchParams.get('filename');
     const fileId = searchParams.get('id');
+    const isPublic = searchParams.get('public');
+
+    // 获取公开文件列表（无需登录）
+    if (isPublic === 'true') {
+      const files = getPublicFiles();
+      return NextResponse.json({ files });
+    }
 
     // 如果提供了文件名，返回文件内容（下载）
     if (filename) {

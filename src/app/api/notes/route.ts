@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllNotes, createNote } from '@/lib/db';
+import { getAllNotes, createNote, getPublicNotes } from '@/lib/db';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
+    const isPublic = searchParams.get('public');
+
+    if (isPublic === 'true') {
+      const notes = getPublicNotes();
+      return NextResponse.json({ notes });
+    }
+
     const author = searchParams.get('author') || 'demo';
     const notes = getAllNotes(author);
     return NextResponse.json({ notes });
