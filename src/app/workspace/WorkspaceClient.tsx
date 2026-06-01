@@ -360,6 +360,10 @@ export default function WorkspaceClient({ initialFolders, initialNotes, initialF
       const data = await res.json();
       if (res.ok) {
         alert(data.message);
+        // 立即更新本地状态（像笔记一样）
+        setFiles(prev => prev.map(f =>
+          f.id === fileId ? { ...f, is_public: isPublic ? 1 : 0 } : f
+        ));
         await refreshFiles();
       } else {
         alert(data.error || '操作失败' + (data.debug ? JSON.stringify(data.debug) : ''));
