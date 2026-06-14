@@ -10,6 +10,7 @@ interface Segment {
   duration: number;
   side: 'pro' | 'con' | 'neutral';
   warn5s: boolean;
+  dualTimer?: boolean;
 }
 
 const STORAGE_KEY = 'timer-config';
@@ -49,6 +50,7 @@ const TEMPLATES: Record<string, { name: string; segments: Omit<Segment, 'id'>[] 
 
 export default function ConfigPage() {
   const router = useRouter();
+  const [matchName, setMatchName] = useState('');
   const [proName, setProName] = useState('正方');
   const [conName, setConName] = useState('反方');
   const [proTopic, setProTopic] = useState('');
@@ -63,6 +65,7 @@ export default function ConfigPage() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const data = JSON.parse(saved);
+        setMatchName(data.matchName || '');
         setProName(data.proName || '正方');
         setConName(data.conName || '反方');
         setProTopic(data.proTopic || '');
@@ -84,7 +87,7 @@ export default function ConfigPage() {
     const tmpl = TEMPLATES[key];
     if (!tmpl) return;
     const newSegments = tmpl.segments.map((s, i) => ({ ...s, id: nextId + i }));
-    const data = { proName, conName, proTopic, conTopic, segments: newSegments, autoNext, nextId: nextId + newSegments.length };
+    const data = { matchName, proName, conName, proTopic, conTopic, segments: newSegments, autoNext, nextId: nextId + newSegments.length };
     setSegments(newSegments);
     setNextId(nextId + newSegments.length);
     save(data);
@@ -96,21 +99,21 @@ export default function ConfigPage() {
     const newSegments = [...segments, newSeg];
     setSegments(newSegments);
     setNextId(nextId + 1);
-    save({ proName, conName, proTopic, conTopic, segments: newSegments, autoNext, nextId: nextId + 1 });
+    save({ matchName, proName, conName, proTopic, conTopic, segments: newSegments, autoNext, nextId: nextId + 1 });
   };
 
   // 删除环节
   const removeSegment = (id: number) => {
     const newSegments = segments.filter(s => s.id !== id);
     setSegments(newSegments);
-    save({ proName, conName, proTopic, conTopic, segments: newSegments, autoNext, nextId });
+    save({ matchName, proName, conName, proTopic, conTopic, segments: newSegments, autoNext, nextId });
   };
 
   // 更新环节
   const updateSegment = (id: number, field: keyof Segment, value: any) => {
     const newSegments = segments.map(s => s.id === id ? { ...s, [field]: value } : s);
     setSegments(newSegments);
-    save({ proName, conName, proTopic, conTopic, segments: newSegments, autoNext, nextId });
+    save({ matchName, proName, conName, proTopic, conTopic, segments: newSegments, autoNext, nextId });
   };
 
   // 上移/下移
@@ -120,7 +123,7 @@ export default function ConfigPage() {
     if (target < 0 || target >= newSegments.length) return;
     [newSegments[index], newSegments[target]] = [newSegments[target], newSegments[index]];
     setSegments(newSegments);
-    save({ proName, conName, proTopic, conTopic, segments: newSegments, autoNext, nextId });
+    save({ matchName, proName, conName, proTopic, conTopic, segments: newSegments, autoNext, nextId });
   };
 
   // 提交
@@ -129,7 +132,7 @@ export default function ConfigPage() {
       alert('请至少添加一个比赛环节');
       return;
     }
-    save({ proName, conName, proTopic, conTopic, segments, autoNext, nextId, autoNext });
+    save({ matchName, proName, conName, proTopic, conTopic, segments, autoNext, nextId });
     router.push('/timer/run');
   };
 
@@ -147,7 +150,19 @@ export default function ConfigPage() {
 
         {/* 对阵双方 */}
         <section className="bg-white/5 rounded-xl p-6 mb-6 border border-gray-800">
-          <h2 className="text-xl font-bold mb-4">对阵双方与辩题</h2>
+          <h2 className="text-xl font-bold mb-4">赛事信息</h2>
+
+          <div className="mb-4">
+            <label className="block text-sm text-gray-400 mb-1">赛事名称</label>
+            <input
+              value={matchName}
+              onChange={e => { setMatchName(e.target.value); save({ matchName: e.target.value, proName, conName, proTopic, conTopic, segments, autoNext, nextId }); }}
+              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+              placeholder="如：银卡赛华科队内选拔赛"
+            />
+          </div>
+
+          <h3 className="text-lg font-semibold mb-3">对阵双方与辩题</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm text-gray-400 mb-1">正方队伍名</label>
@@ -232,9 +247,13 @@ export default function ConfigPage() {
                   <option value="con">反方</option>
                   <option value="neutral">中立</option>
                 </select>
-                <label className="flex items-center gap-1 text-xs text-gray-400">
+                <label className="flex items-center gap-1 text-xs text-gray-400 whitespace-nowrap">
                   <input type="checkbox" checked={seg.warn5s} onChange={e => updateSegment(seg.id, 'warn5s', e.target.checked)} />
                   5秒
+                </label>
+                <label className="flex items-center gap-1 text-xs text-[#6d28d9] whitespace-nowrap">
+                  <input type="checkbox" checked={seg.dualTimer || false} onChange={e => updateSegment(seg.id, 'dualTimer', e.target.checked)} />
+                  双方计时
                 </label>
                 <button onClick={() => removeSegment(seg.id)} className="text-red-400 hover:text-red-300 text-lg">✕</button>
               </div>
@@ -252,7 +271,7 @@ export default function ConfigPage() {
         {/* 自动切换选项 */}
         <section className="bg-white/5 rounded-xl p-6 mb-6 border border-gray-800">
           <label className="flex items-center gap-3">
-            <input type="checkbox" checked={autoNext} onChange={e => { setAutoNext(e.target.checked); save({ proName, conName, proTopic, conTopic, segments, autoNext: e.target.checked, nextId }); }} />
+            <input type="checkbox" checked={autoNext} onChange={e => { setAutoNext(e.target.checked); save({ matchName, proName, conName, proTopic, conTopic, segments, autoNext: e.target.checked, nextId }); }} />
             <span className="text-sm">当前环节结束后自动进入下一环节</span>
           </label>
         </section>
