@@ -175,7 +175,7 @@ export default function DebateTeamHomePage() {
       <footer className="bg-[#0f172a] text-white py-12">
         <div className="max-w-6xl mx-auto px-4">
           <div className="max-w-md mx-auto mb-8">
-            <h4 className="font-bold text-white text-lg mb-5 text-center">辩论队自研功能</h4>
+            <h4 className="font-bold text-white text-lg mb-5 text-center">辩论队工具箱</h4>
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 href="/app"
