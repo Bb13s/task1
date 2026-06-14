@@ -42,11 +42,14 @@ export default function UserNav() {
         登录
       </Link>
       <Link
-        href="/register"
-        className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+        href="/login"
+        className="text-gray-600 hover:text-gray-900 px-3 py-2"
       >
-        注册
+        登录
       </Link>
+      <span className="bg-gray-300 text-gray-500 px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed">
+        注册已关闭
+      </span>
     </div>
   );
 }

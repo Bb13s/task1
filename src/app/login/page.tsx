@@ -40,10 +40,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-[#9e1b32]/5 via-white to-[#6d28d9]/5 flex items-center justify-center">
       <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+          <div className="w-12 h-12 bg-gradient-to-br from-[#9e1b32] to-[#6d28d9] rounded-xl flex items-center justify-center mx-auto mb-4">
             <span className="text-white font-bold text-xl">N</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-800">登录 NoteHub</h1>
@@ -65,7 +65,7 @@ export default function LoginPage() {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#9e1b32] focus:border-transparent outline-none transition-all"
               placeholder="请输入用户名"
               required
             />
@@ -79,7 +79,7 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#9e1b32] focus:border-transparent outline-none transition-all"
               placeholder="请输入密码"
               required
             />
@@ -88,17 +88,14 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-2.5 bg-[#9e1b32] text-white rounded-lg hover:bg-[#7a1527] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? '登录中...' : '登录'}
           </button>
         </form>
 
         <div className="mt-6 text-center text-sm text-gray-500">
-          还没有账号？{' '}
-          <Link href="/register" className="text-purple-600 hover:text-purple-700 font-medium">
-            立即注册
-          </Link>
+          <span className="text-gray-400">账号注册功能已关闭</span>
         </div>
 
         <div className="mt-4 text-center">

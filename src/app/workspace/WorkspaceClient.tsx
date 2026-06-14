@@ -384,17 +384,17 @@ export default function WorkspaceClient({ initialFolders, initialNotes, initialF
           >
             {isSidebarCollapsed ? '☰' : '←'}
           </button>
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+          <Link href="/app" className="flex items-center gap-2">
+            <div className="w-7 h-7 bg-gradient-to-br from-[#9e1b32] to-[#6d28d9] rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xs">N</span>
             </div>
             <span className="font-bold text-lg text-gray-800">NoteHub</span>
           </Link>
         </div>
         <nav className="flex items-center gap-4 text-sm">
-          <Link href="/" className="text-gray-600 hover:text-gray-900">首页</Link>
+          <Link href="/app" className="text-gray-600 hover:text-gray-900">首页</Link>
           <Link href="/explore" className="text-gray-600 hover:text-gray-900">广场</Link>
-          <Link href="/workspace" className="text-purple-600 font-medium">工作区</Link>
+          <Link href="/workspace" className="text-[#9e1b32] font-medium">工作区</Link>
           <div className="flex items-center gap-2 ml-4 pl-4 border-l border-gray-200">
             <span className="text-gray-700">👤 {currentUser.username}</span>
             <button
@@ -481,8 +481,8 @@ export default function WorkspaceClient({ initialFolders, initialNotes, initialF
                       onClick={handleTogglePreview}
                       className={`px-3 py-1.5 text-sm rounded transition-colors ${
                         showPreview
-                          ? 'bg-purple-600 text-white'
-                          : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+                          ? 'bg-[#9e1b32] text-white'
+                          : 'bg-[#9e1b32]/10 text-[#9e1b32] hover:bg-[#9e1b32]/20'
                       }`}
                       title={showPreview ? '关闭预览' : '开启预览'}
                     >

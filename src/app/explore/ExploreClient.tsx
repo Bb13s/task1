@@ -70,14 +70,14 @@ export default function ExploreClient() {
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-[#9e1b32] to-[#6d28d9] rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">N</span>
             </div>
             <span className="font-bold text-xl text-gray-800">NoteHub</span>
           </div>
           <nav className="flex gap-4">
-            <Link href="/" className="text-gray-600 hover:text-gray-900">首页</Link>
-            <Link href="/explore" className="text-purple-600 font-medium">广场</Link>
+            <Link href="/app" className="text-gray-600 hover:text-gray-900">首页</Link>
+            <Link href="/explore" className="text-[#9e1b32] font-medium">广场</Link>
             <Link href="/workspace" className="text-gray-600 hover:text-gray-900">工作区</Link>
           </nav>
         </div>
@@ -184,7 +184,7 @@ export default function ExploreClient() {
                   </div>
 
                   <div className="mt-4 pt-4 border-t border-gray-100">
-                    <span className="text-purple-600 text-sm font-medium">
+                    <span className="text-[#9e1b32] text-sm font-medium">
                       点击下载 →
                     </span>
                   </div>

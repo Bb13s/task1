@@ -10,7 +10,7 @@ export default function DebateTeamHomePage() {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100">
               <Image
-                src="/team-logo.svg"
+                src="/team-logo.png"
                 alt="辩论队队徽"
                 width={40}
                 height={40}
@@ -24,8 +24,8 @@ export default function DebateTeamHomePage() {
             <a href="#gallery" className="text-gray-600 hover:text-[#9e1b32] transition-colors">队伍风采</a>
             <a href="#achievements" className="text-gray-600 hover:text-[#9e1b32] transition-colors">赛事成绩</a>
             <a href="#recruitment" className="text-gray-600 hover:text-[#9e1b32] transition-colors">招新信息</a>
-            <Link href="/app" className="text-gray-400 hover:text-gray-600 transition-colors text-xs">
-              知识库
+            <Link href="/hall-of-fame" className="text-gray-600 hover:text-[#9e1b32] transition-colors">
+              辩论名人堂
             </Link>
           </nav>
         </div>
@@ -34,10 +34,11 @@ export default function DebateTeamHomePage() {
       {/* Hero Section */}
       <section className="relative h-[600px] flex items-center justify-center overflow-hidden">
         {/* Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#9e1b32]/10 via-white to-gray-100">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#9e1b32]/10 via-[#6d28d9]/5 to-gray-100">
           {/* Abstract geometric shapes */}
           <div className="absolute top-20 left-10 w-64 h-64 bg-[#9e1b32]/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#9e1b32]/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#6d28d9]/5 rounded-full blur-3xl"></div>
+          <div className="absolute top-40 right-20 w-48 h-48 bg-[#9e1b32]/5 rounded-full blur-3xl"></div>
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-[#9e1b32]/10 rounded-full"></div>
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-[#9e1b32]/10 rounded-full"></div>
         </div>
@@ -171,26 +172,16 @@ export default function DebateTeamHomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-[#0f172a] text-white py-12">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-            <div>
-              <h4 className="font-bold text-lg mb-4">联系我们</h4>
-              <p className="text-gray-400 text-sm">公众号：华科物院辩论队</p>
-              <p className="text-gray-400 text-sm">邮箱：debate@hust.edu.cn</p>
-            </div>
-            <div>
-              <h4 className="font-bold text-lg mb-4">友情链接</h4>
-              <div className="space-y-2 text-sm">
-                <a href="#" className="block text-gray-400 hover:text-white transition-colors">华中科技大学</a>
-                <a href="#" className="block text-gray-400 hover:text-white transition-colors">物理学院</a>
-                <a href="#" className="block text-gray-400 hover:text-white transition-colors">校辩论队</a>
-              </div>
-            </div>
-            <div>
-              <h4 className="font-bold text-lg mb-4">快速入口</h4>
-              <Link href="/app" className="text-gray-400 hover:text-white transition-colors text-sm">
-                知识库 →
+          <div className="max-w-md mx-auto mb-8">
+            <h4 className="font-bold text-white text-lg mb-5 text-center">辩论队自研功能</h4>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link
+                href="/app"
+                className="inline-flex items-center gap-2 px-5 py-3 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-medium transition-all"
+              >
+                <span className="text-lg">📚</span> 知识库
               </Link>
             </div>
           </div>
