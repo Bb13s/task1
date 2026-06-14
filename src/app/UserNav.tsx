@@ -25,7 +25,7 @@ export default function UserNav() {
   if (user) {
     return (
       <Link
-        href="/workspace"
+        href="/notehub/workspace"
         className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
       >
         进入工作区
@@ -36,13 +36,13 @@ export default function UserNav() {
   return (
     <div className="flex items-center gap-2">
       <Link
-        href="/login"
+        href="/notehub/login"
         className="text-gray-600 hover:text-gray-900 px-3 py-2"
       >
         登录
       </Link>
       <Link
-        href="/login"
+        href="/notehub/login"
         className="text-gray-600 hover:text-gray-900 px-3 py-2"
       >
         登录

@@ -33,8 +33,8 @@ export default function NoteDetailPage({ params }: NotePageProps) {
           </div>
           <nav className="flex gap-4">
             <Link href="/" className="text-gray-600 hover:text-gray-900">首页</Link>
-            <Link href="/explore" className="text-gray-600 hover:text-gray-900">广场</Link>
-            <Link href="/workspace" className="text-purple-600 font-medium">工作区</Link>
+            <Link href="/notehub/explore" className="text-gray-600 hover:text-gray-900">广场</Link>
+            <Link href="/notehub/workspace" className="text-purple-600 font-medium">工作区</Link>
           </nav>
         </div>
       </header>
@@ -86,14 +86,14 @@ export default function NoteDetailPage({ params }: NotePageProps) {
 
         <div className="mt-6 flex items-center justify-center gap-4">
           <Link
-            href="/explore"
+            href="/notehub/explore"
             className="text-purple-600 hover:text-purple-700 font-medium"
           >
             ← 返回广场
           </Link>
           <span className="text-gray-300">|</span>
           <Link
-            href={`/workspace?note=${note.id}`}
+            href={`/notehub/workspace?note=${note.id}`}
             className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 font-medium"
           >
             ✏️ 在工作区编辑

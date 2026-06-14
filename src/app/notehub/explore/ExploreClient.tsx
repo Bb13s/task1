@@ -76,9 +76,9 @@ export default function ExploreClient() {
             <span className="font-bold text-xl text-gray-800">NoteHub</span>
           </div>
           <nav className="flex gap-4">
-            <Link href="/app" className="text-gray-600 hover:text-gray-900">首页</Link>
-            <Link href="/explore" className="text-[#9e1b32] font-medium">广场</Link>
-            <Link href="/workspace" className="text-gray-600 hover:text-gray-900">工作区</Link>
+            <Link href="/notehub" className="text-gray-600 hover:text-gray-900">首页</Link>
+            <Link href="/notehub/explore" className="text-[#9e1b32] font-medium">广场</Link>
+            <Link href="/notehub/workspace" className="text-gray-600 hover:text-gray-900">工作区</Link>
           </nav>
         </div>
       </header>

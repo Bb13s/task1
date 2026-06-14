@@ -27,7 +27,7 @@ export default function LoginPage() {
 
       if (res.ok) {
         // 登录成功，跳转到工作区
-        router.push('/workspace');
+        router.push('/notehub/workspace');
         router.refresh();
       } else {
         setError(data.error || '登录失败');
