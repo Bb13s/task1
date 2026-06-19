@@ -1,0 +1,31 @@
+# 辩论智能体 — 系统配置
+
+deepseek:
+  model: "deepseek-v4-flash"
+  temperature: 0.8          # 辩论需要一定随机性
+  max_tokens: 512           # 一次回复最长
+  timeout: 30               # API 超时秒数
+
+debate:
+  free_debate:
+    max_rounds: 0           # 0 = 无限轮
+  formal_debate:
+    opening_turns: 1
+    rebuttal_turns: 1
+    free_debate_minutes: 3
+    closing_turns: 1
+
+session:
+  idle_timeout_minutes: 60  # 超过 60 分钟无消息 → 辩论自动结束
+  max_messages: 200         # 单场最多消息数
+
+reply:
+  split_by: "sentence"      # 拆条方式：sentence / paragraph / comma
+  split_delay: 0.8          # 拆条间隔秒数
+  max_splits: 5             # 最多拆成几条
+
+paths:
+  character_data: "app/character_data"
+  debates: "app/data/debates"
+  knowledge_base: "app/knowledge_base"
+  knowledge_data: "app/data/knowledge"

@@ -195,6 +195,14 @@ export default function HallOfFamePage() {
               >
                 <span className="text-lg">⏱</span> 辩论计时器
               </Link>
+              <a
+                href="http://139.155.142.76:8000"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-3 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-medium transition-all"
+              >
+                <span className="text-lg">🤖</span> AI 辩手
+              </a>
             </div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm">

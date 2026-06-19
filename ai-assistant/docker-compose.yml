@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  debate-ai:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      # 持久化数据（辩论记录、知识库索引）
+      - ./app/data:/app/app/data
+      # 热更新（知识库文件改了自动生效）
+      - ./app/knowledge_base:/app/app/knowledge_base
+      # 角色配置（切换角色不用重建容器）
+      - ./app/character_data:/app/app/character_data
+      - ./app/config/characters:/app/app/config/characters
+    env_file:
+      - .env
+    restart: unless-stopped

@@ -32,7 +32,7 @@ export default function NoteDetailPage({ params }: NotePageProps) {
             <span className="font-bold text-xl text-gray-800">NoteHub</span>
           </div>
           <nav className="flex gap-4">
-            <Link href="/" className="text-gray-600 hover:text-gray-900">首页</Link>
+            <Link href="/notehub" className="text-gray-600 hover:text-gray-900">首页</Link>
             <Link href="/notehub/explore" className="text-gray-600 hover:text-gray-900">广场</Link>
             <Link href="/notehub/workspace" className="text-purple-600 font-medium">工作区</Link>
           </nav>

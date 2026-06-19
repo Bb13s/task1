@@ -1,0 +1,11 @@
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+httpx>=0.27.0
+pyyaml>=6.0
+python-dotenv>=1.0
+jinja2>=3.1
+aiofiles>=23.0
+watchfiles>=0.21.0
+# 可选：安装后启用语义搜索
+# chromadb>=0.5.0
+# sentence-transformers>=2.7.0

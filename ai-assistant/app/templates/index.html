@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}辩论 AI - 徐经纬{% endblock %}
+
+{% block content %}
+<!-- ── 设置页面 ── -->
+<div id="setup-screen" class="screen">
+    <div class="setup-card">
+        <h1>辩论 AI</h1>
+        <p class="subtitle">选好辩题和立场，开始对练</p>
+
+        <div class="form-group">
+            <label>你的名字</label>
+            <input type="text" id="user-name" placeholder="输入你的名字" value="">
+        </div>
+
+        <div id="debate-fields">
+            <div class="form-group">
+                <label>辩题</label>
+                <input type="text" id="motion" value="" placeholder="输入辩题（闲聊模式不需要）">
+            </div>
+
+            <div class="form-group">
+                <label>你的立场</label>
+                <div class="side-selector">
+                    <button class="side-btn active" data-side="正方">正方</button>
+                    <button class="side-btn" data-side="反方">反方</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>模式</label>
+            <div class="mode-selector">
+                <button class="mode-btn active" data-mode="free">自由辩论</button>
+                <button class="mode-btn" data-mode="chat">闲聊</button>
+            </div>
+        </div>
+
+        <button id="start-btn" class="btn-primary">开始辩论</button>
+    </div>
+</div>
+
+<!-- ── 辩论页面 ── -->
+<div id="debate-screen" class="screen" style="display:none">
+    <div class="debate-container">
+        <!-- 头部 -->
+        <div class="debate-header">
+            <div class="header-left">
+                <span class="round-badge" id="round-label">自由辩论</span>
+                <span id="debate-info"></span>
+            </div>
+            <div class="header-right">
+                <a href="/admin" class="btn-sm" style="text-decoration:none">管理</a>
+                <button class="btn-sm" id="feedback-btn">请求点评</button>
+                <button class="btn-sm" id="back-btn" style="display:none">返回设置</button>
+                <button class="btn-sm btn-danger" id="end-btn">结束辩论</button>
+            </div>
+        </div>
+
+        <!-- 消息区 -->
+        <div class="messages" id="messages">
+            <div class="system-msg">连接中...</div>
+        </div>
+
+        <!-- 输入区 -->
+        <div class="input-area">
+            <input type="text" id="msg-input" placeholder="输入你的辩论内容..." autocomplete="off">
+            <button id="send-btn">发送</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

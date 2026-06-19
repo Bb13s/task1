@@ -40,3 +40,7 @@ next-env.d.ts
 
 # local database
 /data
+
+# ai-assistant
+/ai-assistant/.env
+/ai-assistant/**/__pycache__

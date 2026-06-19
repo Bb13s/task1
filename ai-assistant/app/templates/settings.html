@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}管理面板 - 辩论 AI{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>管理面板</h1>
+        <a href="/" class="btn-sm">← 返回辩论</a>
+    </div>
+
+    <!-- 角色切换 -->
+    <div class="admin-section">
+        <h2>当前角色</h2>
+        <div class="char-list" id="char-list">
+            <span>加载中...</span>
+        </div>
+    </div>
+
+    <!-- 知识库状态 -->
+    <div class="admin-section">
+        <h2>知识库</h2>
+        <div id="kb-stats">加载中...</div>
+        <div id="kb-docs"></div>
+    </div>
+
+    <!-- 辩论存档 -->
+    <div class="admin-section">
+        <h2>过往辩论存档</h2>
+        <div id="debate-list">加载中...</div>
+        <div id="debate-detail" style="display:none"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/admin.js"></script>
+{% endblock %}
