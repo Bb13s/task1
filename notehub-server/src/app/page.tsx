@@ -88,7 +88,7 @@ export default function AppPage() {
             <span className="font-bold text-xl text-gray-800">NoteHub</span>
           </div>
           <nav className="flex items-center gap-4">
-            <a href="http://139.155.142.76:3000" className="text-gray-600 hover:text-gray-900 text-sm">← 返回官网</a>
+            <a href={process.env.NEXT_PUBLIC_MAIN_SITE_URL || "/"} className="text-gray-600 hover:text-gray-900 text-sm">← 返回官网</a>
             <Link href="/" className="text-[#9e1b32] font-medium">首页</Link>
             {user ? (
               <>
