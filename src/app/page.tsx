@@ -178,7 +178,7 @@ export default function DebateTeamHomePage() {
             <h4 className="font-bold text-white text-lg mb-5 text-center">辩论队工具箱</h4>
             <div className="flex flex-wrap justify-center gap-4">
               <a
-                href="http://139.155.142.76:6000"
+                href="http://139.155.142.76:6001"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-5 py-3 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-medium transition-all"
