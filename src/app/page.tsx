@@ -177,12 +177,14 @@ export default function DebateTeamHomePage() {
           <div className="max-w-md mx-auto mb-8">
             <h4 className="font-bold text-white text-lg mb-5 text-center">辩论队工具箱</h4>
             <div className="flex flex-wrap justify-center gap-4">
-              <Link
-                href="/notehub"
+              <a
+                href="http://139.155.142.76:6000"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-5 py-3 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-medium transition-all"
               >
                 <span className="text-lg">📚</span> 知识库
-              </Link>
+              </a>
               <Link
                 href="/timer"
                 className="inline-flex items-center gap-2 px-5 py-3 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-medium transition-all"

@@ -22,7 +22,7 @@ export default function RegisterPage() {
 
         <div className="mt-6 text-center">
           <Link
-            href="/notehub/login"
+            href="/login"
             className="inline-block w-full py-2.5 bg-[#9e1b32] text-white rounded-lg hover:bg-[#7a1527] transition-colors font-medium"
           >
             前往登录

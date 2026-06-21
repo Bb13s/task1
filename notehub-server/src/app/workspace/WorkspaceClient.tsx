@@ -384,7 +384,7 @@ export default function WorkspaceClient({ initialFolders, initialNotes, initialF
           >
             {isSidebarCollapsed ? '☰' : '←'}
           </button>
-          <Link href="/notehub" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <div className="w-7 h-7 bg-gradient-to-br from-[#9e1b32] to-[#6d28d9] rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xs">N</span>
             </div>
@@ -392,9 +392,9 @@ export default function WorkspaceClient({ initialFolders, initialNotes, initialF
           </Link>
         </div>
         <nav className="flex items-center gap-4 text-sm">
-          <Link href="/notehub" className="text-gray-600 hover:text-gray-900">首页</Link>
-          <Link href="/notehub/explore" className="text-gray-600 hover:text-gray-900">广场</Link>
-          <Link href="/notehub/workspace" className="text-[#9e1b32] font-medium">工作区</Link>
+          <Link href="/" className="text-gray-600 hover:text-gray-900">首页</Link>
+          <Link href="/explore" className="text-gray-600 hover:text-gray-900">广场</Link>
+          <Link href="/workspace" className="text-[#9e1b32] font-medium">工作区</Link>
           <div className="flex items-center gap-2 ml-4 pl-4 border-l border-gray-200">
             <span className="text-gray-700">👤 {currentUser.username}</span>
             <button

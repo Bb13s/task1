@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { initDb, seedData, initUserTables } from "@/lib/db";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -22,24 +21,6 @@ export const metadata: Metadata = {
     apple: "/favicon.svg",
   },
 };
-
-try {
-  initDb();
-} catch (e) {
-  console.error('initDb error:', e);
-}
-
-try {
-  seedData();
-} catch (e) {
-  console.error('seedData error:', e);
-}
-
-try {
-  initUserTables();
-} catch (e) {
-  console.error('initUserTables error:', e);
-}
 
 export default function RootLayout({
   children,

@@ -88,12 +88,12 @@ export default function AppPage() {
             <span className="font-bold text-xl text-gray-800">NoteHub</span>
           </div>
           <nav className="flex items-center gap-4">
-            <Link href="/" className="text-gray-600 hover:text-gray-900 text-sm">← 返回官网</Link>
-            <Link href="/notehub" className="text-[#9e1b32] font-medium">首页</Link>
+            <a href="http://139.155.142.76:3000" className="text-gray-600 hover:text-gray-900 text-sm">← 返回官网</a>
+            <Link href="/" className="text-[#9e1b32] font-medium">首页</Link>
             {user ? (
               <>
-                <Link href="/notehub/explore" className="text-gray-600 hover:text-gray-900">广场</Link>
-                <Link href="/notehub/workspace" className="text-gray-600 hover:text-gray-900">工作区</Link>
+                <Link href="/explore" className="text-gray-600 hover:text-gray-900">广场</Link>
+                <Link href="/workspace" className="text-gray-600 hover:text-gray-900">工作区</Link>
               </>
             ) : null}
             <div className="w-px h-4 bg-gray-300"></div>
@@ -118,13 +118,13 @@ export default function AppPage() {
           {user ? (
             <div className="flex items-center justify-center gap-4">
               <Link
-                href="/notehub/workspace"
+                href="/workspace"
                 className="bg-[#9e1b32] text-white px-8 py-3 rounded-xl hover:bg-[#7a1527] transition-colors font-medium text-lg"
               >
                 开始使用
               </Link>
               <Link
-                href="/notehub/explore"
+                href="/explore"
                 className="bg-white text-[#9e1b32] border-2 border-[#9e1b32] px-8 py-3 rounded-xl hover:bg-[#9e1b32]/5 transition-colors font-medium text-lg"
               >
                 浏览广场
@@ -164,7 +164,7 @@ export default function AppPage() {
             <div className="max-w-6xl mx-auto">
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-2xl font-bold text-gray-900">最新公开笔记</h2>
-                <Link href="/notehub/explore" className="text-[#9e1b32] hover:text-[#7a1527] font-medium">
+                <Link href="/explore" className="text-[#9e1b32] hover:text-[#7a1527] font-medium">
                   查看全部 →
                 </Link>
               </div>
@@ -176,7 +176,7 @@ export default function AppPage() {
                   {recentNotes.map((note) => (
                     <Link
                       key={note.id}
-                      href={`/notehub/notes/${note.id}`}
+                      href={`/notes/${note.id}`}
                       className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow block"
                     >
                       <h3 className="font-semibold text-lg text-gray-800 mb-2 line-clamp-1">

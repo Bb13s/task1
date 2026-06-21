@@ -32,7 +32,7 @@ export default function WorkspacePage({ searchParams }: WorkspacePageProps) {
 
   // 未登录，重定向到登录页
   if (!user) {
-    redirect('/notehub/login');
+    redirect('/login');
   }
 
   // 确保种子数据已插入
