@@ -105,8 +105,11 @@ class Dispatcher:
             state["feedback_requested"] = False
             return await self._handle_feedback(debate_id, user_id, state, adapter)
 
-        # ── 5. 构建人格 prompt ──
-        character_prompt = self.character_engine.build_character_prompt(debate_context)
+        # ── 5. 构建人格 prompt（闲聊和辩论用不同的人格指令）──
+        if state["mode"] == "chat":
+            character_prompt = self.character_engine.build_chat_prompt()
+        else:
+            character_prompt = self.character_engine.build_character_prompt(debate_context)
 
         # ── 6. 获取历史 ──
         history = self.session_manager.get_history(debate_id, last_n=20)

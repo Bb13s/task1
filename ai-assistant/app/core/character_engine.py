@@ -93,6 +93,64 @@ class CharacterEngine:
 
         return "\n".join(parts)
 
+    def build_chat_prompt(self) -> str:
+        """构建闲聊模式的人格指令块 —— 比辩论模式更放松、更像真人。"""
+        cfg = self.config
+        chat_cfg = cfg.get("chat_style", {})
+        style = cfg.get("style", {})
+
+        parts = []
+
+        # ── 身份 ──
+        parts.append(f"[你是 {cfg['name']}]")
+
+        # ── 闲聊风格（优先使用 chat_style）──
+        if chat_cfg:
+            parts.append(f"你现在不在辩论场上。你在跟朋友聊天。")
+            parts.append(f"说话风格：{chat_cfg.get('tone', '')} 句子{chat_cfg.get('sentence_length', '自然随意')}。")
+
+            natural = chat_cfg.get("natural_traits", [])
+            if natural:
+                parts.append("聊天时的自然习惯（不是硬性要求，是你本来就这样的）：")
+                for t in natural:
+                    parts.append(f"- {t}")
+
+            relaxed = chat_cfg.get("relaxed_rules", [])
+            if relaxed:
+                parts.append("聊天时的语言：")
+                for r in relaxed:
+                    parts.append(f"- {r}")
+
+            opening = chat_cfg.get("opening_style", "")
+            if opening:
+                parts.append(f"回答方式：{opening}")
+
+            chat_forbidden = chat_cfg.get("chat_forbidden", [])
+            if chat_forbidden:
+                parts.append("聊天中绝对不要做：")
+                for f in chat_forbidden:
+                    parts.append(f"- {f}")
+        else:
+            # 没有 chat_style 配置时，降级为简化的辩论风格
+            parts.append(f"说话风格：{style.get('tone', '')}。但你现在在闲聊，放松一点说话。")
+
+        # ── 人设描述（帮助 AI 理解这个人的完整形象）──
+        if self._persona_text:
+            parts.append(f"\n[关于你这个人]\n{self._persona_text[:1000]}")
+
+        # ── 口头禅（只取部分，不要太多）──
+        if self._phrases:
+            parts.append(f"\n[你常用的表达方式]\n{self._phrases[:500]}")
+
+        # ── 真实发言片段（精选 1-2 段作为语言风格参考）──
+        if self._speeches:
+            parts.append("\n[以下是你真实的说话风格参考——不是要你在闲聊中辩论，而是感受你的语感和思维节奏]")
+            for i, speech in enumerate(self._speeches[:2]):
+                snippet = speech[:400]
+                parts.append(f"\n--- 你的真实语言片段 #{i+1} ---\n{snippet}")
+
+        return "\n".join(parts)
+
     def get_style_constraints(self) -> dict:
         """返回需要传给 reply_engine 的风格约束。"""
         return {
