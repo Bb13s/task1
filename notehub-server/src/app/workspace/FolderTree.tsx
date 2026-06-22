@@ -404,7 +404,7 @@ export default function FolderTree({
             draggable
             onDragStart={(e) => handleDragStart(e, note.id)}
             className={`flex items-center gap-1 px-2 py-1.5 cursor-pointer hover:bg-gray-100 rounded-md mx-2 ${
-              selectedNoteId === note.id ? 'bg-[#9e1b32]/10 text-[#9e1b32] font-medium' : ''
+              selectedNoteId === note.id ? 'text-[#9e1b32] font-medium' : ''
             }`}
             style={{ paddingLeft: `${(level + 1) * 12 + 8}px` }}
             onClick={(e) => {
@@ -426,7 +426,7 @@ export default function FolderTree({
           <div
             key={file.id}
             className={`flex items-center gap-1 px-2 py-1.5 cursor-pointer hover:bg-gray-100 rounded-md mx-2 group ${
-              selectedFileId === file.id ? 'bg-[#9e1b32]/10 text-[#9e1b32]' : ''
+              selectedFileId === file.id ? 'text-[#9e1b32]' : ''
             }`}
             style={{ paddingLeft: `${(level + 1) * 12 + 8}px` }}
             onClick={(e) => {
