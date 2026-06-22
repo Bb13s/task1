@@ -6,6 +6,7 @@ import FolderTree from './FolderTree';
 import MarkdownPreview from './MarkdownPreview';
 import SimpleEditor from './SimpleEditor';
 import FilePreview from './FilePreview';
+import AlbumSelector from './AlbumSelector';
 import { Note, FileRecord, User } from '@/lib/db';
 import JSZip from 'jszip';
 
@@ -395,6 +396,7 @@ export default function WorkspaceClient({ initialFolders, initialNotes, initialF
           <Link href="/" className="text-gray-600 hover:text-gray-900">首页</Link>
           <Link href="/explore" className="text-gray-600 hover:text-gray-900">广场</Link>
           <Link href="/workspace" className="text-[#9e1b32] font-medium">工作区</Link>
+          <Link href="/admin/albums" className="text-gray-400 hover:text-gray-600">管理</Link>
           <div className="flex items-center gap-2 ml-4 pl-4 border-l border-gray-200">
             <span className="text-gray-700">👤 {currentUser.username}</span>
             <button
@@ -490,7 +492,7 @@ export default function WorkspaceClient({ initialFolders, initialNotes, initialF
                     </button>
                     <button
                       onClick={handleDownloadNote}
-                      className="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+                      className="px-3 py-1.5 text-sm bg-[#9e1b32]/10 text-[#9e1b32] rounded hover:bg-[#9e1b32]/20 transition-colors"
                       title="下载为 Markdown 文件"
                     >
                       ⬇️ 下载
@@ -499,6 +501,25 @@ export default function WorkspaceClient({ initialFolders, initialNotes, initialF
                 </div>
                 <div className="flex items-center gap-2 mt-1 text-xs text-gray-400">
                   <span>📁 {editingNote.folder_path}</span>
+                  <span>•</span>
+                  <span className="flex items-center gap-1">
+                    📂 <AlbumSelector
+                      value={editingNote.album_id ?? null}
+                      onChange={async (albumId) => {
+                        try {
+                          await fetch(`/api/notes/${editingNote.id}`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ album_id: albumId }),
+                          });
+                          setNotes(prev => prev.map(n =>
+                            n.id === editingNote.id ? { ...n, album_id: albumId } : n
+                          ));
+                          setEditingNote(prev => prev ? { ...prev, album_id: albumId } : null);
+                        } catch {}
+                      }}
+                    />
+                  </span>
                   <span>•</span>
                   <span className={`
                     ${saveStatus === 'saved' ? 'text-green-600' : ''}

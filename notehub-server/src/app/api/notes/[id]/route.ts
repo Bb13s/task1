@@ -8,13 +8,14 @@ export async function PATCH(
   try {
     const id = parseInt(params.id);
     const body = await request.json();
-    const { title, content, folder_path, is_public } = body;
+    const { title, content, folder_path, is_public, album_id } = body;
 
-    const updates: Partial<{ title: string; content: string; folder_path: string; is_public: number }> = {};
+    const updates: Partial<{ title: string; content: string; folder_path: string; is_public: number; album_id: number | null }> = {};
     if (title !== undefined) updates.title = title;
     if (content !== undefined) updates.content = content;
     if (folder_path !== undefined) updates.folder_path = folder_path;
     if (is_public !== undefined) updates.is_public = is_public;
+    if (album_id !== undefined) updates.album_id = album_id;
 
     const success = updateNote(id, updates, 'demo');
     if (success) {

@@ -39,6 +39,8 @@ export async function POST(request: NextRequest) {
     const noteId = formData.get('noteId') as string | null;
     const folderPath = (formData.get('folderPath') as string) || '/';
     const isPublic = formData.get('isPublic') === '1';
+    const albumIdStr = formData.get('albumId') as string | null;
+    const albumId = albumIdStr ? parseInt(albumIdStr) : null;
 
     if (!file) {
       return NextResponse.json(
@@ -87,7 +89,8 @@ export async function POST(request: NextRequest) {
       user.username,
       folderPath,
       noteId ? parseInt(noteId) : null,
-      isPublic ? 1 : 0
+      isPublic ? 1 : 0,
+      albumId
     );
     console.log('File record created:', fileRecord);
 

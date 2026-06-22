@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { unlink } from 'fs/promises';
 import path from 'path';
 import { cookies } from 'next/headers';
-import { getFilesByUploader, deleteFileRecord, getFileById, getFileByFilename, updateFilePublicStatus, getSessionById, getUserById, getPublicFiles, db } from '@/lib/db';
+import { getFilesByUploader, deleteFileRecord, getFileById, getFileByFilename, updateFilePublicStatus, updateFileAlbumId, getSessionById, getUserById, getPublicFiles, db } from '@/lib/db';
 import { readFile } from 'fs/promises';
 
 export const dynamic = 'force-dynamic';
@@ -160,16 +160,21 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { is_public } = body;
+    const { is_public, album_id } = body;
 
-    if (is_public === undefined) {
-      return NextResponse.json(
-        { error: '缺少 is_public 参数' },
-        { status: 400 }
-      );
+    let success = false;
+    let message = '';
+
+    if (is_public !== undefined) {
+      success = updateFilePublicStatus(parseInt(fileId), is_public ? 1 : 0, user.username);
+      message = is_public ? '文件已公开到广场' : '文件已取消公开';
     }
 
-    const success = updateFilePublicStatus(parseInt(fileId), is_public ? 1 : 0, user.username);
+    if (album_id !== undefined) {
+      const albumSuccess = updateFileAlbumId(parseInt(fileId), album_id, user.username);
+      success = success || albumSuccess;
+      if (albumSuccess && !message) message = '专辑绑定已更新';
+    }
 
     if (!success) {
       return NextResponse.json(
@@ -180,7 +185,7 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: is_public ? '文件已公开到广场' : '文件已取消公开',
+      message: message || '更新成功',
     });
   } catch (error: any) {
     console.error('Update file error:', error);

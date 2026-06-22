@@ -73,6 +73,35 @@ export function initDb() {
   } catch (error) {
     console.error('Migration error:', error);
   }
+
+  // 迁移：albums 表 + album_id 字段
+  try {
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS albums (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL UNIQUE,
+        description TEXT,
+        created_at INTEGER DEFAULT (strftime('%s','now'))
+      );
+    `);
+
+    const noteCols = db.prepare('PRAGMA table_info(notes)').all() as { name: string }[];
+    if (!noteCols.some(c => c.name === 'album_id')) {
+      db.exec('ALTER TABLE notes ADD COLUMN album_id INTEGER REFERENCES albums(id)');
+      console.log('Added album_id to notes');
+    }
+
+    const fileCols = db.prepare('PRAGMA table_info(files)').all() as { name: string }[];
+    if (!fileCols.some(c => c.name === 'album_id')) {
+      db.exec('ALTER TABLE files ADD COLUMN album_id INTEGER REFERENCES albums(id)');
+      console.log('Added album_id to files');
+    }
+
+    db.exec('CREATE INDEX IF NOT EXISTS idx_notes_public_album ON notes(is_public, album_id)');
+    db.exec('CREATE INDEX IF NOT EXISTS idx_files_public_album ON files(is_public, album_id)');
+  } catch (error) {
+    console.error('Album migration error:', error);
+  }
 }
 
 export interface Note {
@@ -83,6 +112,7 @@ export interface Note {
   author: string;
   created_at: string;
   is_public: number;
+  album_id: number | null;
 }
 
 export interface Folder {
@@ -105,6 +135,14 @@ export interface FileRecord {
   uploaded_by: string;
   uploaded_at: string;
   is_public: number;
+  album_id: number | null;
+}
+
+export interface Album {
+  id: number;
+  name: string;
+  description: string | null;
+  created_at: number;
 }
 
 export function getPublicNotes(): Note[] {
@@ -328,11 +366,11 @@ export function createNote(
 
 export function updateNote(
   id: number,
-  updates: Partial<Pick<Note, 'title' | 'content' | 'folder_path' | 'is_public'>>,
+  updates: Partial<Pick<Note, 'title' | 'content' | 'folder_path' | 'is_public' | 'album_id'>>,
   author: string
 ): boolean {
   const fields: string[] = [];
-  const values: (string | number)[] = [];
+  const values: (string | number | null)[] = [];
 
   if (updates.title !== undefined) {
     fields.push('title = ?');
@@ -349,6 +387,10 @@ export function updateNote(
   if (updates.is_public !== undefined) {
     fields.push('is_public = ?');
     values.push(updates.is_public);
+  }
+  if (updates.album_id !== undefined) {
+    fields.push('album_id = ?');
+    values.push(updates.album_id);
   }
 
   if (fields.length === 0) return false;
@@ -379,12 +421,13 @@ export function createFileRecord(
   uploadedBy: string,
   folderPath: string = '/',
   noteId: number | null = null,
-  isPublic: number = 0
+  isPublic: number = 0,
+  albumId: number | null = null
 ): FileRecord {
   const stmt = db.prepare(
-    'INSERT INTO files (filename, original_name, mime_type, size, path, folder_path, uploaded_by, note_id, is_public) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    'INSERT INTO files (filename, original_name, mime_type, size, path, folder_path, uploaded_by, note_id, is_public, album_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
   );
-  const result = stmt.run(filename, originalName, mimeType, size, filePath, folderPath, uploadedBy, noteId, isPublic);
+  const result = stmt.run(filename, originalName, mimeType, size, filePath, folderPath, uploadedBy, noteId, isPublic, albumId);
   return {
     id: Number(result.lastInsertRowid),
     filename,
@@ -422,6 +465,14 @@ export function getFileByFilename(filename: string): FileRecord | undefined {
 export function deleteFileRecord(id: number, uploadedBy: string): boolean {
   const stmt = db.prepare('DELETE FROM files WHERE id = ? AND uploaded_by = ?');
   const result = stmt.run(id, uploadedBy);
+  return result.changes > 0;
+}
+
+export function updateFileAlbumId(id: number, albumId: number | null, uploadedBy: string): boolean {
+  const file = getFileById(id);
+  if (!file || file.uploaded_by !== uploadedBy) return false;
+  const stmt = db.prepare('UPDATE files SET album_id = ? WHERE id = ?');
+  const result = stmt.run(albumId, id);
   return result.changes > 0;
 }
 
@@ -516,6 +567,108 @@ export function migrateFilesTable() {
   } catch (error) {
     console.error('Files table migration error:', error);
   }
+}
+
+// ==================== Album Operations ====================
+
+export function getAllAlbums(): Album[] {
+  const stmt = db.prepare('SELECT * FROM albums ORDER BY name');
+  return stmt.all() as Album[];
+}
+
+export function createAlbum(name: string, description: string | null): Album {
+  const stmt = db.prepare('INSERT INTO albums (name, description) VALUES (?, ?)');
+  const result = stmt.run(name, description || null);
+  return {
+    id: Number(result.lastInsertRowid),
+    name,
+    description: description || null,
+    created_at: Math.floor(Date.now() / 1000),
+  };
+}
+
+export function updateAlbum(id: number, name: string, description: string | null): boolean {
+  const stmt = db.prepare('UPDATE albums SET name = ?, description = ? WHERE id = ?');
+  const result = stmt.run(name, description || null, id);
+  return result.changes > 0;
+}
+
+export function deleteAlbum(id: number): boolean {
+  const stmt = db.prepare('DELETE FROM albums WHERE id = ?');
+  const result = stmt.run(id);
+  if (result.changes > 0) {
+    db.prepare('UPDATE notes SET album_id = NULL WHERE album_id = ?').run(id);
+    db.prepare('UPDATE files SET album_id = NULL WHERE album_id = ?').run(id);
+    return true;
+  }
+  return false;
+}
+
+// ==================== Search ====================
+
+export interface SearchResultItem {
+  type: 'note' | 'pdf';
+  item_id: number;
+  title: string;
+  author: string;
+  album_name: string | null;
+  album_id: number | null;
+}
+
+export function searchExplore(
+  keyword: string | null,
+  albumId: number | null,
+  page: number,
+  pageSize: number
+): { items: SearchResultItem[]; total: number } {
+  let whereClause = '';
+  const params: (string | number | null)[] = [];
+
+  if (albumId !== null) {
+    whereClause += ' AND source.album_id = ?';
+    params.push(albumId);
+  }
+  if (keyword) {
+    whereClause += ' AND (source.title LIKE ? OR source.album_name LIKE ? OR source.author LIKE ?)';
+    const kw = `%${keyword}%`;
+    params.push(kw, kw, kw);
+  }
+
+  const countSql = `SELECT COUNT(*) as total FROM (
+    SELECT n.id, n.title, u.username AS author, a.name AS album_name, n.album_id
+    FROM notes n
+    LEFT JOIN users u ON n.author = u.username
+    LEFT JOIN albums a ON n.album_id = a.id
+    WHERE n.is_public = 1
+    UNION ALL
+    SELECT f.id, f.original_name, u.username, a.name AS album_name, f.album_id
+    FROM files f
+    LEFT JOIN users u ON f.uploaded_by = u.username
+    LEFT JOIN albums a ON f.album_id = a.id
+    WHERE f.is_public = 1
+  ) AS source WHERE 1=1${whereClause}`;
+
+  const countResult = db.prepare(countSql).get(...params) as { total: number };
+  const total = countResult.total;
+
+  const dataSql = `SELECT * FROM (
+    SELECT 'note' AS type, n.id AS item_id, n.title, u.username AS author, a.name AS album_name, n.album_id
+    FROM notes n
+    LEFT JOIN users u ON n.author = u.username
+    LEFT JOIN albums a ON n.album_id = a.id
+    WHERE n.is_public = 1
+    UNION ALL
+    SELECT 'pdf' AS type, f.id AS item_id, f.original_name AS title, u.username AS author, a.name AS album_name, f.album_id
+    FROM files f
+    LEFT JOIN users u ON f.uploaded_by = u.username
+    LEFT JOIN albums a ON f.album_id = a.id
+    WHERE f.is_public = 1
+  ) AS source WHERE 1=1${whereClause} ORDER BY source.title LIMIT ? OFFSET ?`;
+
+  params.push(pageSize, (page - 1) * pageSize);
+  const items = db.prepare(dataSql).all(...params) as SearchResultItem[];
+
+  return { items, total };
 }
 
 // ==================== User System ====================
