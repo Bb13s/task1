@@ -26,7 +26,7 @@ export default function NoteDetailPage({ params }: NotePageProps) {
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-[#9e1b32] to-[#4A2887] rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">N</span>
             </div>
             <span className="font-bold text-xl text-gray-800">NoteHub</span>
@@ -34,7 +34,7 @@ export default function NoteDetailPage({ params }: NotePageProps) {
           <nav className="flex gap-4">
             <Link href="/" className="text-gray-600 hover:text-gray-900">首页</Link>
             <Link href="/explore" className="text-gray-600 hover:text-gray-900">广场</Link>
-            <Link href="/workspace" className="text-purple-600 font-medium">工作区</Link>
+            <Link href="/workspace" className="text-[#9e1b32] font-medium">工作区</Link>
           </nav>
         </div>
       </header>
@@ -87,14 +87,14 @@ export default function NoteDetailPage({ params }: NotePageProps) {
         <div className="mt-6 flex items-center justify-center gap-4">
           <Link
             href="/explore"
-            className="text-purple-600 hover:text-purple-700 font-medium"
+            className="text-[#9e1b32] hover:text-[#7a1527] font-medium"
           >
             ← 返回广场
           </Link>
           <span className="text-gray-300">|</span>
           <Link
             href={`/workspace?note=${note.id}`}
-            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 font-medium"
+            className="bg-[#9e1b32] text-white px-4 py-2 rounded-lg hover:bg-[#7a1527] font-medium"
           >
             ✏️ 在工作区编辑
           </Link>

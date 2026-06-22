@@ -174,7 +174,7 @@ export default function FileManager({ files, onFilesChange }: FileManagerProps) 
             border-2 border-dashed rounded-lg p-6 text-center cursor-pointer
             transition-colors duration-200
             ${isDragging
-              ? 'border-purple-500 bg-purple-50'
+              ? 'border-[#9e1b32] bg-[#9e1b32]/5'
               : 'border-gray-300 hover:border-gray-400 bg-gray-50'
             }
             ${isUploading ? 'opacity-50 pointer-events-none' : ''}
@@ -197,7 +197,7 @@ export default function FileManager({ files, onFilesChange }: FileManagerProps) 
 
         {/* 上传进度 */}
         {isUploading && (
-          <div className="mt-3 p-2 bg-purple-50 text-purple-700 text-sm rounded">
+          <div className="mt-3 p-2 bg-[#9e1b32]/5 text-[#9e1b32] text-sm rounded">
             {uploadProgress}
           </div>
         )}
@@ -259,7 +259,7 @@ export default function FileManager({ files, onFilesChange }: FileManagerProps) 
                   {isImage(file.mime_type) && (
                     <button
                       onClick={() => copyMarkdownImage(file)}
-                      className="flex-1 px-2 py-1 text-xs bg-purple-100 hover:bg-purple-200 rounded text-purple-700 transition-colors"
+                      className="flex-1 px-2 py-1 text-xs bg-[#9e1b32]/10 hover:bg-[#9e1b32]/20 rounded text-[#9e1b32] transition-colors"
                     >
                       MD 图片
                     </button>

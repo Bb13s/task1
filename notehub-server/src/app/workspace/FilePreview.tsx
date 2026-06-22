@@ -49,7 +49,7 @@ export default function FilePreview({ file }: FilePreviewProps) {
           <a
             href={fileUrl}
             download={file.original_name}
-            className="px-3 py-1.5 bg-purple-100 text-purple-700 rounded text-sm hover:bg-purple-200 transition-colors"
+            className="px-3 py-1.5 bg-[#9e1b32]/10 text-[#9e1b32] rounded text-sm hover:bg-[#9e1b32]/20 transition-colors"
           >
             ⬇️ 下载
           </a>
@@ -86,7 +86,7 @@ export default function FilePreview({ file }: FilePreviewProps) {
             <a
               href={fileUrl}
               download={file.original_name}
-              className="px-3 py-1.5 bg-purple-100 text-purple-700 rounded text-sm hover:bg-purple-200 transition-colors"
+              className="px-3 py-1.5 bg-[#9e1b32]/10 text-[#9e1b32] rounded text-sm hover:bg-[#9e1b32]/20 transition-colors"
             >
               ⬇️ 下载
             </a>
@@ -115,7 +115,7 @@ export default function FilePreview({ file }: FilePreviewProps) {
           <a
             href={fileUrl}
             download={file.original_name}
-            className="px-3 py-1.5 bg-purple-100 text-purple-700 rounded text-sm hover:bg-purple-200 transition-colors"
+            className="px-3 py-1.5 bg-[#9e1b32]/10 text-[#9e1b32] rounded text-sm hover:bg-[#9e1b32]/20 transition-colors"
           >
             ⬇️ 下载
           </a>
@@ -141,7 +141,7 @@ export default function FilePreview({ file }: FilePreviewProps) {
       <a
         href={fileUrl}
         download={file.original_name}
-        className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+        className="px-6 py-2 bg-[#9e1b32] text-white rounded-lg hover:bg-[#7a1527] transition-colors"
       >
         ⬇️ 下载文件
       </a>

@@ -325,7 +325,7 @@ export default function FolderTree({
       <div key={node.id ?? 'root'} className="select-none">
         <div
           className={`flex items-center gap-1 px-2 py-1.5 cursor-pointer hover:bg-gray-100 rounded-md mx-2 ${
-            isSelected ? 'bg-purple-50 text-purple-700' : ''
+            isSelected ? 'bg-[#9e1b32]/10 text-[#9e1b32]' : ''
           } ${isDragOver ? 'bg-blue-50 border-2 border-blue-300 border-dashed' : ''}`}
           style={{ paddingLeft: `${level * 12 + 8}px` }}
           onClick={() => {
@@ -374,13 +374,13 @@ export default function FolderTree({
                   setNewFolderName('');
                 }
               }}
-              className="text-sm border border-purple-300 rounded px-2 py-0.5 w-24 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="text-sm border border-[#9e1b32]/30 rounded px-2 py-0.5 w-24 focus:outline-none focus:ring-2 focus:ring-[#9e1b32]"
               placeholder="文件夹名"
               autoFocus
             />
             <button
               onClick={submitCreateFolder}
-              className="text-xs bg-purple-600 text-white px-1.5 py-0.5 rounded hover:bg-purple-700"
+              className="text-xs bg-[#9e1b32] text-white px-1.5 py-0.5 rounded hover:bg-[#7a1527]"
             >
               ✓
             </button>
@@ -404,7 +404,7 @@ export default function FolderTree({
             draggable
             onDragStart={(e) => handleDragStart(e, note.id)}
             className={`flex items-center gap-1 px-2 py-1.5 cursor-pointer hover:bg-gray-100 rounded-md mx-2 ${
-              selectedNoteId === note.id ? 'bg-purple-100 text-purple-800 font-medium' : ''
+              selectedNoteId === note.id ? 'bg-[#9e1b32]/10 text-[#9e1b32] font-medium' : ''
             }`}
             style={{ paddingLeft: `${(level + 1) * 12 + 8}px` }}
             onClick={(e) => {
@@ -426,7 +426,7 @@ export default function FolderTree({
           <div
             key={file.id}
             className={`flex items-center gap-1 px-2 py-1.5 cursor-pointer hover:bg-gray-100 rounded-md mx-2 group ${
-              selectedFileId === file.id ? 'bg-purple-100 text-purple-800' : ''
+              selectedFileId === file.id ? 'bg-[#9e1b32]/10 text-[#9e1b32]' : ''
             }`}
             style={{ paddingLeft: `${(level + 1) * 12 + 8}px` }}
             onClick={(e) => {
@@ -494,7 +494,7 @@ export default function FolderTree({
               setCreatingFolderParent(null);
               setIsCreatingFolder(true);
             }}
-            className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded hover:bg-purple-200"
+            className="text-xs bg-[#9e1b32]/10 text-[#9e1b32] px-2 py-1 rounded hover:bg-[#9e1b32]/20"
           >
             + 新建
           </button>
@@ -519,13 +519,13 @@ export default function FolderTree({
                   setNewFolderName('');
                 }
               }}
-              className="text-sm border border-purple-300 rounded px-2 py-0.5 w-24 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="text-sm border border-[#9e1b32]/30 rounded px-2 py-0.5 w-24 focus:outline-none focus:ring-2 focus:ring-[#9e1b32]"
               placeholder="文件夹名"
               autoFocus
             />
             <button
               onClick={submitCreateFolder}
-              className="text-xs bg-purple-600 text-white px-1.5 py-0.5 rounded hover:bg-purple-700"
+              className="text-xs bg-[#9e1b32] text-white px-1.5 py-0.5 rounded hover:bg-[#7a1527]"
             >
               ✓
             </button>

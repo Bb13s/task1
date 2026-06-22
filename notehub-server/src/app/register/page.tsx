@@ -4,10 +4,10 @@ import Link from 'next/link';
 
 export default function RegisterPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#9e1b32]/5 via-white to-[#6d28d9]/5 flex items-center justify-center">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 bg-gradient-to-br from-[#9e1b32] to-[#6d28d9] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+          <div className="w-14 h-14 bg-gradient-to-br from-[#9e1b32] to-[#4A2887] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
             <span className="text-white font-bold text-xl">N</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-800">注册 NoteHub</h1>

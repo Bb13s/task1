@@ -97,13 +97,13 @@ export default function CodeMirrorEditor({
       },
       '.cm-cursor': {
         borderLeftWidth: '2px',
-        borderLeftColor: '#7c3aed',
+        borderLeftColor: '#4A2887',
       },
       '.cm-activeLine': {
-        backgroundColor: 'rgba(124, 58, 237, 0.05)',
+        backgroundColor: 'rgba(74, 40, 135, 0.05)',
       },
       '.cm-activeLineGutter': {
-        backgroundColor: 'rgba(124, 58, 237, 0.1)',
+        backgroundColor: 'rgba(74, 40, 135, 0.1)',
       },
       '.cm-gutters': {
         backgroundColor: '#fafafa',
@@ -116,7 +116,7 @@ export default function CodeMirrorEditor({
         fontSize: '12px',
       },
       '.cm-selectionBackground': {
-        backgroundColor: 'rgba(124, 58, 237, 0.2)',
+        backgroundColor: 'rgba(74, 40, 135, 0.2)',
       },
       // Markdown 语法高亮颜色
       '.cm-heading': {
@@ -133,11 +133,11 @@ export default function CodeMirrorEditor({
         fontSize: '1.15em',
       },
       '.cm-strong': {
-        color: '#6b21a8',
+        color: '#4A2887',
         fontWeight: 'bold',
       },
       '.cm-emphasis': {
-        color: '#7c3aed',
+        color: '#4A2887',
         fontStyle: 'italic',
       },
       '.cm-link': {
@@ -159,7 +159,7 @@ export default function CodeMirrorEditor({
         paddingLeft: '8px',
       },
       '.cm-list': {
-        color: '#7c3aed',
+        color: '#4A2887',
       },
       '.cm-comment': {
         color: '#9ca3af',
@@ -172,7 +172,7 @@ export default function CodeMirrorEditor({
         fontSize: '13px',
       },
       '.cm-completionMatchedText': {
-        color: '#7c3aed',
+        color: '#4A2887',
         fontWeight: 'bold',
       },
     });

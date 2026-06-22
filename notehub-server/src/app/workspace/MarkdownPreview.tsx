@@ -44,7 +44,7 @@ export default function MarkdownPreview({ content }: MarkdownPreviewProps) {
           ol: ({ children }) => <ol className="list-decimal list-inside mb-4 ml-2">{children}</ol>,
           li: ({ children }) => <li className="mb-1">{children}</li>,
           blockquote: ({ children }) => (
-            <blockquote className="border-l-4 border-purple-500 pl-4 italic my-4 text-gray-600">
+            <blockquote className="border-l-4 border-[#4A2887] pl-4 italic my-4 text-gray-600">
               {children}
             </blockquote>
           ),

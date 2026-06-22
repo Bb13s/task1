@@ -385,7 +385,7 @@ export default function WorkspaceClient({ initialFolders, initialNotes, initialF
             {isSidebarCollapsed ? '☰' : '←'}
           </button>
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-gradient-to-br from-[#9e1b32] to-[#6d28d9] rounded-lg flex items-center justify-center">
+            <div className="w-7 h-7 bg-gradient-to-br from-[#9e1b32] to-[#4A2887] rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xs">N</span>
             </div>
             <span className="font-bold text-lg text-gray-800">NoteHub</span>
@@ -482,7 +482,7 @@ export default function WorkspaceClient({ initialFolders, initialNotes, initialF
                       className={`px-3 py-1.5 text-sm rounded transition-colors ${
                         showPreview
                           ? 'bg-[#9e1b32] text-white'
-                          : 'bg-[#9e1b32]/10 text-[#9e1b32] hover:bg-[#9e1b32]/20'
+                          : 'bg-[#4A2887]/10 text-[#4A2887] hover:bg-[#4A2887]/20'
                       }`}
                       title={showPreview ? '关闭预览' : '开启预览'}
                     >

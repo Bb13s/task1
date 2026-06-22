@@ -68,7 +68,7 @@ export default function AppPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#9e1b32]/5 via-white to-[#6d28d9]/5 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br bg-gray-50 flex items-center justify-center">
         <div className="text-gray-500">加载中...</div>
       </div>
     );
@@ -77,12 +77,12 @@ export default function AppPage() {
   const recentNotes = notes.slice(0, 6);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#9e1b32]/5 via-white to-[#6d28d9]/5">
+    <div className="min-h-screen bg-gradient-to-br bg-gray-50">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-[#9e1b32] to-[#6d28d9] rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-[#9e1b32] to-[#4A2887] rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">N</span>
             </div>
             <span className="font-bold text-xl text-gray-800">NoteHub</span>
@@ -108,7 +108,7 @@ export default function AppPage() {
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            <span className="bg-gradient-to-r from-[#9e1b32] to-[#6d28d9] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#9e1b32] to-[#4A2887] bg-clip-text text-transparent">
               欢迎来到——物院巴别塔
             </span>
           </h1>
@@ -207,7 +207,7 @@ export default function AppPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 mx-4">
             <div className="text-center mb-6">
-              <div className="w-14 h-14 bg-gradient-to-br from-[#9e1b32] to-[#6d28d9] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <div className="w-14 h-14 bg-gradient-to-br from-[#9e1b32] to-[#4A2887] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <span className="text-white font-bold text-2xl">N</span>
               </div>
               <h2 className="text-2xl font-bold text-gray-800">知识库登录</h2>
