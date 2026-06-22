@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import { FileRecord } from '@/lib/db';
+import AlbumSelector from './AlbumSelector';
 
 interface FilePreviewProps {
   file: FileRecord | null;
+  albumId?: number | null;
+  onAlbumChange?: (albumId: number | null) => void;
 }
 
-export default function FilePreview({ file }: FilePreviewProps) {
+export default function FilePreview({ file, albumId, onAlbumChange }: FilePreviewProps) {
   const [fileUrl, setFileUrl] = useState<string>('');
 
   useEffect(() => {
@@ -45,6 +48,12 @@ export default function FilePreview({ file }: FilePreviewProps) {
           <div>
             <h3 className="font-medium text-gray-800">{file.original_name}</h3>
             <p className="text-xs text-gray-500">{(file.size / 1024).toFixed(1)} KB</p>
+            {onAlbumChange && (
+              <div className="mt-1 flex items-center gap-1">
+                <span className="text-xs text-gray-400">📂</span>
+                <AlbumSelector value={albumId ?? null} onChange={onAlbumChange} />
+              </div>
+            )}
           </div>
           <a
             href={fileUrl}
@@ -73,6 +82,12 @@ export default function FilePreview({ file }: FilePreviewProps) {
           <div>
             <h3 className="font-medium text-gray-800">{file.original_name}</h3>
             <p className="text-xs text-gray-500">{(file.size / 1024).toFixed(1)} KB</p>
+            {onAlbumChange && (
+              <div className="mt-1 flex items-center gap-1">
+                <span className="text-xs text-gray-400">📂</span>
+                <AlbumSelector value={albumId ?? null} onChange={onAlbumChange} />
+              </div>
+            )}
           </div>
           <div className="flex gap-2">
             <a
@@ -111,6 +126,12 @@ export default function FilePreview({ file }: FilePreviewProps) {
           <div>
             <h3 className="font-medium text-gray-800">{file.original_name}</h3>
             <p className="text-xs text-gray-500">{(file.size / 1024).toFixed(1)} KB</p>
+            {onAlbumChange && (
+              <div className="mt-1 flex items-center gap-1">
+                <span className="text-xs text-gray-400">📂</span>
+                <AlbumSelector value={albumId ?? null} onChange={onAlbumChange} />
+              </div>
+            )}
           </div>
           <a
             href={fileUrl}

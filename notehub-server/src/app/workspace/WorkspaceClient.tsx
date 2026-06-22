@@ -447,7 +447,23 @@ export default function WorkspaceClient({ initialFolders, initialNotes, initialF
         {/* PDF Preview Mode - Takes remaining space */}
         {previewMode === 'file' && previewFile ? (
           <div className="flex-1 bg-white overflow-hidden">
-            <FilePreview file={previewFile} />
+            <FilePreview
+              file={previewFile}
+              albumId={previewFile.album_id}
+              onAlbumChange={async (albumId) => {
+                try {
+                  await fetch(`/api/files?id=${previewFile.id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ album_id: albumId }),
+                  });
+                  setFiles(prev => prev.map(f =>
+                    f.id === previewFile.id ? { ...f, album_id: albumId } : f
+                  ));
+                  setPreviewFile(prev => prev ? { ...prev, album_id: albumId } : null);
+                } catch {}
+              }}
+            />
           </div>
         ) : (
           <>
