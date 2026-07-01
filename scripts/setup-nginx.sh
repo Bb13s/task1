@@ -6,7 +6,7 @@
 set -e
 
 DOMAIN=$1
-APP_PORT=3000
+HUB_DIR="/var/www/notehub/hub"
 
 if [ -z "$DOMAIN" ]; then
   echo "错误：请提供域名"
@@ -14,7 +14,7 @@ if [ -z "$DOMAIN" ]; then
   exit 1
 fi
 
-echo "=== 配置 Nginx for $DOMAIN ==="
+echo "=== 配置 Nginx for $DOMAIN (十三工作室主控页) ==="
 
 # 创建 Nginx 配置
 cat > /etc/nginx/sites-available/notehub << 'EOF'
@@ -22,31 +22,25 @@ server {
     listen 80;
     server_name DOMAIN_PLACEHOLDER;
 
-    client_max_body_size 20M;
+    root HUB_DIR_PLACEHOLDER;
+    index index.html;
 
+    # 主控页 - 静态文件
     location / {
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_cache_bypass $http_upgrade;
+        try_files $uri $uri/ =404;
     }
 
-    # 静态文件缓存
-    location /_next/static {
-        proxy_pass http://localhost:3000;
-        proxy_cache_valid 200 365d;
+    # 静态资源缓存
+    location ~* \.(css|js|jpg|jpeg|png|gif|ico|svg|woff2)$ {
+        expires 30d;
         add_header Cache-Control "public, immutable";
     }
 }
 EOF
 
-# 替换域名
+# 替换占位符
 sed -i "s/DOMAIN_PLACEHOLDER/$DOMAIN/g" /etc/nginx/sites-available/notehub
+sed -i "s|HUB_DIR_PLACEHOLDER|$HUB_DIR|g" /etc/nginx/sites-available/notehub
 
 # 启用站点
 ln -sf /etc/nginx/sites-available/notehub /etc/nginx/sites-enabled/

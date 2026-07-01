@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>十三工作室</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <header class="header">
+        <div class="header-inner">
+            <span class="logo">十三</span>
+            <nav class="nav">
+                <a href="#projects">项目</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg">
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+            <div class="orb orb-3"></div>
+            <div class="ring ring-1"></div>
+            <div class="ring ring-2"></div>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title">十三工作室</h1>
+            <p class="hero-subtitle">创意 · 技术 · 辩论</p>
+            <p class="hero-desc">华中科技大学物理学院旗下技术工作室，专注于辩论生态工具的开发与维护</p>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about">
+        <div class="container">
+            <h2 class="section-title">关于工作室</h2>
+            <div class="about-card">
+                <p>十三工作室隶属于华中科技大学物理学院辩论队，致力于为辩论活动提供数字化支持。我们从计时器、知识库到 AI 辩手，逐步构建完整的辩论技术生态。</p>
+                <p>我们的目标是让每一位辩手都能获得高效、智能的工具辅助，让辩论训练和比赛更加专业。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section class="projects" id="projects">
+        <div class="container">
+            <h2 class="section-title">旗下项目</h2>
+            <div class="project-grid">
+                <!-- 辩论队官网 -->
+                <a class="project-card" data-port="3000" target="_blank">
+                    <div class="card-icon">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                            <rect x="6" y="8" width="36" height="32" rx="3" stroke="currentColor" stroke-width="2.5"/>
+                            <line x1="16" y1="17" x2="32" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="16" y1="23" x2="28" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="16" y1="29" x2="24" y2="29" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3 class="card-title">辩论队官网</h3>
+                    <p class="card-desc">华中科技大学物理学院辩论队官方网站，队伍风采展示、赛事成绩、招新信息与辩论计时器。</p>
+                    <span class="card-link">进入网站 →</span>
+                </a>
+
+                <!-- NoteHub -->
+                <a class="project-card" data-port="6001" target="_blank">
+                    <div class="card-icon">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                            <rect x="8" y="4" width="32" height="40" rx="4" stroke="currentColor" stroke-width="2.5"/>
+                            <line x1="14" y1="14" x2="34" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="14" y1="21" x2="30" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="14" y1="28" x2="26" y2="28" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <rect x="8" y="33" width="32" height="11" rx="4" stroke="currentColor" stroke-width="2.5"/>
+                            <line x1="18" y1="38" x2="30" y2="38" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3 class="card-title">NoteHub</h3>
+                    <p class="card-desc">辩论知识管理平台。Markdown 笔记编辑、PDF 资料库、公开知识探索——为辩手打造的第二大脑。</p>
+                    <span class="card-link">进入网站 →</span>
+                </a>
+
+                <!-- 辩论AI -->
+                <a class="project-card" data-port="8000" target="_blank">
+                    <div class="card-icon">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                            <circle cx="18" cy="18" r="10" stroke="currentColor" stroke-width="2.5"/>
+                            <circle cx="30" cy="30" r="10" stroke="currentColor" stroke-width="2.5"/>
+                            <circle cx="18" cy="18" r="3" fill="currentColor"/>
+                            <circle cx="30" cy="30" r="3" fill="currentColor"/>
+                            <line x1="23" y1="23" x2="25" y2="25" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3 class="card-title">辩论 AI</h3>
+                    <p class="card-desc">基于大语言模型的 AI 辩论对手。支持角色切换、知识库检索、赛后复盘——随时随地的辩论训练伙伴。</p>
+                    <span class="card-link">进入网站 →</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <span class="footer-logo">十三</span>
+                    <p>十三工作室 © 2026</p>
+                </div>
+                <div class="footer-links">
+                    <h4>快速访问</h4>
+                    <a data-port="3000" target="_blank">辩论队官网</a>
+                    <a data-port="6001" target="_blank">NoteHub</a>
+                    <a data-port="8000" target="_blank">辩论 AI</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>华中科技大学物理学院 · 十三工作室</p>
+            </div>
+        </div>
+    </footer>
+<script>
+    // 根据当前域名动态设置端口链接
+    (function() {
+        var host = window.location.hostname;
+        var links = document.querySelectorAll('[data-port]');
+        for (var i = 0; i < links.length; i++) {
+            var port = links[i].getAttribute('data-port');
+            links[i].href = 'http://' + host + ':' + port;
+        }
+    })();
+</script>
+</body>
+</html>

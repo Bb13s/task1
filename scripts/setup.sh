@@ -56,6 +56,7 @@ mkdir -p $APP_DIR
 mkdir -p $LOG_DIR
 mkdir -p $APP_DIR/data
 mkdir -p $APP_DIR/uploads
+mkdir -p $APP_DIR/hub   # 十三工作室主控页
 
 # 6. 设置权限
 echo -e "${YELLOW}[6/8] 设置目录权限...${NC}"
@@ -89,4 +90,11 @@ echo "   pm2 startup"
 echo ""
 echo "6. 配置 Nginx（需要域名）："
 echo "   运行：sudo ./scripts/setup-nginx.sh your-domain.com"
+echo "   （主控页将部署到 80 端口，各项目通过不同端口访问）"
+echo ""
+echo "7. 项目访问地址："
+echo "   十三工作室主控页：http://你的域名或IP"
+echo "   辩论队官网：http://你的域名或IP:3000"
+echo "   NoteHub：    http://你的域名或IP:6001"
+echo "   辩论 AI：    http://你的域名或IP:8000"
 echo ""
