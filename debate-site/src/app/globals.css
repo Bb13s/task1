@@ -25,3 +25,20 @@ body {
     text-wrap: balance;
   }
 }
+
+@keyframes infinite-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.gallery-scroll {
+  animation: infinite-scroll 30s linear infinite;
+}
+
+.gallery-scroll:hover {
+  animation-play-state: paused;
+}

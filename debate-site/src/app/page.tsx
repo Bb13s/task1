@@ -1,6 +1,21 @@
 import Link from "next/link";
 import Image from "next/image";
 
+const galleryImages = [
+  "/队伍风采图片1.jpg",
+  "/队伍风采图片2.jpg",
+  "/队伍风采图片3.jpg",
+  "/队伍风采图片4.jpg",
+  "/队伍风采图片5.jpeg",
+  "/队伍风采图片6.jpeg",
+  "/队伍风采图片7.jpeg",
+  "/队伍风采图片8.jpeg",
+  "/队伍风采图片9.jpg",
+  "/队伍风采图片10.jpg",
+  "/队伍风采图片11.jpg",
+  "/队伍风采图片12.jpeg",
+];
+
 export default function DebateTeamHomePage() {
   return (
     <div className="min-h-screen bg-white">
@@ -86,18 +101,21 @@ export default function DebateTeamHomePage() {
       </section>
 
       {/* Gallery Section */}
-      <section id="gallery" className="py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">队伍风采</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div
-                key={i}
-                className="aspect-square rounded-lg bg-gray-200 hover:bg-gray-300 transition-colors cursor-pointer"
-                style={{
-                  backgroundColor: i % 2 === 0 ? '#f3f4f6' : '#e5e7eb'
-                }}
-              ></div>
+      <section id="gallery" className="py-20 bg-white overflow-hidden">
+        <div className="max-w-full mx-auto">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12 px-4">队伍风采</h2>
+          <div className="gallery-scroll flex gap-4 w-max">
+            {[...galleryImages, ...galleryImages].map((src, i) => (
+              <div key={i} className="h-64 w-auto flex-shrink-0 rounded-lg overflow-hidden">
+                <Image
+                  src={src}
+                  alt={`队伍风采图片 ${(i % galleryImages.length) + 1}`}
+                  width={384}
+                  height={256}
+                  className="h-full w-auto object-cover"
+                  unoptimized
+                />
+              </div>
             ))}
           </div>
         </div>
