@@ -3,14 +3,24 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fefaf5;
+  --foreground: #3d2c24;
+  --color-ivory: #fefaf5;
+  --color-card: #fffbf7;
+  --color-warm-gray: #f5f0e8;
+  --color-warm-brown: #2c1810;
+  --color-hust-red: #9e1b32;
+  --color-dark-red: #7a1527;
+  --color-gold: #c4943a;
+  --color-body-text: #3d2c24;
+  --color-muted-text: #8b7355;
+  --font-serif: Georgia, "Times New Roman", "宋体", SimSun, serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1a1008;
+    --foreground: #e8d5c4;
   }
 }
 
@@ -20,19 +30,41 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+/* ===== 入场动画 ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
+.animate-section {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s cubic-bezier(0.22, 0.61, 0.36, 1),
+              transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.animate-section.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 依次延迟 */
+.animate-section.delay-1 { transition-delay: 0.1s; }
+.animate-section.delay-2 { transition-delay: 0.2s; }
+.animate-section.delay-3 { transition-delay: 0.3s; }
+.animate-section.delay-4 { transition-delay: 0.4s; }
+.animate-section.delay-5 { transition-delay: 0.5s; }
+
+/* ===== 无限滚动 ===== */
 @keyframes infinite-scroll {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
 
 .gallery-scroll {
@@ -41,4 +73,29 @@ body {
 
 .gallery-scroll:hover {
   animation-play-state: paused;
+}
+
+/* ===== 装饰线 ===== */
+.decorative-line {
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-hust-red), var(--color-gold));
+  border-radius: 2px;
+}
+
+/* ===== 首字放大 ===== */
+.drop-cap::first-letter {
+  font-family: var(--font-serif);
+  font-size: 3.5rem;
+  float: left;
+  line-height: 0.8;
+  padding-right: 8px;
+  padding-top: 4px;
+  color: var(--color-hust-red);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
 }

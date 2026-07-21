@@ -15,40 +15,13 @@ interface HallOfFamer {
 }
 
 const allMembers: HallOfFamer[] = [
-  // 2018级
-  { id: 1, name: "啦啦啦", grade: "2018级", role: "啦啦啦", bio: "啦啦啦", achievements: ["啦啦啦"] },
-  { id: 2, name: "啦啦啦", grade: "2018级", role: "啦啦啦", bio: "啦啦啦", achievements: ["啦啦啦"] },
-  { id: 3, name: "啦啦啦", grade: "2018级", role: "啦啦啦", bio: "啦啦啦", achievements: ["啦啦啦"] },
-  // 2019级
-  { id: 4, name: "啦啦啦", grade: "2019级", role: "啦啦啦", bio: "啦啦啦", achievements: ["啦啦啦"] },
-  { id: 5, name: "啦啦啦", grade: "2019级", role: "啦啦啦", bio: "啦啦啦", achievements: ["啦啦啦"] },
-  { id: 6, name: "啦啦啦", grade: "2019级", role: "啦啦啦", bio: "啦啦啦", achievements: ["啦啦啦"] },
-  { id: 7, name: "啦啦啦", grade: "2019级", role: "啦啦啦", bio: "啦啦啦", achievements: ["啦啦啦"] },
-  // 2020级
-  { id: 8, name: "啦啦啦", grade: "2020级", role: "啦啦啦", bio: "啦啦啦", achievements: ["啦啦啦"] },
-  { id: 9, name: "啦啦啦", grade: "2020级", role: "啦啦啦", bio: "啦啦啦", achievements: ["啦啦啦"] },
-  { id: 10, name: "啦啦啦", grade: "2020级", role: "啦啦啦", bio: "啦啦啦", achievements: ["啦啦啦"] },
-  // 2021级
-  { id: 11, name: "啦啦啦", grade: "2021级", role: "啦啦啦", bio: "啦啦啦", achievements: ["啦啦啦"] },
-  { id: 12, name: "啦啦啦", grade: "2021级", role: "啦啦啦", bio: "啦啦啦", achievements: ["啦啦啦"] },
-  // 2022级
-  { id: 13, name: "啦啦啦", grade: "2022级", role: "啦啦啦", bio: "啦啦啦", achievements: ["啦啦啦"] },
-  { id: 14, name: "啦啦啦", grade: "2022级", role: "啦啦啦", bio: "啦啦啦", achievements: ["啦啦啦"] },
-  { id: 15, name: "啦啦啦", grade: "2022级", role: "啦啦啦", bio: "啦啦啦", achievements: ["啦啦啦"] },
-  // 2023级
-  { id: 16, name: "啦啦啦", grade: "2023级", role: "啦啦啦", bio: "啦啦啦", achievements: ["啦啦啦"] },
-  { id: 17, name: "啦啦啦", grade: "2023级", role: "啦啦啦", bio: "啦啦啦", achievements: ["啦啦啦"] },
-  { id: 18, name: "啦啦啦", grade: "2023级", role: "啦啦啦", bio: "啦啦啦", achievements: ["啦啦啦"] },
-  // 2024级
-  { id: 19, name: "啦啦啦", grade: "2024级", role: "啦啦啦", bio: "啦啦啦", achievements: ["啦啦啦"] },
-  { id: 20, name: "啦啦啦", grade: "2024级", role: "啦啦啦", bio: "啦啦啦", achievements: ["啦啦啦"] },
   // 2025级
-  { id: 21, name: "徐经纬", grade: "2025级", role: "啦啦啦", bio: "啦啦啦", achievements: ["啦啦啦"], avatar: "/hall-of-fame/xujingwei.jpg" },
+  { id: 21, name: "徐经纬", grade: "2025级", role: "笨笨十三少", bio: "代码跑不通可以 debug，论点拆不动可以喊队友。", achievements: ["网站搭建者"], avatar: "/hall-of-fame/xujingwei.jpg" },
   { id: 22, name: "王思远", grade: "2025级", role: "半截的诗", bio: "我都这么菜了，怎么还不是你的菜？", achievements: ["25级新生杯佳辩"], avatar: "/hall-of-fame/wangsiyuan.jpg" },
   { id: 23, name: "江安博", grade: "2025级", role: "maodai86", bio: "都是同龄人我原本没想降维打击！", achievements: ["25级新生杯佳辩"], avatar: "/hall-of-fame/jianganbo.jpg" },
-  { id: 24, name: "刘名扬", grade: "2025级", role: "啦啦啦", bio: "啦啦啦", achievements: ["啦啦啦"], avatar: "/hall-of-fame/liumingyang.jpg" },
-  { id: 25, name: "董征", grade: "2025级", role: "啦啦啦", bio: "啦啦啦", achievements: ["啦啦啦"], avatar: "/hall-of-fame/dongzheng.jpg" },
-  { id: 26, name: "鲍嘉明", grade: "2025级", role: "啦啦啦", bio: "啦啦啦", achievements: ["啦啦啦"], avatar: "/hall-of-fame/baojiaming.jpg" },
+  { id: 24, name: "刘名扬", grade: "2025级", role: "刘名扬", bio: "你想约谁打模辩？我微信都有。", achievements: ["校辩论社副社长"], avatar: "/hall-of-fame/liumingyang.jpg" },
+  { id: 25, name: "董征", grade: "2025级", role: "董", bio: "你尽管输出，破防了算我输。", achievements: ["物院辩论队最坚固的盾"], avatar: "/hall-of-fame/dongzheng.jpg" },
+  { id: 26, name: "鲍嘉明", grade: "2025级", role: "石英", bio: "剑不需要多动，对面自己会慌。", achievements: ["物院辩论队最锋利的剑"], avatar: "/hall-of-fame/baojiaming.jpg" },
 ];
 
 const grades = ["全部", "2018级", "2019级", "2020级", "2021级", "2022级", "2023级", "2024级", "2025级"];
@@ -60,40 +33,79 @@ export default function HallOfFamePage() {
     ? allMembers
     : allMembers.filter(m => m.grade === activeGrade);
 
+  const allLockedGrades = grades.filter(g => g !== "全部" && g !== "2025级");
+
   return (
-    <div className="min-h-screen bg-[#0f172a]">
+    <div className="min-h-screen" style={{ backgroundColor: "#2c1810" }}>
       {/* Header */}
-      <header className="bg-[#0f172a] border-b border-gray-800 sticky top-0 z-50">
+      <header
+        className="sticky top-0 z-50 border-b"
+        style={{
+          backgroundColor: "rgba(44,24,16,0.94)",
+          borderColor: "rgba(196,148,58,0.12)",
+          backdropFilter: "blur(8px)",
+        }}
+      >
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-700">
+            <div
+              className="w-8 h-8 rounded-full overflow-hidden ring-2"
+              style={{ ringColor: "rgba(196,148,58,0.3)", backgroundColor: "#3d2c24" }}
+            >
               <Image src="/team-logo.png" alt="队徽" width={32} height={32} className="w-full h-full object-cover" />
             </div>
-            <span className="font-bold text-lg text-white">华中科技大学物理学院辩论队</span>
+            <span
+              className="font-bold text-lg"
+              style={{ color: "#e8d5c4", fontFamily: "var(--font-serif)" }}
+            >
+              华中科技大学物理学院辩论队
+            </span>
           </Link>
           <nav className="flex items-center gap-6 text-sm">
-            <Link href="/#about" className="text-gray-400 hover:text-white transition-colors">关于我们</Link>
-            <Link href="/#gallery" className="text-gray-400 hover:text-white transition-colors">队伍风采</Link>
-            <Link href="/#achievements" className="text-gray-400 hover:text-white transition-colors">赛事成绩</Link>
-            <Link href="/#recruitment" className="text-gray-400 hover:text-white transition-colors">招新信息</Link>
-            <span className="text-[#9e1b32] font-medium">辩论名人堂</span>
+            <Link href="/#about" style={{ color: "#8b7355" }} className="hover:text-[#e8d5c4] transition-colors">关于我们</Link>
+            <Link href="/#gallery" style={{ color: "#8b7355" }} className="hover:text-[#e8d5c4] transition-colors">队伍风采</Link>
+            <Link href="/#achievements" style={{ color: "#8b7355" }} className="hover:text-[#e8d5c4] transition-colors">赛事成绩</Link>
+            <Link href="/#recruitment" style={{ color: "#8b7355" }} className="hover:text-[#e8d5c4] transition-colors">招新信息</Link>
+            <span style={{ color: "#c4943a", fontFamily: "var(--font-serif)" }} className="font-medium">
+              辩论名人堂
+            </span>
           </nav>
         </div>
       </header>
 
       {/* Hero */}
       <section className="relative py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0f172a] via-[#0f172a] to-[#0f172a]">
-          <div className="absolute top-10 left-1/4 w-96 h-96 bg-[#9e1b32]/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-10 right-1/4 w-64 h-64 bg-[#6d28d9]/10 rounded-full blur-3xl"></div>
-          <div className="absolute top-1/2 right-1/3 w-48 h-48 bg-[#9e1b32]/5 rounded-full blur-3xl"></div>
+        <div className="absolute inset-0">
+          <div
+            className="absolute top-10 left-1/4 w-96 h-96 rounded-full blur-3xl"
+            style={{ backgroundColor: "rgba(196,148,58,0.08)" }}
+          ></div>
+          <div
+            className="absolute bottom-10 right-1/4 w-64 h-64 rounded-full blur-3xl"
+            style={{ backgroundColor: "rgba(158,27,50,0.08)" }}
+          ></div>
+          <div
+            className="absolute top-1/2 right-1/3 w-48 h-48 rounded-full blur-3xl"
+            style={{ backgroundColor: "rgba(196,148,58,0.04)" }}
+          ></div>
         </div>
         <div className="relative z-10 text-center px-4">
-          <div className="inline-block px-4 py-1 rounded-full border border-[#9e1b32]/30 text-[#9e1b32] text-sm mb-6">
+          <div
+            className="inline-block px-4 py-1 rounded-full text-sm mb-6 tracking-wider"
+            style={{
+              border: "1px solid rgba(196,148,58,0.25)",
+              color: "#c4943a",
+            }}
+          >
             物理学院辩论队 · 荣誉殿堂
           </div>
-          <h1 className="text-5xl font-bold text-white mb-4 tracking-wider">辩论名人堂</h1>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+          <h1
+            className="text-5xl font-bold mb-4 tracking-[0.08em]"
+            style={{ color: "#e8d5c4", fontFamily: "var(--font-serif)" }}
+          >
+            辩论名人堂
+          </h1>
+          <p className="text-xl max-w-2xl mx-auto" style={{ color: "#8b7355" }}>
             一届又一届的辩手在这里留下足迹，用语言与逻辑书写属于物院的辩论篇章
           </p>
         </div>
@@ -107,11 +119,31 @@ export default function HallOfFamePage() {
               <button
                 key={grade}
                 onClick={() => setActiveGrade(grade)}
-                className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
+                className="px-5 py-2 rounded-full text-sm font-medium transition-all"
+                style={
                   activeGrade === grade
-                    ? 'bg-[#9e1b32] text-white shadow-lg shadow-[#9e1b32]/20'
-                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
-                }`}
+                    ? {
+                        backgroundColor: "#c4943a",
+                        color: "#2c1810",
+                        boxShadow: "0 2px 12px rgba(196,148,58,0.2)",
+                      }
+                    : {
+                        backgroundColor: "rgba(255,255,255,0.06)",
+                        color: "#8b7355",
+                      }
+                }
+                onMouseEnter={(e) => {
+                  if (activeGrade !== grade) {
+                    e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.1)";
+                    e.currentTarget.style.color = "#e8d5c4";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (activeGrade !== grade) {
+                    e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.06)";
+                    e.currentTarget.style.color = "#8b7355";
+                  }
+                }}
               >
                 {grade}
               </button>
@@ -123,18 +155,63 @@ export default function HallOfFamePage() {
       {/* Card Grid */}
       <section className="pb-24 px-4">
         <div className="max-w-6xl mx-auto">
-          <p className="text-gray-500 text-sm mb-6 text-center">
+          <p className="text-sm mb-6 text-center" style={{ color: "#8b7355" }}>
             共 {filteredMembers.length} 位辩手
           </p>
+
+          {activeGrade === "全部" && (
+            <div className="mb-10">
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+                {allLockedGrades.map((grade) => (
+                  <div
+                    key={grade}
+                    className="rounded-xl p-4 text-center transition-all cursor-default"
+                    style={{
+                      backgroundColor: "rgba(255,255,255,0.02)",
+                      border: "1px dashed rgba(196,148,58,0.15)",
+                    }}
+                  >
+                    <div
+                      className="w-12 h-12 mx-auto mb-3 rounded-full flex items-center justify-center text-lg"
+                      style={{ backgroundColor: "rgba(255,255,255,0.04)", color: "#8b7355" }}
+                    >
+                      🔒
+                    </div>
+                    <p className="text-sm font-medium" style={{ color: "#8b7355" }}>{grade}</p>
+                    <p className="text-xs mt-1" style={{ color: "#5a3f2e" }}>待解锁</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {filteredMembers.map((member) => (
               <div
                 key={member.id}
-                className="bg-gray-900/80 border border-gray-800 rounded-xl p-5 hover:border-[#9e1b32]/30 hover:bg-gray-900 transition-all group"
+                className="rounded-xl p-5 transition-all group"
+                style={{
+                  backgroundColor: "rgba(255,255,255,0.03)",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = "rgba(196,148,58,0.3)";
+                  e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.05)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)";
+                  e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.03)";
+                }}
               >
                 {/* Avatar */}
                 <div className="flex justify-center mb-4">
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#9e1b32]/30 to-gray-800 flex items-center justify-center text-white font-bold text-2xl overflow-hidden ring-2 ring-gray-700 group-hover:ring-[#9e1b32]/50 transition-all">
+                  <div
+                    className="w-20 h-20 rounded-full flex items-center justify-center text-white font-bold text-2xl overflow-hidden ring-2 transition-all"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(196,148,58,0.2), rgba(44,24,16,0.8))",
+                      ringColor: "rgba(255,255,255,0.1)",
+                    }}
+                  >
                     {member.avatar ? (
                       <Image src={member.avatar} alt={member.name} width={80} height={80} className="w-full h-full object-cover" />
                     ) : (
@@ -145,23 +222,30 @@ export default function HallOfFamePage() {
 
                 {/* Info */}
                 <div className="text-center mb-3">
-                  <h3 className="text-white font-bold text-lg">{member.name}</h3>
+                  <h3 className="font-bold text-lg" style={{ color: "#e8d5c4" }}>{member.name}</h3>
                   <div className="flex items-center justify-center gap-2 mt-1">
-                    <span className="text-[#9e1b32] text-xs font-medium">{member.grade}</span>
-                    <span className="text-gray-600">·</span>
-                    <span className="text-gray-400 text-xs">{member.role}</span>
+                    <span className="text-xs font-medium" style={{ color: "#c4943a" }}>{member.grade}</span>
+                    <span style={{ color: "#5a3f2e" }}>·</span>
+                    <span className="text-xs" style={{ color: "#8b7355" }}>{member.role}</span>
                   </div>
                 </div>
 
                 {/* Bio */}
-                <p className="text-gray-500 text-sm text-center mb-4">&ldquo;{member.bio}&rdquo;</p>
+                <p className="text-sm text-center mb-4" style={{ color: "#8b7355" }}>
+                  &ldquo;{member.bio}&rdquo;
+                </p>
 
                 {/* Achievements */}
                 <div className="flex flex-wrap justify-center gap-2">
                   {member.achievements.map((achievement, i) => (
                     <span
                       key={i}
-                      className="text-xs px-2.5 py-1 rounded-full bg-[#9e1b32]/10 text-[#9e1b32] border border-[#9e1b32]/20"
+                      className="text-xs px-2.5 py-1 rounded-full"
+                      style={{
+                        backgroundColor: "rgba(196,148,58,0.1)",
+                        color: "#c4943a",
+                        border: "1px solid rgba(196,148,58,0.2)",
+                      }}
                     >
                       {achievement}
                     </span>
@@ -171,43 +255,42 @@ export default function HallOfFamePage() {
             ))}
           </div>
 
-          {filteredMembers.length === 0 && (
-            <p className="text-gray-500 text-center py-16">暂无数据</p>
+          {filteredMembers.length === 0 && activeGrade !== "全部" && (
+            <div className="text-center py-16">
+              <p className="text-lg" style={{ color: "#8b7355" }}>🔒 更多神秘学长姐大人有待解锁！</p>
+            </div>
           )}
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#0f172a] border-t border-gray-800 py-12">
+      <footer
+        className="border-t py-12"
+        style={{ borderColor: "rgba(196,148,58,0.1)", backgroundColor: "#2c1810" }}
+      >
         <div className="max-w-6xl mx-auto px-4">
-          <div className="max-w-md mx-auto mb-8">
-            <h4 className="font-bold text-white text-lg mb-5 text-center">辩论队工具箱</h4>
-            <div className="flex flex-wrap justify-center gap-4">
-              <a
-                href="http://139.155.142.76:6001"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-3 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-medium transition-all"
-              >
-                <span className="text-lg">📚</span> 知识库
-              </a>
-              <Link
-                href="/timer"
-                className="inline-flex items-center gap-2 px-5 py-3 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-medium transition-all"
-              >
-                <span className="text-lg">⏱</span> 辩论计时器
-              </Link>
-              <a
-                href="http://139.155.142.76:8000"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-3 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-medium transition-all"
-              >
-                <span className="text-lg">🤖</span> AI 辩手
-              </a>
-            </div>
+          <div className="flex flex-wrap justify-center gap-4 mb-8">
+            <Link
+              href="/timer"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-medium transition-all"
+              style={{
+                backgroundColor: "rgba(255,255,255,0.06)",
+                color: "#8b7355",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.1)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.06)";
+              }}
+            >
+              <span className="text-lg">⏱</span> 辩论计时器
+            </Link>
           </div>
-          <div className="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm">
+          <div
+            className="border-t pt-8 text-center text-sm"
+            style={{ borderColor: "rgba(255,255,255,0.06)", color: "#5a3f2e" }}
+          >
             <p>© 2026 华中科技大学物理学院辩论队 版权所有</p>
           </div>
         </div>
