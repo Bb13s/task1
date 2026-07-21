@@ -73,24 +73,14 @@ export default function DebateTeamHomePage() {
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">关于我们</h2>
           <div className="bg-white rounded-xl shadow-sm p-8 space-y-6">
             <p className="text-gray-600 leading-relaxed">
-              啦啦啦
+              华中科技大学物理学院辩论队是学院官方思辨队伍，覆盖本、硕、博全学段学子，立足物理学科重逻辑、重实证、重推导的专业特质，打造独属于理工科的辩论平台。我们打破理科生不善表达的固有印象，将数理推演思维融入赛场立论与攻防，以严谨论据拆解议题，以清晰表达传递思考，零基础同学也能在这里系统学习辩论技巧，在交流思辨中打磨逻辑与口才。
             </p>
             <p className="text-gray-600 leading-relaxed">
-              啦啦啦
+              队伍常年征战校内喻晓之巅、新生杯等校级赛事，多名博士队员入选校队出征国际华语辩论赛事并斩获佳绩，同时定期联动武大、中科大等高校院系开展交流模辩。队内拥有完善的新生带教体系，每周开展模辩、复盘与思辨分享，兼顾竞技备赛与轻松团建。加入我们，既能收获赛场荣誉、锻炼公开表达与团队协作能力，也能用思辨思维赋能学术汇报、科研写作，结识一群热爱思考的同行伙伴。 
             </p>
-            <div className="grid grid-cols-3 gap-6 pt-6 border-t border-gray-100">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-[#9e1b32] mb-2">2018</div>
-                <div className="text-gray-500 text-sm">成立时间</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-[#9e1b32] mb-2">50+</div>
-                <div className="text-gray-500 text-sm">现役队员</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-[#9e1b32] mb-2">20+</div>
-                <div className="text-gray-500 text-sm">荣誉奖项</div>
-              </div>
+            <p className="text-gray-600 leading-relaxed"> 
+              赛场之外队内生活同样热闹充实，各式各样的团建聚餐、休闲出游活动持续上线，氛围轻松融洽。队内横跨本硕博的学长学姐实力出众、待人热忱，不管是辩论备赛、学业科研还是日常生活，都能随时为你答疑解惑，超多温暖有趣的专属队内日常，等待你入队后一同解锁体验。 
+            </p>
             </div>
           </div>
         </div>
@@ -120,20 +110,30 @@ export default function DebateTeamHomePage() {
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">赛事成绩</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-[#9e1b32]">
-              <div className="text-sm text-gray-500 mb-2">2025年</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">校级辩论赛</h3>
+              <div className="text-sm text-gray-500 mb-2">2024年</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">“新生杯”辩论赛</h3>
+              <p className="text-[#9e1b32] font-medium">亚军</p>
+            </div>
+            <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-[#9e1b32]">
+              <div className="text-sm text-gray-500 mb-2">2023年</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">“喻晓之巅”辩论赛</h3>
+              <p className="text-[#9e1b32] font-medium">亚军</p>
+            </div>
+            <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-[#9e1b32]">
+              <div className="text-sm text-gray-500 mb-2">2021年</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">“喻晓之巅”辩论赛</h3>
               <p className="text-[#9e1b32] font-medium">冠军</p>
             </div>
             <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-[#9e1b32]">
-              <div className="text-sm text-gray-500 mb-2">2024年</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">院系杯</h3>
-              <p className="text-[#9e1b32] font-medium">亚军 · 最佳辩手</p>
-            </div>
+              <div className="text-sm text-gray-500 mb-2">2021年</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">“新生杯”辩论赛</h3>
+              <p className="text-[#9e1b32] font-medium">季军</p>
+            </div>  
             <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-[#9e1b32]">
-              <div className="text-sm text-gray-500 mb-2">2024年</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">新生赛</h3>
-              <p className="text-[#9e1b32] font-medium">四强</p>
-            </div>
+              <div className="text-sm text-gray-500 mb-2">2020年</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">“新生杯”辩论赛</h3>
+              <p className="text-[#9e1b32] font-medium">季军</p>
+            </div>                       
           </div>
         </div>
       </section>
@@ -161,10 +161,16 @@ export default function DebateTeamHomePage() {
                 </div>
               </div>
               <div className="flex flex-col items-center">
-                <div className="w-48 h-48 bg-white rounded-lg flex items-center justify-center mb-4">
-                  <span className="text-gray-400 text-sm">招新群二维码</span>
+                <div className="w-48 h-48 bg-white rounded-lg flex items-center justify-center mb-4 overflow-hidden">
+                  <Image
+                    src="/招新群二维码.jpg"
+                    alt="招新群二维码"
+                    width={192}
+                    height={192}
+                    className="object-cover"
+                  />
                 </div>
-                <p className="text-white/70 text-sm">QQ群：123456789</p>
+                <p className="text-white/70 text-sm">QQ群：1005481846</p>
               </div>
             </div>
           </div>
@@ -174,35 +180,16 @@ export default function DebateTeamHomePage() {
       {/* Footer */}
       <footer className="bg-[#0f172a] text-white py-12">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="max-w-md mx-auto mb-8">
-            <h4 className="font-bold text-white text-lg mb-5 text-center">辩论队工具箱</h4>
-            <div className="flex flex-wrap justify-center gap-4">
-              <a
-                href="http://139.155.142.76:6001"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-3 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-medium transition-all"
-              >
-                <span className="text-lg">📚</span> 知识库
-              </a>
-              <Link
-                href="/timer"
-                className="inline-flex items-center gap-2 px-5 py-3 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-medium transition-all"
-              >
-                <span className="text-lg">⏱</span> 辩论计时器
-              </Link>
-              <a
-                href="http://139.155.142.76:8000"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-3 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-medium transition-all"
-              >
-                <span className="text-lg">🎤</span> AI 辩手
-              </a>
-            </div>
+          <div className="flex flex-wrap justify-center gap-4 mb-8">
+            <Link
+              href="/timer"
+              className="inline-flex items-center gap-2 px-5 py-3 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-medium transition-all"
+            >
+              <span className="text-lg">⏱</span> 辩论计时器
+            </Link>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm">
-            <p>© 2026 华中科技大学物理学院辩论队 版权所有</p>
+            <p>© 2026 华中科技大学物理学院辩论队</p>
           </div>
         </div>
       </footer>
