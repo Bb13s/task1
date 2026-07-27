@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>辩论计时器</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:#0a0a0a;color:#fff}
+input,select,button{font-family:inherit}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+const STORAGE_KEY = 'timer-config';
+const TEMPLATES = {
+  campus: { name: '校园赛规则', segments: [
+    { name: '开场', duration: 60, side: 'neutral', warn5s: true },
+    { name: '正方一辩立论', duration: 180, side: 'pro', warn5s: true },
+    { name: '反方四辩质询', duration: 90, side: 'con', warn5s: true },
+    { name: '反方一辩立论', duration: 180, side: 'con', warn5s: true },
+    { name: '正方四辩质询', duration: 90, side: 'pro', warn5s: true },
+    { name: '正方二辩申论', duration: 120, side: 'pro', warn5s: true },
+    { name: '反方三辩质询', duration: 90, side: 'con', warn5s: true },
+    { name: '反方二辩申论', duration: 120, side: 'con', warn5s: true },
+    { name: '正方三辩质询', duration: 90, side: 'pro', warn5s: true },
+    { name: '自由辩论', duration: 300, side: 'neutral', warn5s: true },
+    { name: '反方结辩', duration: 180, side: 'con', warn5s: true },
+    { name: '正方结辩', duration: 180, side: 'pro', warn5s: true }
+  ]},
+  silver: { name: '银卡赛规则', segments: [
+    { name: '开场', duration: 60, side: 'neutral', warn5s: true },
+    { name: '正方一辩立论', duration: 180, side: 'pro', warn5s: true },
+    { name: '反方四辩质询', duration: 90, side: 'con', warn5s: true },
+    { name: '反方一辩立论', duration: 180, side: 'con', warn5s: true },
+    { name: '正方四辩质询', duration: 90, side: 'pro', warn5s: true },
+    { name: '自由辩论', duration: 300, side: 'neutral', warn5s: true },
+    { name: '反方结辩', duration: 210, side: 'con', warn5s: true },
+    { name: '正方结辩', duration: 210, side: 'pro', warn5s: true }
+  ]}
+};
+
+function formatTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return m + ':' + String(sec).padStart(2, '0');
+}
+
+function SetupPage({ onNext }) {
+  const [tested, setTested] = useState(false);
+  const actx = useRef(null);
+  const test = () => {
+    try {
+      if (!actx.current) actx.current = new AudioContext();
+      const ctx = actx.current;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine'; osc.frequency.value = 440;
+      gain.gain.value = 0.5;
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start();
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1);
+      osc.stop(ctx.currentTime + 1);
+      setTested(true);
+    } catch { alert('当前环境不支持音频'); }
+  };
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white">
+      <div className="max-w-3xl mx-auto px-4 py-12">
+        <div className="flex items-center gap-3 mb-10">
+          <span className="text-[#9e1b32] font-medium">辩论计时器</span>
+        </div>
+        <h1 className="text-3xl font-bold mb-2">设备测试</h1>
+        <p className="text-gray-400 mb-10">在开始计时前，请确认扬声器正常工作</p>
+        <section className="bg-white/5 rounded-xl p-6 mb-10 border border-gray-800">
+          <h2 className="text-xl font-bold mb-1">测试扬声器</h2>
+          <p className="text-gray-400 text-sm mb-4">点击下方按钮，收听是否有提示音</p>
+          <button onClick={test} className="px-6 py-2.5 bg-[#9e1b32] text-white rounded-lg hover:bg-[#7a1527] transition-colors font-medium">
+            {tested ? '🔊 再次测试' : '🔇 测试扬声器'}
+          </button>
+          {tested && <span className="ml-3 text-green-400 text-sm">✓ 扬声器正常</span>}
+        </section>
+        <button onClick={onNext} className="w-full py-3 bg-[#9e1b32] text-white rounded-xl hover:bg-[#7a1527] transition-colors font-medium text-lg">
+          下一步 →
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ConfigPage({ onStart }) {
+  const [matchName, setMatchName] = useState('');
+  const [proName, setProName] = useState('正方');
+  const [conName, setConName] = useState('反方');
+  const [proTopic, setProTopic] = useState('');
+  const [conTopic, setConTopic] = useState('');
+  const [segments, setSegments] = useState([]);
+  const [autoNext, setAutoNext] = useState(false);
+  const [nextId, setNextId] = useState(1);
+  const saveData = useRef(() => {});
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const d = JSON.parse(saved);
+        setMatchName(d.matchName||''); setProName(d.proName||'正方'); setConName(d.conName||'反方');
+        setProTopic(d.proTopic||''); setConTopic(d.conTopic||'');
+        setSegments(d.segments||[]); setAutoNext(d.autoNext||false); setNextId(d.nextId||1);
+      }
+    } catch {}
+  }, []);
+
+  const state = { matchName, proName, conName, proTopic, conTopic, segments, autoNext, nextId };
+
+  saveData.current = (data) => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(Object.assign({}, state, data)));
+  };
+
+  const applyTemplate = (key) => {
+    const tmpl = TEMPLATES[key];
+    if (!tmpl) return;
+    const ns = tmpl.segments.map((s,i) => ({...s, id: nextId + i}));
+    setSegments(ns); setNextId(nextId + ns.length);
+    saveData.current({segments: ns, nextId: nextId + ns.length});
+  };
+  const addSegment = () => {
+    const ns = [...segments, {id: nextId, name: '', duration: 120, side: 'neutral', warn5s: true}];
+    setSegments(ns); setNextId(nextId+1);
+    saveData.current({segments: ns, nextId: nextId+1});
+  };
+  const removeSegment = (id) => {
+    const ns = segments.filter(s => s.id !== id);
+    setSegments(ns); saveData.current({segments: ns});
+  };
+  const updateSegment = (id, field, value) => {
+    const ns = segments.map(s => s.id === id ? {...s, [field]: value} : s);
+    setSegments(ns); saveData.current({segments: ns});
+  };
+  const moveSegment = (index, dir) => {
+    const ns = [...segments];
+    const t = index + dir;
+    if (t < 0 || t >= ns.length) return;
+    [ns[index], ns[t]] = [ns[t], ns[index]];
+    setSegments(ns); saveData.current({segments: ns});
+  };
+  const handleStart = () => {
+    if (segments.length === 0) { alert('请至少添加一个比赛环节'); return; }
+    saveData.current({segments, nextId, autoNext});
+    onStart();
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white">
+      <div className="max-w-4xl mx-auto px-4 py-12">
+        <h1 className="text-3xl font-bold mb-10">赛前配置</h1>
+        <section className="bg-white/5 rounded-xl p-6 mb-6 border border-gray-800">
+          <h2 className="text-xl font-bold mb-4">赛事信息</h2>
+          <div className="mb-4">
+            <label className="block text-sm text-gray-400 mb-1">赛事名称</label>
+            <input value={matchName} onChange={e=>{setMatchName(e.target.value);saveData.current({matchName:e.target.value})}}
+              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white" placeholder="如：银卡赛华科队内选拔赛"/>
+          </div>
+          <h3 className="text-lg font-semibold mb-3">对阵双方与辩题</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div><label className="block text-sm text-gray-400 mb-1">正方队伍名</label>
+              <input value={proName} onChange={e=>{setProName(e.target.value);saveData.current({proName:e.target.value})}}
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white" placeholder="正方队伍名"/></div>
+            <div><label className="block text-sm text-gray-400 mb-1">反方队伍名</label>
+              <input value={conName} onChange={e=>{setConName(e.target.value);saveData.current({conName:e.target.value})}}
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white" placeholder="反方队伍名"/></div>
+            <div><label className="block text-sm text-gray-400 mb-1">正方辩题</label>
+              <input value={proTopic} onChange={e=>{setProTopic(e.target.value);saveData.current({proTopic:e.target.value})}}
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white" placeholder="正方辩题"/></div>
+            <div><label className="block text-sm text-gray-400 mb-1">反方辩题</label>
+              <input value={conTopic} onChange={e=>{setConTopic(e.target.value);saveData.current({conTopic:e.target.value})}}
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white" placeholder="反方辩题"/></div>
+          </div>
+        </section>
+        <section className="bg-white/5 rounded-xl p-6 mb-6 border border-gray-800">
+          <h2 className="text-xl font-bold mb-4">赛程配置</h2>
+          <div className="flex gap-3 mb-6">
+            <button onClick={()=>applyTemplate('campus')} className="px-4 py-2 bg-[#6d28d9]/20 text-[#6d28d9] border border-[#6d28d9]/30 rounded-lg text-sm hover:bg-[#6d28d9]/30">套用「校园赛规则」</button>
+            <button onClick={()=>applyTemplate('silver')} className="px-4 py-2 bg-[#6d28d9]/20 text-[#6d28d9] border border-[#6d28d9]/30 rounded-lg text-sm hover:bg-[#6d28d9]/30">套用「银卡赛规则」</button>
+          </div>
+          <div className="space-y-3 mb-4">
+            {segments.map((seg, idx) => (
+              <div key={seg.id} className="flex items-center gap-3 bg-gray-800/50 rounded-lg p-3">
+                <div className="flex flex-col gap-1">
+                  <button onClick={()=>moveSegment(idx,-1)} className="text-gray-500 hover:text-white text-xs" disabled={idx===0}>▲</button>
+                  <button onClick={()=>moveSegment(idx,1)} className="text-gray-500 hover:text-white text-xs" disabled={idx===segments.length-1}>▼</button>
+                </div>
+                <input value={seg.name} onChange={e=>updateSegment(seg.id,'name',e.target.value)} className="flex-1 px-3 py-1.5 bg-gray-700 border border-gray-600 rounded text-white text-sm" placeholder="环节名称"/>
+                <input type="number" value={seg.duration} onChange={e=>updateSegment(seg.id,'duration',parseInt(e.target.value)||0)} className="w-20 px-2 py-1.5 bg-gray-700 border border-gray-600 rounded text-white text-sm text-center"/>
+                <span className="text-gray-400 text-xs w-6">秒</span>
+                <select value={seg.side} onChange={e=>updateSegment(seg.id,'side',e.target.value)} className="px-2 py-1.5 bg-gray-700 border border-gray-600 rounded text-white text-sm">
+                  <option value="pro">正方</option><option value="con">反方</option><option value="neutral">中立</option></select>
+                <label className="flex items-center gap-1 text-xs text-gray-400 whitespace-nowrap">
+                  <input type="checkbox" checked={seg.warn5s} onChange={e=>updateSegment(seg.id,'warn5s',e.target.checked)}/>5秒</label>
+                <label className="flex items-center gap-1 text-xs text-[#6d28d9] whitespace-nowrap">
+                  <input type="checkbox" checked={seg.dualTimer||false} onChange={e=>updateSegment(seg.id,'dualTimer',e.target.checked)}/>双方计时</label>
+                <button onClick={()=>removeSegment(seg.id)} className="text-red-400 hover:text-red-300 text-lg">✕</button>
+              </div>
+            ))}
+            {segments.length===0 && <p className="text-gray-500 text-sm text-center py-4">暂无环节，请添加或套用模板</p>}
+          </div>
+          <button onClick={addSegment} className="px-4 py-2 border border-dashed border-gray-600 rounded-lg text-gray-400 text-sm hover:border-gray-500 hover:text-white">+ 添加环节</button>
+        </section>
+        <section className="bg-white/5 rounded-xl p-6 mb-6 border border-gray-800">
+          <label className="flex items-center gap-3">
+            <input type="checkbox" checked={autoNext} onChange={e=>{setAutoNext(e.target.checked);saveData.current({autoNext:e.target.checked})}}/>
+            <span className="text-sm">当前环节结束后自动进入下一环节</span>
+          </label>
+        </section>
+        <button onClick={handleStart} className="w-full py-3 bg-[#9e1b32] text-white rounded-xl hover:bg-[#7a1527] transition-colors font-medium text-lg">使用以上配置开始计时</button>
+      </div>
+    </div>
+  );
+}
+
+function RunPage({ onBack }) {
+  const [config, setConfig] = useState(null);
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [timerState, setTimerState] = useState('idle');
+  const [surpriseActive, setSurpriseActive] = useState(false);
+  const [dualTimer, setDualTimer] = useState(false);
+  const [proTimeLeft, setProTimeLeft] = useState(0);
+  const [conTimeLeft, setConTimeLeft] = useState(0);
+  const [activeSide, setActiveSide] = useState('pro');
+  const intervalRef = useRef(0);
+  const actxRef = useRef(null);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved || !JSON.parse(saved).segments?.length) { onBack(); return; }
+      const data = JSON.parse(saved);
+      setConfig(data);
+      const first = data.segments[0];
+      setTimeLeft(first.duration);
+      if (first.dualTimer) { setDualTimer(true); setProTimeLeft(first.duration); setConTimeLeft(first.duration); }
+    } catch { onBack(); }
+  }, []);
+
+  const playBeep = useCallback((freq, duration, startDelay = 0) => {
+    try {
+      const ctx = actxRef.current || new AudioContext();
+      actxRef.current = ctx;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine'; osc.frequency.value = freq;
+      gain.gain.value = 0.3;
+      osc.connect(gain); gain.connect(ctx.destination);
+      const start = ctx.currentTime + startDelay;
+      osc.start(start);
+      gain.gain.setValueAtTime(0.3, start);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+      osc.stop(start + duration);
+    } catch {}
+  }, []);
+  const playWarn30s = useCallback(() => { playBeep(500,0.25,0); playBeep(500,0.25,0.4); playBeep(500,0.25,0.8); }, [playBeep]);
+  const playWarn5s = useCallback(() => { playBeep(880,0.12,0); playBeep(880,0.12,0.2); playBeep(880,0.12,0.4); }, [playBeep]);
+  const playTimeUp = useCallback(() => { for(let g=0;g<2;g++) for(let i=0;i<4;i++) playBeep(660,0.15,g*2.5+i*0.25); }, [playBeep]);
+  const playSurprise = useCallback(() => { for(let i=0;i<5;i++) playBeep(440,0.1,i*0.15); }, [playBeep]);
+
+  const current = config?.segments[currentIdx];
+
+  useEffect(() => {
+    if (timerState !== 'running') return;
+    intervalRef.current = setInterval(() => {
+      if (dualTimer) {
+        if (activeSide === 'pro') {
+          setProTimeLeft(prev => { if(prev<=1){playTimeUp();return 0;} if(prev===31)playWarn30s(); if(prev===6&&current?.warn5s)playWarn5s(); return prev-1; });
+        } else {
+          setConTimeLeft(prev => { if(prev<=1){playTimeUp();return 0;} if(prev===31)playWarn30s(); if(prev===6&&current?.warn5s)playWarn5s(); return prev-1; });
+        }
+      } else {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            setTimerState('idle'); playTimeUp();
+            if (config?.autoNext && currentIdx < (config.segments.length - 1)) {
+              setTimeout(() => { setCurrentIdx(p => p+1); setTimeLeft(config.segments[currentIdx+1].duration); }, 500);
+            }
+            return 0;
+          }
+          if(prev===31) playWarn30s(); if(prev===6&&config?.segments[currentIdx]?.warn5s) playWarn5s(); return prev-1;
+        });
+      }
+    }, 1000);
+    return () => clearInterval(intervalRef.current);
+  }, [timerState, config, currentIdx, dualTimer, activeSide, playWarn30s, playWarn5s, playTimeUp]);
+
+  const total = current?.duration || 0;
+  const progress = total > 0 ? (timeLeft / total) * 100 : 0;
+  const toggleTimer = () => {
+    if (timerState === 'running') setTimerState('paused');
+    else { if (dualTimer && timerState === 'idle') setActiveSide('pro'); setTimerState('running'); }
+  };
+  const switchSide = () => { if (!dualTimer) return; setActiveSide(p => p==='pro'?'con':'pro'); };
+  const resetTimer = () => { setTimerState('idle');
+    if (dualTimer) { setProTimeLeft(current?.duration||0); setConTimeLeft(current?.duration||0); }
+    else setTimeLeft(current?.duration||0); };
+  const switchSegment = (idx) => {
+    setCurrentIdx(idx); const seg = config.segments[idx];
+    if(seg.dualTimer){setDualTimer(true);setProTimeLeft(seg.duration);setConTimeLeft(seg.duration);}
+    else{setDualTimer(false);setTimeLeft(seg.duration);}
+    setTimerState('idle');
+  };
+  const prevSegment = () => { if(currentIdx<=0)return; switchSegment(currentIdx-1); };
+  const nextSegment = () => { if(!config||currentIdx>=config.segments.length-1){alert('已到最后一个环节');return;} switchSegment(currentIdx+1); };
+  const handleSurprise = () => { setSurpriseActive(true); setTimeLeft(30); setTimerState('running'); playSurprise();
+    setTimeout(()=>{setSurpriseActive(false);setTimeLeft(current?.duration||0);setTimerState('idle');},30000); };
+  const toggleFullscreen = async () => {
+    if (!document.fullscreenElement) await document.documentElement.requestFullscreen(); else await document.exitFullscreen();
+  };
+
+  useEffect(() => {
+    const hk = (e) => {
+      if (e.target.tagName==='INPUT'||e.target.tagName==='SELECT') return;
+      switch(e.key){case' ':e.preventDefault();toggleTimer();break;case'ArrowLeft':e.preventDefault();prevSegment();break;
+        case'ArrowRight':e.preventDefault();nextSegment();break;case'p':case'P':setTimerState('paused');break;
+        case'r':case'R':resetTimer();break;case'Tab':e.preventDefault();if(dualTimer)switchSide();break;
+        case'q':case'Q':playWarn30s();break;case'w':case'W':playWarn5s();break;case'e':case'E':playTimeUp();break;
+        case'f':case'F':toggleFullscreen();break;case'b':case'B':onBack();break;}
+    };
+    window.addEventListener('keydown', hk); return () => window.removeEventListener('keydown', hk);
+  }, [timerState,currentIdx,config,dualTimer,activeSide,playWarn30s,playWarn5s,playTimeUp]);
+
+  if (!config || !current) return null;
+  const tc = timeLeft===0?'text-red-500':timeLeft<=5?'text-yellow-400':'text-white';
+  return (
+    <div className="h-screen bg-gradient-to-b from-[#0a0a0a] to-[#1a1a1a] flex flex-col overflow-hidden select-none">
+      <div className="flex h-[10vh] shrink-0">
+        <div className={`w-1/2 flex items-center pl-6 ${surpriseActive?'bg-purple-700':'bg-[#9e1b32]'} ${timeLeft===0?'animate-pulse':''}`}>
+          <span className="text-white/30 font-bold text-5xl md:text-7xl select-none leading-none">正方</span>
+          {config.proName&&config.proName!=='正方'&&<span className="text-white font-bold text-2xl md:text-4xl ml-4">{config.proName}</span>}
+        </div>
+        <div className={`w-1/2 flex items-center justify-end pr-6 ${surpriseActive?'bg-purple-700':'bg-[#6d28d9]'} ${timeLeft===0?'animate-pulse':''}`}>
+          {config.conName&&config.conName!=='反方'&&<span className="text-white font-bold text-2xl md:text-4xl mr-4">{config.conName}</span>}
+          <span className="text-white/30 font-bold text-5xl md:text-7xl select-none leading-none">反方</span>
+        </div>
+      </div>
+      {(config.proTopic||config.conTopic)&&<div className="flex shrink-0 px-6 py-3">
+        <div className="w-1/2">{config.proTopic&&<span className="text-gray-400 font-medium text-xl md:text-2xl">{config.proTopic}</span>}</div>
+        <div className="w-1/2 text-right">{config.conTopic&&<span className="text-gray-400 font-medium text-xl md:text-2xl">{config.conTopic}</span>}</div>
+      </div>}
+      <div className="flex-1 flex flex-col items-center justify-center px-4 -mt-48">
+        {config.matchName&&<h1 className="text-4xl md:text-5xl font-bold -mt-16 mb-16 bg-gradient-to-r from-[#9e1b32] to-[#6d28d9] bg-clip-text text-transparent">{config.matchName}</h1>}
+        <h2 className="text-gray-400 text-3xl md:text-4xl mb-6 font-light tracking-wider">{surpriseActive?'⚡ 奇袭':current.name}</h2>
+        {dualTimer?(
+          <div className="flex items-center justify-center gap-8 md:gap-16 w-full px-4">
+            <div onClick={()=>{if(activeSide!=='pro')setActiveSide('pro')}} className={`flex flex-col items-center cursor-pointer transition-all p-6 rounded-2xl ${activeSide==='pro'?'bg-[#9e1b32]/10 ring-2 ring-[#9e1b32] scale-105':'opacity-50 hover:opacity-80'}`}>
+              <span className="text-[#9e1b32] text-lg font-bold mb-2">{config.proName}</span>
+              <span className={`text-[8vw] md:text-[6vw] font-bold tabular-nums tracking-wider leading-none ${proTimeLeft===0?'text-red-500 animate-pulse':proTimeLeft<=5?'text-yellow-400':'text-white'}`}>{formatTime(proTimeLeft)}</span>
+            </div>
+            <span className="text-gray-600 text-2xl font-bold">VS</span>
+            <div onClick={()=>{if(activeSide!=='con')setActiveSide('con')}} className={`flex flex-col items-center cursor-pointer transition-all p-6 rounded-2xl ${activeSide==='con'?'bg-[#6d28d9]/10 ring-2 ring-[#6d28d9] scale-105':'opacity-50 hover:opacity-80'}`}>
+              <span className="text-[#6d28d9] text-lg font-bold mb-2">{config.conName}</span>
+              <span className={`text-[8vw] md:text-[6vw] font-bold tabular-nums tracking-wider leading-none ${conTimeLeft===0?'text-red-500 animate-pulse':conTimeLeft<=5?'text-yellow-400':'text-white'}`}>{formatTime(conTimeLeft)}</span>
+            </div>
+          </div>
+        ):(
+          <>
+            <div className={`text-[12vw] md:text-[10vw] font-bold tabular-nums ${tc} tracking-wider leading-none mb-4 ${timeLeft===0?'animate-pulse':''}`} style={{textShadow:'0 0 40px rgba(0,0,0,0.5)'}}>{formatTime(timeLeft)}</div>
+            <div className="w-64 md:w-96 h-1 bg-gray-800 rounded-full overflow-hidden mt-4">
+              <div className="h-full rounded-full transition-all duration-1000" style={{width:`${progress}%`,backgroundColor:timeLeft===0?'#ef4444':timeLeft<=5?'#eab308':surpriseActive?'#7c3aed':'#9e1b32'}}/>
+            </div>
+          </>
+        )}
+      </div>
+      <div className="absolute bottom-0 left-0 right-0 opacity-15 hover:opacity-100 transition-opacity duration-300">
+        <div className="bg-black/80 backdrop-blur-sm border-t border-gray-800 px-4 py-3">
+          <div className="max-w-4xl mx-auto flex flex-wrap justify-center gap-2">
+            <button onClick={toggleTimer} className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-xs text-gray-200">{timerState==='running'?'⏸ 暂停 (空格)':'▶ 启动 (空格)'}</button>
+            <button onClick={resetTimer} className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-xs text-gray-200">↺ 重置 (R)</button>
+            <button onClick={prevSegment} className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-xs text-gray-200">◀ 上一 (←)</button>
+            <button onClick={nextSegment} className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-xs text-gray-200">下一 (→) ▶</button>
+            <button onClick={handleSurprise} className="px-3 py-1.5 bg-purple-800 hover:bg-purple-700 rounded text-xs text-gray-200">⚡ 奇袭</button>
+            {dualTimer&&<button onClick={switchSide} className="px-3 py-1.5 bg-[#6d28d9] hover:bg-[#5b21b6] rounded text-xs text-gray-200">↔ 切换 (Tab)</button>}
+            <button onClick={playWarn30s} className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-xs text-gray-200">🔔 30秒 (Q)</button>
+            <button onClick={playWarn5s} className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-xs text-gray-200">⏰ 5秒 (W)</button>
+            <button onClick={playTimeUp} className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-xs text-gray-200">🔔 结束 (E)</button>
+            <button onClick={toggleFullscreen} className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-xs text-gray-200">⛶ 全屏 (F)</button>
+            <button onClick={onBack} className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-xs text-gray-200">← 配置 (B)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [page, setPage] = useState('setup');
+  return (
+    <>
+      {page === 'setup' && <SetupPage onNext={() => setPage('config')} />}
+      {page === 'config' && <ConfigPage onStart={() => setPage('run')} />}
+      {page === 'run' && <RunPage onBack={() => setPage('config')} />}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

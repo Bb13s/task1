@@ -1,7 +1,7 @@
 // 辩论 AI - WebSocket 客户端
 
 let ws = null;
-let currentMode = "free";
+let currentMode = "chat";
 let currentUserId = "";
 let currentMotion = "";
 let currentUserSide = "";
@@ -17,14 +17,26 @@ const sendBtn = document.getElementById("send-btn");
 const startBtn = document.getElementById("start-btn");
 const feedbackBtn = document.getElementById("feedback-btn");
 const endBtn = document.getElementById("end-btn");
-const roundLabel = document.getElementById("round-label");
-const debateInfo = document.getElementById("debate-info");
+const backBtn = document.getElementById("back-btn");
+const headerName = document.getElementById("header-name");
+const headerMode = document.getElementById("header-mode");
 const userNameInput = document.getElementById("user-name");
 const motionInput = document.getElementById("motion");
-const backBtn = document.getElementById("back-btn");
+const debateFields = document.getElementById("debate-fields");
 const typingDiv = createTypingIndicator();
 
-// ── 设置页：选择器逻辑 ──
+// ── 设置页：模式选择 ──
+document.querySelectorAll(".mode-card").forEach(card => {
+    card.addEventListener("click", () => {
+        document.querySelectorAll(".mode-card").forEach(c => c.classList.remove("active"));
+        card.classList.add("active");
+        const isDebate = card.dataset.mode === "free";
+        debateFields.style.display = isDebate ? "" : "none";
+        startBtn.textContent = isDebate ? "开始辩论" : "开始对话";
+    });
+});
+
+// 立场按钮
 document.querySelectorAll(".side-btn").forEach(btn => {
     btn.addEventListener("click", () => {
         btn.parentElement.querySelectorAll(".side-btn").forEach(b => b.classList.remove("active"));
@@ -32,17 +44,7 @@ document.querySelectorAll(".side-btn").forEach(btn => {
     });
 });
 
-document.querySelectorAll(".mode-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-        btn.parentElement.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        // 闲聊模式隐藏辩题和立场
-        const isChat = btn.dataset.mode === "chat";
-        document.getElementById("debate-fields").style.display = isChat ? "none" : "";
-    });
-});
-
-// ── 页面加载：检查是否有未结束的辩论 ──
+// ── 页面加载：检查未结束辩论 ──
 (function checkSavedDebate() {
     try {
         const saved = localStorage.getItem("debate_state");
@@ -54,13 +56,9 @@ document.querySelectorAll(".mode-btn").forEach(btn => {
                 currentUserSide = state.user_side || "";
                 currentMode = state.mode || "chat";
                 debateId = state.debate_id;
-
                 setupScreen.style.display = "none";
                 debateScreen.style.display = "";
-                debateInfo.textContent = currentMode === "chat" ? "闲聊模式" : `${currentMotion} | 你：${currentUserSide}`;
-                roundLabel.textContent = "重新连接中...";
-                document.getElementById("back-btn").style.display = "";
-
+                updateHeader();
                 userNameInput.value = currentUserId;
                 connectWebSocket(currentUserId, currentMotion, currentUserSide, currentMode);
                 return;
@@ -70,25 +68,24 @@ document.querySelectorAll(".mode-btn").forEach(btn => {
         localStorage.removeItem("debate_state");
     }
 
-    // 正常流程：显示设置页，恢复用户名
     setupScreen.style.display = "";
     debateScreen.style.display = "none";
     const savedName = localStorage.getItem("user_name");
     if (savedName) userNameInput.value = savedName;
 })();
 
-// ── 开始辩论 ──
+// ── 开始 ──
 startBtn.addEventListener("click", startDebate);
 
 function startDebate() {
     currentUserId = userNameInput.value.trim() || "user" + Math.random().toString(36).slice(2, 6);
-    currentMode = document.querySelector(".mode-btn.active")?.dataset.mode || "chat";
+    currentMode = document.querySelector(".mode-card.active")?.dataset.mode || "chat";
 
     if (currentMode === "chat") {
         currentMotion = "";
         currentUserSide = "";
     } else {
-        currentMotion = motionInput.value.trim() || "人工智能应不应该被限制发展";
+        currentMotion = motionInput.value.trim() || "未指定辩题";
         currentUserSide = document.querySelector(".side-btn.active")?.dataset.side || "正方";
     }
 
@@ -96,39 +93,27 @@ function startDebate() {
 
     setupScreen.style.display = "none";
     debateScreen.style.display = "";
-    debateInfo.textContent = currentMode === "chat" ? "闲聊模式" : `${currentMotion} | 你：${currentUserSide}`;
-    roundLabel.textContent = "连接中...";
-    backBtn.style.display = "none";
-
+    updateHeader();
     connectWebSocket(currentUserId, currentMotion, currentUserSide, currentMode);
 }
 
-function backToSetup() {
-    if (ws) ws.close();
-    debateActive = false;
-    clearDebateState();
-    messagesEl.innerHTML = "";
-    debateScreen.style.display = "none";
-    setupScreen.style.display = "";
-    roundLabel.textContent = "";
+function updateHeader() {
+    headerName.textContent = "小B";
+    headerMode.textContent = currentMode === "chat" ? "闲聊" : currentMotion;
 }
 
-// ── WebSocket 连接 ──
+// ── WebSocket ──
 function connectWebSocket(userId, motion, userSide, mode) {
     const protocol = location.protocol === "https:" ? "wss:" : "ws:";
     ws = new WebSocket(`${protocol}//${location.host}/ws/debate`);
 
     ws.onopen = () => {
         ws.send(JSON.stringify({
-            type: "connect",
-            user_id: userId,
-            motion: motion,
-            user_side: userSide,
-            mode: mode,
-            debate_id: debateId || null,     // 恢复已有辩论
+            type: "connect", user_id: userId, motion, user_side: userSide,
+            mode, debate_id: debateId || null,
         }));
         messagesEl.innerHTML = "";
-        addSystem("已连接，准备辩论...");
+        addSystem("已连接");
         debateActive = true;
     };
 
@@ -138,16 +123,13 @@ function connectWebSocket(userId, motion, userSide, mode) {
     };
 
     ws.onclose = () => {
-        addSystem("连接已断开 — 刷新页面可重新连接");
+        addSystem("连接已断开 — 刷新页面重新连接");
         debateActive = false;
     };
 
-    ws.onerror = () => {
-        addSystem("连接出错");
-    };
+    ws.onerror = () => addSystem("连接出错");
 }
 
-// ── 消息处理 ──
 function handleMessage(msg) {
     removeTyping();
 
@@ -160,22 +142,18 @@ function handleMessage(msg) {
             else removeTyping();
             break;
         case "round_change":
-            roundLabel.textContent = msg.label;
-            addSystem(`--- 进入：${msg.label} ---`);
+            addSystem(`—— ${msg.label} ——`);
             break;
         case "feedback":
             addFeedback(msg.content);
             break;
         case "system":
             addSystem(msg.content);
-            if (currentMode === "chat") roundLabel.textContent = "闲聊";
-            else if (currentMode === "free") roundLabel.textContent = "自由辩论";
             break;
         case "error":
             addSystem("错误：" + msg.message);
             break;
         case "debate_id":
-            // 服务器返回 debate_id，存到本地
             debateId = msg.debate_id;
             saveDebateState();
             break;
@@ -187,11 +165,8 @@ function handleMessage(msg) {
 // ── 状态持久化 ──
 function saveDebateState() {
     localStorage.setItem("debate_state", JSON.stringify({
-        user_id: currentUserId,
-        motion: currentMotion,
-        user_side: currentUserSide,
-        mode: currentMode,
-        debate_id: debateId,
+        user_id: currentUserId, motion: currentMotion,
+        user_side: currentUserSide, mode: currentMode, debate_id: debateId,
     }));
 }
 
@@ -199,21 +174,38 @@ function clearDebateState() {
     localStorage.removeItem("debate_state");
 }
 
-// ── UI 操作 ──
+// ── 消息渲染 ──
 function addMessage(sender, content, isSplit) {
+    const now = new Date();
+    const time = now.getHours().toString().padStart(2,'0') + ":" +
+                 now.getMinutes().toString().padStart(2,'0');
+
     const div = document.createElement("div");
     div.className = `message ${sender === "ai" ? "ai" : "user"}${isSplit ? " split" : ""}`;
 
-    const label = document.createElement("div");
-    label.className = "sender-label";
-    label.textContent = sender === "ai" ? "徐经纬" : currentUserId;
+    const row = document.createElement("div");
+    row.className = "message-row";
+
+    const avatar = document.createElement("div");
+    avatar.className = "msg-avatar";
+    avatar.textContent = sender === "ai" ? "B" : currentUserId.charAt(0).toUpperCase();
+
+    const contentDiv = document.createElement("div");
+    contentDiv.className = "msg-content";
 
     const bubble = document.createElement("div");
     bubble.className = "bubble";
     bubble.textContent = content;
 
-    div.appendChild(label);
-    div.appendChild(bubble);
+    const timeDiv = document.createElement("div");
+    timeDiv.className = "msg-time";
+    timeDiv.textContent = time;
+
+    contentDiv.appendChild(timeDiv);
+    contentDiv.appendChild(bubble);
+    row.appendChild(avatar);
+    row.appendChild(contentDiv);
+    div.appendChild(row);
     messagesEl.appendChild(div);
 }
 
@@ -227,7 +219,6 @@ function addSystem(text) {
 function addFeedback(content) {
     const div = document.createElement("div");
     div.className = "feedback-box";
-    // 简单 Markdown → HTML 转换
     let html = content
         .replace(/^### (.+)$/gm, '<h4>$1</h4>')
         .replace(/^## (.+)$/gm, '<h3>$1</h3>')
@@ -245,25 +236,30 @@ function addFeedback(content) {
         .replace(/\n\n/g, '<br><br>')
         .replace(/\n/g, '<br>');
 
-    div.innerHTML = `<div class="title">赛后点评</div><div class="content">${html}</div>`;
+    div.innerHTML = '<div class="title">赛后点评</div><div class="content">' + html + '</div>';
     messagesEl.appendChild(div);
 }
 
+// 打字指示器
 function createTypingIndicator() {
     const div = document.createElement("div");
-    div.className = "message ai";
+    div.className = "message ai typing";
     div.style.display = "none";
 
-    const label = document.createElement("div");
-    label.className = "sender-label";
-    label.textContent = "徐经纬";
+    const row = document.createElement("div");
+    row.className = "message-row";
+
+    const avatar = document.createElement("div");
+    avatar.className = "msg-avatar";
+    avatar.textContent = "B";
 
     const bubble = document.createElement("div");
-    bubble.className = "typing-bubble";
+    bubble.className = "bubble";
     bubble.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
 
-    div.appendChild(label);
-    div.appendChild(bubble);
+    row.appendChild(avatar);
+    row.appendChild(bubble);
+    div.appendChild(row);
     return div;
 }
 
@@ -277,7 +273,7 @@ function removeTyping() {
     typingDiv.style.display = "none";
 }
 
-// ── 发送消息 ──
+// ── 发送 ──
 function sendMessage() {
     const text = msgInput.value.trim();
     if (!text || !debateActive || !ws || ws.readyState !== WebSocket.OPEN) return;
@@ -293,7 +289,7 @@ msgInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") sendMessage();
 });
 
-// ── 按钮操作 ──
+// ── 按钮 ──
 feedbackBtn.addEventListener("click", () => {
     if (ws && debateActive) {
         ws.send(JSON.stringify({ type: "request_feedback" }));
@@ -301,14 +297,20 @@ feedbackBtn.addEventListener("click", () => {
     }
 });
 
-backBtn.addEventListener("click", backToSetup);
+backBtn.addEventListener("click", () => {
+    if (ws) ws.close();
+    debateActive = false;
+    clearDebateState();
+    messagesEl.innerHTML = "";
+    debateScreen.style.display = "none";
+    setupScreen.style.display = "";
+});
 
 endBtn.addEventListener("click", () => {
     if (ws && debateActive) {
         ws.send(JSON.stringify({ type: "end_debate" }));
         debateActive = false;
         clearDebateState();
-        addSystem("辩论已结束 — 点【返回设置】开始新辩论");
-        backBtn.style.display = "";
+        addSystem("辩论已结束");
     }
 });

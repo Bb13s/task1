@@ -1,19 +1,3 @@
-/* ===== CSS Variables ===== */
-:root {
-    --brand-red: #9e1b32;
-    --brand-red-dark: #7a1527;
-    --brand-purple: #4A2887;
-    --brand-purple-light: #6d28d9;
-    --bg-dark: #0a0a0f;
-    --bg-card: #14141f;
-    --bg-card-hover: #1a1a2a;
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --border: rgba(255,255,255,0.06);
-    --radius: 16px;
-    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
 /* ===== Reset & Base ===== */
 *, *::before, *::after {
     margin: 0;
@@ -26,11 +10,10 @@ html {
 }
 
 body {
-    font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--bg-dark);
-    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
     line-height: 1.7;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
 }
 
 a {
@@ -51,9 +34,8 @@ a {
     left: 0;
     right: 0;
     z-index: 100;
-    background: rgba(10, 10, 15, 0.85);
     backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 .header-inner {
@@ -69,18 +51,12 @@ a {
 .logo {
     font-size: 20px;
     font-weight: 900;
-    color: var(--brand-red);
     letter-spacing: 4px;
 }
 
 .nav a {
     font-size: 14px;
-    color: var(--text-secondary);
-    transition: color var(--transition);
-}
-
-.nav a:hover {
-    color: var(--text-primary);
+    transition: color 0.3s;
 }
 
 /* ===== Hero ===== */
@@ -94,76 +70,6 @@ a {
     padding: 120px 24px 80px;
 }
 
-.hero-bg {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-}
-
-.orbs {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.15;
-}
-
-.orb-1 {
-    position: absolute;
-    top: 15%;
-    left: 10%;
-    width: 320px;
-    height: 320px;
-    background: var(--brand-red);
-    border-radius: 50%;
-    filter: blur(100px);
-    opacity: 0.12;
-}
-
-.orb-2 {
-    position: absolute;
-    bottom: 15%;
-    right: 8%;
-    width: 400px;
-    height: 400px;
-    background: var(--brand-purple);
-    border-radius: 50%;
-    filter: blur(100px);
-    opacity: 0.10;
-}
-
-.orb-3 {
-    position: absolute;
-    top: 45%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 260px;
-    height: 260px;
-    background: var(--brand-purple-light);
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.06;
-}
-
-.ring {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
-    border: 1px solid rgba(158, 27, 50, 0.08);
-}
-
-.ring-1 {
-    width: 700px;
-    height: 700px;
-}
-
-.ring-2 {
-    width: 500px;
-    height: 500px;
-    border-color: rgba(74, 40, 135, 0.08);
-}
-
 .hero-content {
     position: relative;
     z-index: 10;
@@ -175,26 +81,14 @@ a {
     font-weight: 900;
     letter-spacing: 16px;
     margin-bottom: 20px;
-    background: linear-gradient(135deg, var(--text-primary) 0%, #cbd5e1 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    line-height: 1.2;
 }
 
 .hero-subtitle {
     font-size: clamp(1.1rem, 2.5vw, 1.5rem);
-    color: var(--brand-red);
     font-weight: 500;
     letter-spacing: 12px;
     margin-bottom: 24px;
-}
-
-.hero-desc {
-    font-size: 1rem;
-    color: var(--text-secondary);
-    max-width: 500px;
-    margin: 0 auto;
-    line-height: 1.8;
 }
 
 /* ===== Sections ===== */
@@ -211,21 +105,15 @@ section {
 }
 
 /* ===== About ===== */
-.about {
-    background: rgba(255,255,255,0.01);
-}
-
 .about-card {
     max-width: 700px;
     margin: 0 auto;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: 16px;
     padding: 40px;
+    border: 1px solid;
 }
 
 .about-card p {
-    color: var(--text-secondary);
     margin-bottom: 16px;
     font-size: 15px;
     line-height: 1.9;
@@ -245,29 +133,23 @@ section {
 .project-card {
     display: flex;
     flex-direction: column;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: 16px;
     padding: 36px 28px;
-    transition: transform var(--transition), background var(--transition), border-color var(--transition), box-shadow var(--transition);
+    border: 1px solid;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                background 0.3s, border-color 0.3s, box-shadow 0.3s;
     cursor: pointer;
+    position: relative;
+    overflow: hidden;
 }
 
 .project-card:hover {
-    transform: translateY(-6px);
-    background: var(--bg-card-hover);
-    border-color: rgba(158, 27, 50, 0.25);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
 }
 
 .card-icon {
-    color: var(--brand-red);
     margin-bottom: 24px;
-    transition: color var(--transition);
-}
-
-.project-card:hover .card-icon {
-    color: var(--brand-purple-light);
+    transition: color 0.3s;
 }
 
 .card-title {
@@ -278,7 +160,6 @@ section {
 }
 
 .card-desc {
-    color: var(--text-secondary);
     font-size: 14px;
     line-height: 1.8;
     flex: 1;
@@ -288,18 +169,12 @@ section {
 .card-link {
     font-size: 14px;
     font-weight: 500;
-    color: var(--brand-red);
-    transition: color var(--transition);
-}
-
-.project-card:hover .card-link {
-    color: var(--brand-purple-light);
+    transition: color 0.3s;
 }
 
 /* ===== Footer ===== */
 .footer {
-    background: rgba(255,255,255,0.02);
-    border-top: 1px solid var(--border);
+    border-top: 1px solid;
     padding: 60px 0 30px;
 }
 
@@ -313,46 +188,28 @@ section {
 .footer-logo {
     font-size: 28px;
     font-weight: 900;
-    color: var(--brand-red);
-    letter-spacing: 6px;
     display: block;
     margin-bottom: 8px;
+    letter-spacing: 6px;
 }
 
 .footer-brand p {
-    color: var(--text-secondary);
     font-size: 14px;
 }
 
 .footer-links h4 {
     font-size: 14px;
     font-weight: 600;
-    color: var(--text-primary);
     margin-bottom: 16px;
     letter-spacing: 2px;
 }
 
 .footer-links a {
     display: block;
-    color: var(--text-secondary);
     font-size: 14px;
     margin-bottom: 10px;
-    transition: color var(--transition);
-}
-
-.footer-links a:hover {
-    color: var(--text-primary);
-}
-
-.footer-bottom {
-    padding-top: 24px;
-    border-top: 1px solid var(--border);
-    text-align: center;
-}
-
-.footer-bottom p {
-    color: #4b5563;
-    font-size: 13px;
+    transition: color 0.3s;
+    cursor: pointer;
 }
 
 /* ===== Responsive ===== */

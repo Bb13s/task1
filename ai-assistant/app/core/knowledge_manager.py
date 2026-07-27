@@ -102,15 +102,19 @@ class KnowledgeManager:
 
     # ── 索引 ──
 
-    def index_all(self):
-        """全量索引 knowledge_base/ 下所有 .md 文件。"""
+    def index_all(self, extra_dirs: list = None):
+        """全量索引 knowledge_base/ 和额外目录下所有 .md 文件。"""
         self._ensure_deps()
         self._docs.clear()
 
-        logger.info(f"开始索引知识库: {self.kb_dir}")
+        dirs = [self.kb_dir]
+        if extra_dirs:
+            dirs.extend(Path(d) for d in extra_dirs if Path(d).exists())
 
-        for md_file in sorted(self.kb_dir.rglob("*.md")):
-            self._index_file(md_file)
+        for d in dirs:
+            logger.info(f"索引: {d}")
+            for md_file in sorted(d.rglob("*.md")):
+                self._index_file(md_file, rel_base=d)
 
         # 重建 FTS5
         self._rebuild_fts()
@@ -121,8 +125,8 @@ class KnowledgeManager:
 
         logger.info(f"知识库索引完成，共 {len(self._docs)} 篇文档")
 
-    def _index_file(self, filepath: Path):
-        """索引单个文件。"""
+    def _index_file(self, filepath: Path, rel_base: Path = None):
+        """索引单个文件。rel_base 用于计算相对路径，默认使用 self.kb_dir。"""
         try:
             text = filepath.read_text(encoding="utf-8")
         except Exception:
@@ -136,22 +140,34 @@ class KnowledgeManager:
         if isinstance(triggers, str):
             triggers = [triggers]
 
-        # 生成一些默认 trigger：从文件名和目录名
+        # 从文件名和目录名中提取中文触发词（过滤英文路径碎片和角色名）
         auto_triggers = set()
         for part in filepath.parts:
-            auto_triggers.update(re.findall(r"[\u4e00-\u9fff\w]+", part))
+            for match in re.findall(r"[\u4e00-\u9fff]{2,}", part):
+                # 排除 speeches/character_data 等目录名和已知角色名
+                if match in ("徐经纬", "小王", "speeches", "character_data", "knowledge_base"):
+                    continue
+                auto_triggers.add(match)
 
         all_triggers = list(set(triggers + list(auto_triggers)))
 
+        # 计算文档 key：优先用相对路径，否则用文件名
+        base = rel_base or self.kb_dir
+        try:
+            doc_key = str(filepath.relative_to(base))
+        except ValueError:
+            parent_name = filepath.parent.name if filepath.parent.name else ""
+            doc_key = f"{parent_name}/{filepath.name}" if parent_name else filepath.name
+
         doc = KnowledgeDoc(
-            path=str(filepath.relative_to(self.kb_dir)),
+            path=doc_key,
             triggers=all_triggers,
             side=meta.get("side", "通用"),
             doc_type=meta.get("type", "argument"),
             title=self._extract_title(content),
             content=content,
         )
-        self._docs[str(filepath.relative_to(self.kb_dir))] = doc
+        self._docs[doc_key] = doc
 
     def _extract_title(self, content: str) -> str:
         """从 Markdown 中提取标题。"""

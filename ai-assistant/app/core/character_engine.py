@@ -11,28 +11,47 @@ class CharacterEngine:
         self.config = character_config
         self.data_dir = Path(character_data_dir) / self.config["name"]
         self._speeches: list[str] = []          # 真实辩论稿（全文缓存）
-        self._phrases: str = ""                  # 口头禅文档（全文缓存）
-        self._persona_text: str = ""             # 人设描述
+        self._phrases: str = ""                  # 辩论句式（全文缓存）
+        self._phrases_chat: str = ""             # 闲聊句式（全文缓存）
+        self._persona_text: str = ""             # 核心人设（辩论闲聊通用）
+        self._persona_chat_text: str = ""        # 闲聊专属人设
+        self._chat_examples: list[str] = []      # 日常聊天示例（few-shot 训练数据）
 
         self._load_all_materials()
 
     def _load_all_materials(self):
         """加载该人的全部素材（第一阶段全量加载，量不大）。"""
-        # 加载人设描述
+        # 加载核心人设（辩论闲聊通用）
         persona_path = self.data_dir / "persona.md"
         if persona_path.exists():
             self._persona_text = persona_path.read_text(encoding="utf-8")
 
-        # 加载口头禅
+        # 加载闲聊专属人设
+        persona_chat_path = self.data_dir / "persona_chat.md"
+        if persona_chat_path.exists():
+            self._persona_chat_text = persona_chat_path.read_text(encoding="utf-8")
+
+        # 加载辩论句式
         phrases_path = self.data_dir / "phrases.md"
         if phrases_path.exists():
             self._phrases = phrases_path.read_text(encoding="utf-8")
+
+        # 加载闲聊句式
+        phrases_chat_path = self.data_dir / "phrases_chat.md"
+        if phrases_chat_path.exists():
+            self._phrases_chat = phrases_chat_path.read_text(encoding="utf-8")
 
         # 加载所有辩论稿
         speeches_dir = self.data_dir / "speeches"
         if speeches_dir.exists():
             for file in sorted(speeches_dir.glob("*.md")):
                 self._speeches.append(file.read_text(encoding="utf-8"))
+
+        # 加载日常聊天示例（闲聊模式的 few-shot 训练数据）
+        chats_dir = self.data_dir / "chats"
+        if chats_dir.exists():
+            for file in sorted(chats_dir.glob("*.md")):
+                self._chat_examples.append(file.read_text(encoding="utf-8"))
 
     def build_character_prompt(self, debate_context: dict = None) -> str:
         """构建完整的人格指令块，注入到主 prompt 中。"""
@@ -134,20 +153,25 @@ class CharacterEngine:
             # 没有 chat_style 配置时，降级为简化的辩论风格
             parts.append(f"说话风格：{style.get('tone', '')}。但你现在在闲聊，放松一点说话。")
 
-        # ── 人设描述（帮助 AI 理解这个人的完整形象）──
+        # ── 核心人设 ──
         if self._persona_text:
-            parts.append(f"\n[关于你这个人]\n{self._persona_text[:1000]}")
+            parts.append(f"\n[关于你这个人（核心）]\n{self._persona_text[:600]}")
 
-        # ── 口头禅（只取部分，不要太多）──
-        if self._phrases:
-            parts.append(f"\n[你常用的表达方式]\n{self._phrases[:500]}")
+        # ── 闲聊专属人设（比核心人设更重要：定义了你在咖啡馆里的样子）──
+        if self._persona_chat_text:
+            parts.append(f"\n[闲聊时的你——比核心人设更重要]\n{self._persona_chat_text}")
 
-        # ── 真实发言片段（精选 1-2 段作为语言风格参考）──
-        if self._speeches:
-            parts.append("\n[以下是你真实的说话风格参考——不是要你在闲聊中辩论，而是感受你的语感和思维节奏]")
-            for i, speech in enumerate(self._speeches[:2]):
-                snippet = speech[:400]
-                parts.append(f"\n--- 你的真实语言片段 #{i+1} ---\n{snippet}")
+        # ── 闲聊惯用表达 ──
+        if self._phrases_chat:
+            parts.append(f"\n[你闲聊时常用的说法]\n{self._phrases_chat}")
+
+        # ── 日常聊天示例（最重要的 few-shot 训练数据，直接展示你在闲聊中怎么说话）──
+        if self._chat_examples:
+            parts.append("\n[以下是你在日常聊天中的真实对话示例 —— 请严格模仿这种语气、节奏和思维方式来聊天]")
+            parts.append("这些是你被问到各种问题时实际会说的话。注意你的回答方式：先给直觉感受，再自然展开，有时反问对方。你说话长短由话题决定，不是每句都长篇大论。")
+            for i, chat in enumerate(self._chat_examples):
+                # 聊天示例全文注入，这些是最有价值的训练数据
+                parts.append(f"\n--- 聊天示例 #{i+1} ---\n{chat}")
 
         return "\n".join(parts)
 
@@ -164,7 +188,10 @@ class CharacterEngine:
         self.data_dir = Path(character_data_dir) / self.config["name"]
         self._speeches = []
         self._phrases = ""
+        self._phrases_chat = ""
         self._persona_text = ""
+        self._persona_chat_text = ""
+        self._chat_examples = []
         self._load_all_materials()
 
     def get_position_hint(self, motion: str) -> str | None:

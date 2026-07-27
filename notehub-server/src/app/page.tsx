@@ -88,7 +88,6 @@ export default function AppPage() {
             <span className="font-bold text-xl text-gray-800">NoteHub</span>
           </div>
           <nav className="flex items-center gap-4">
-            <a href={process.env.NEXT_PUBLIC_MAIN_SITE_URL || "/"} className="text-gray-600 hover:text-gray-900 text-sm">← 返回官网</a>
             <Link href="/" className="text-[#9e1b32] font-medium">首页</Link>
             {user ? (
               <>
@@ -109,11 +108,11 @@ export default function AppPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
             <span className="bg-gradient-to-r from-[#9e1b32] to-[#4A2887] bg-clip-text text-transparent">
-              欢迎来到——物院巴别塔
+              十三工作室——NoteHub
             </span>
           </h1>
           <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-            个人知识库管理、物院资源共享平台。现已支持新建Markdown、上传PDF以及所有工作区文件的公开！
+            个人知识库管理、资源共享平台。现已支持新建Markdown、上传PDF以及所有工作区文件的公开！
           </p>
           {user ? (
             <div className="flex items-center justify-center gap-4">
@@ -195,12 +194,6 @@ export default function AppPage() {
         </>
       ) : null}
 
-      {/* Footer */}
-      <footer className="bg-[#0f172a] border-t border-gray-800 py-8">
-        <div className="max-w-6xl mx-auto px-4 text-center text-gray-500">
-          <p className="text-gray-500">© 2026 华中科技大学物理学院辩论队</p>
-        </div>
-      </footer>
 
       {/* Login Modal */}
       {showLogin && (
@@ -212,7 +205,7 @@ export default function AppPage() {
               </div>
               <h2 className="text-2xl font-bold text-gray-800">知识库登录</h2>
               <p className="text-gray-500 mt-3 px-4 py-2 bg-amber-50 text-amber-700 rounded-lg text-sm border border-amber-200">
-                知识库服务仅向内部人员开放，如有账号请登录
+                欢迎使用 NoteHub，请登录或注册账号
               </p>
             </div>
 
@@ -257,7 +250,7 @@ export default function AppPage() {
             </form>
 
             <div className="mt-4 text-center">
-              <span className="text-sm text-gray-400">账号注册功能已关闭</span>
+              <Link href="/register" className="text-sm text-[#9e1b32] hover:text-[#7a1527]">没有账号？立即注册</Link>
             </div>
           </div>
         </div>

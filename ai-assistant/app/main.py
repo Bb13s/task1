@@ -24,7 +24,8 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(message
 logger = logging.getLogger(__name__)
 
 # ── 路径 ──
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))      # app/
+PROJECT_ROOT = os.path.dirname(BASE_DIR)                    # ai-assistant/
 
 # ── 全局单例 ──
 config: dict = {}
@@ -63,7 +64,15 @@ async def lifespan(app: FastAPI):
         kb_dir=settings["paths"]["knowledge_base"],
         data_dir=settings["paths"]["knowledge_data"],
     )
-    knowledge_manager.index_all()
+    # 索引知识库 + 角色 speeches 目录
+    chars_dir = os.path.join(BASE_DIR, "character_data")
+    extra_dirs = []
+    if os.path.exists(chars_dir):
+        for char_dir in os.listdir(chars_dir):
+            speeches_dir = os.path.join(chars_dir, char_dir, "speeches")
+            if os.path.isdir(speeches_dir):
+                extra_dirs.append(speeches_dir)
+    knowledge_manager.index_all(extra_dirs=extra_dirs)
     # 后台文件监控
     import asyncio
     asyncio.create_task(knowledge_manager.watch())
@@ -121,30 +130,30 @@ async def admin_page(request: Request):
 
 @app.get("/api/characters")
 async def list_characters():
-    """列出所有可用的角色。"""
-    chars_dir = os.path.join(BASE_DIR, "config", "characters")
+    """列出所有可用的角色。扫描 character_data/ 下包含 style.yaml 的目录。"""
+    chars_base = os.path.join(BASE_DIR, "character_data")
     characters = []
-    for f in sorted(os.listdir(chars_dir)):
-        if f.endswith(".yaml"):
-            import yaml as _yaml
-            path = os.path.join(chars_dir, f)
-            with open(path, "r", encoding="utf-8") as fh:
-                cfg = _yaml.safe_load(fh) or {}
-            name = cfg.get("name", f.replace(".yaml", ""))
-            characters.append({
-                "id": f.replace(".yaml", ""),
-                "name": name,
-                "active": name == character_engine.config.get("name", ""),
-            })
+    if os.path.exists(chars_base):
+        for d in sorted(os.listdir(chars_base)):
+            style_path = os.path.join(chars_base, d, "style.yaml")
+            if os.path.isfile(style_path):
+                import yaml as _yaml
+                with open(style_path, "r", encoding="utf-8") as fh:
+                    cfg = _yaml.safe_load(fh) or {}
+                name = cfg.get("name", d)
+                characters.append({
+                    "id": d,
+                    "name": name,
+                    "active": name == character_engine.config.get("name", ""),
+                })
     return {"characters": characters}
 
 
 @app.post("/api/characters/switch")
 async def switch_character(data: dict):
     """切换角色。"""
-    char_id = data.get("id", "default")
-    chars_dir = os.path.join(BASE_DIR, "config", "characters")
-    path = os.path.join(chars_dir, f"{char_id}.yaml")
+    char_id = data.get("id", "徐经纬")
+    path = os.path.join(BASE_DIR, "character_data", char_id, "style.yaml")
 
     if not os.path.exists(path):
         return {"error": f"角色 '{char_id}' 不存在"}, 404
@@ -185,7 +194,7 @@ async def knowledge_status():
 @app.get("/api/debates")
 async def list_debates():
     """列出所有辩论存档。"""
-    debates_dir = os.path.join(BASE_DIR, config["settings"]["paths"]["debates"])
+    debates_dir = os.path.join(PROJECT_ROOT, config["settings"]["paths"]["debates"])
     debates = []
     if os.path.exists(debates_dir):
         for f in sorted(os.listdir(debates_dir), reverse=True):
@@ -212,7 +221,7 @@ async def list_debates():
 @app.get("/api/debates/{debate_id}")
 async def view_debate(debate_id: str):
     """查看单场辩论详情。"""
-    debates_dir = os.path.join(BASE_DIR, config["settings"]["paths"]["debates"])
+    debates_dir = os.path.join(PROJECT_ROOT, config["settings"]["paths"]["debates"])
     path = os.path.join(debates_dir, f"{debate_id}.json")
     if not os.path.exists(path):
         return {"error": "辩论不存在"}, 404
@@ -221,6 +230,19 @@ async def view_debate(debate_id: str):
     with open(path, "r", encoding="utf-8") as fh:
         d = _json.load(fh)
     return d
+
+
+@app.delete("/api/debates/{debate_id}")
+async def delete_debate(debate_id: str):
+    """删除单场辩论存档。"""
+    debates_dir = os.path.join(PROJECT_ROOT, config["settings"]["paths"]["debates"])
+    path = os.path.join(debates_dir, f"{debate_id}.json")
+    if not os.path.exists(path):
+        return {"error": "辩论不存在"}, 404
+
+    os.remove(path)
+    logger.info(f"辩论存档已删除: {debate_id}")
+    return {"status": "ok"}
 
 
 app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
@@ -258,7 +280,7 @@ async def ws_debate(ws: WebSocket):
         # 闲聊模式：简单开聊
         if mode == "chat":
             await ws.send_text(json.dumps({"type": "debate_id", "debate_id": debate_id}, ensure_ascii=False))
-            await adapter.send_message(user_id, "嗨，我是徐经纬。聊点什么？", is_split=False)
+            await adapter.send_message(user_id, "嗨，我是小B。聊点什么？", is_split=False)
         else:
             # 辩论模式：发送辩题等信息
             await ws.send_text(json.dumps({"type": "debate_id", "debate_id": debate_id}, ensure_ascii=False))

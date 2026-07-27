@@ -1,0 +1,1954 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>太阳系探索之旅</title>
+<style>
+/* ========== 全局 ========== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  overflow: hidden;
+  background: #000;
+  font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+#canvas-container { position: fixed; inset: 0; z-index: 1; }
+canvas { display: block; }
+
+/* ========== 加载页 ========== */
+#loading {
+  position: fixed; inset: 0; z-index: 100;
+  background: #000;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  transition: opacity 0.6s;
+}
+#loading.hidden { opacity: 0; pointer-events: none; }
+#loading .loader-ring {
+  width: 60px; height: 60px;
+  border: 3px solid rgba(255,255,255,0.15);
+  border-top-color: #ffaa00;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+#loading p { color: #aaa; margin-top: 18px; font-size: 16px; letter-spacing: 2px; }
+
+/* ========== 降级页 ========== */
+#fallback {
+  display: none; position: fixed; inset: 0; z-index: 99;
+  background: #0a0a1a; color: #fff;
+  padding: 40px 20px; overflow-y: auto;
+}
+#fallback.show { display: block; }
+#fallback h1 { text-align: center; font-size: 28px; margin-bottom: 30px; color: #ffaa00; }
+#fallback .fb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; max-width: 1000px; margin: 0 auto; }
+#fallback .fb-card {
+  background: rgba(255,255,255,0.06); border-radius: 12px; padding: 20px;
+  border-left: 4px solid #ffaa00;
+}
+#fallback .fb-card h3 { font-size: 18px; margin-bottom: 8px; }
+#fallback .fb-card p { font-size: 14px; color: #bbb; line-height: 1.7; }
+
+/* ========== 标题 ========== */
+#title-bar {
+  position: fixed; top: 20px; left: 24px; z-index: 10;
+  pointer-events: none;
+}
+#title-bar h1 {
+  font-size: clamp(20px, 3vw, 28px); color: #fff;
+  text-shadow: 0 0 20px rgba(255,170,0,0.5);
+  font-weight: 700; letter-spacing: 3px;
+}
+#title-bar .subtitle { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+
+/* ========== 一级弹窗 ========== */
+.popup-level1 {
+  position: fixed; z-index: 20;
+  top: 50%; right: 30px;
+  transform: translateY(-50%);
+  background: rgba(10, 10, 30, 0.92);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 16px;
+  padding: 28px 24px 20px;
+  width: 370px; max-width: calc(100vw - 40px); max-height: 85vh;
+  overflow-y: auto;
+  color: #fff;
+  transition: opacity 0.3s, transform 0.3s;
+  opacity: 0; pointer-events: none;
+  transform: translateY(-50%) translateX(20px);
+}
+.popup-level1.show { opacity: 1; pointer-events: auto; transform: translateY(-50%) translateX(0); }
+.popup-level1 .popup-emoji { font-size: 48px; display: block; margin-bottom: 8px; }
+.popup-level1 .popup-title { font-size: 22px; font-weight: 700; margin-bottom: 6px; color: #ffaa00; }
+.popup-level1 .popup-tagline { font-size: 14px; color: #bbb; margin-bottom: 14px; line-height: 1.5; }
+.popup-level1 .popup-data { margin-bottom: 16px; }
+.popup-level1 .popup-data-item {
+  font-size: 13px; color: #aaa; padding: 4px 0;
+  display: flex; gap: 8px;
+}
+.popup-level1 .popup-data-item .label { color: #888; min-width: 70px; }
+.popup-level1 .popup-data-item .value { color: #ddd; }
+.popup-level1 .popup-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+.popup-level1 button {
+  padding: 10px 20px; border-radius: 10px; border: none;
+  font-size: 14px; cursor: pointer; font-family: inherit;
+  transition: background 0.2s, transform 0.15s;
+}
+.popup-level1 button:active { transform: scale(0.95); }
+.btn-detail { background: #ff8800; color: #fff; }
+.btn-detail:hover { background: #ffaa00; }
+.btn-moon { background: #4488cc; color: #fff; }
+.btn-moon:hover { background: #55aadd; }
+.btn-earth { background: #33aa55; color: #fff; }
+.btn-earth:hover { background: #44cc66; }
+.btn-close-popup { background: rgba(255,255,255,0.12); color: #ccc; }
+.btn-close-popup:hover { background: rgba(255,255,255,0.2); }
+
+/* ========== 二级弹窗 ========== */
+.popup-level2 {
+  position: fixed; inset: 0; z-index: 30;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.35s;
+  opacity: 0; pointer-events: none;
+}
+.popup-level2.show { opacity: 1; pointer-events: auto; }
+.popup-level2 .overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(6px);
+}
+.popup-level2 .detail-card {
+  position: relative;
+  background: rgba(12, 12, 36, 0.96);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 20px;
+  width: 90vw; max-width: 620px; max-height: 85vh;
+  overflow-y: auto;
+  padding: 32px 28px;
+  color: #fff;
+}
+.popup-level2 .detail-card h2 { font-size: 26px; color: #ffaa00; margin-bottom: 20px; }
+.popup-level2 .detail-card .section {
+  margin-bottom: 18px;
+}
+.popup-level2 .detail-card .section-title {
+  font-size: 15px; color: #ff8800; font-weight: 700;
+  margin-bottom: 6px; display: flex; align-items: center; gap: 6px;
+}
+.popup-level2 .detail-card .section-content {
+  font-size: 14px; color: #ccc; line-height: 1.8;
+}
+.popup-level2 .detail-card .section-content ul { padding-left: 18px; }
+.popup-level2 .detail-card .section-content li { margin-bottom: 4px; }
+/* 详情弹窗表格 */
+.popup-level2 .detail-card table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 13px; }
+.popup-level2 .detail-card th { background: rgba(255,136,0,0.18); padding: 7px 10px; text-align: left; color: #ffaa00; font-weight: 600; }
+.popup-level2 .detail-card td { padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.06); vertical-align: top; }
+.popup-level2 .detail-card .myth-table th:first-child { color: #ff6666; }
+.popup-level2 .detail-card .myth-table th:last-child { color: #66dd88; }
+.popup-level2 .detail-card hr { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 10px 0; }
+.popup-level2 .btn-close-detail {
+  position: sticky; top: 0; float: right;
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(0,0,0,0.5);
+  color: #fff; font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 5;
+}
+.popup-level2 .btn-close-detail:hover { background: rgba(255,255,255,0.15); }
+
+/* ========== 底部控制栏 ========== */
+#controls-bar {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10;
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(10, 10, 30, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 40px;
+  padding: 10px 20px;
+  flex-wrap: wrap; justify-content: center;
+}
+#controls-bar button {
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.06);
+  color: #ddd; font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s, transform 0.15s;
+}
+#controls-bar button:hover { background: rgba(255,255,255,0.14); }
+#controls-bar button:active { transform: scale(0.9); }
+#controls-bar button.active { background: rgba(255,136,0,0.3); border-color: #ff8800; }
+#controls-bar .speed-slider {
+  width: 90px; height: 4px;
+  -webkit-appearance: none; appearance: none;
+  background: rgba(255,255,255,0.2); border-radius: 2px;
+  outline: none; cursor: pointer;
+}
+#controls-bar .speed-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 18px; height: 18px;
+  border-radius: 50%; background: #ff8800; cursor: pointer;
+}
+#controls-bar .speed-label { color: #aaa; font-size: 12px; min-width: 38px; text-align: center; }
+#controls-bar .divider { width: 1px; height: 20px; background: rgba(255,255,255,0.12); margin: 0 4px; }
+#controls-bar .nav-btn { font-size: 13px; width: 40px; height: 40px; }
+
+/* ========== 前置科普弹窗 ========== */
+#intro-popup {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(8px);
+  transition: opacity 0.4s;
+}
+#intro-popup.hidden { opacity: 0; pointer-events: none; }
+#intro-popup .intro-card {
+  background: rgba(12, 12, 40, 0.96);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 20px;
+  padding: 36px 32px;
+  width: 90vw; max-width: 680px; max-height: 82vh;
+  overflow-y: auto;
+  color: #fff; text-align: left; line-height: 1.7;
+}
+#intro-popup .intro-card h2 { font-size: 24px; color: #ffaa00; margin-bottom: 20px; text-align: center; }
+#intro-popup .intro-card h3 { font-size: 16px; color: #ffcc66; margin: 16px 0 8px; }
+#intro-popup .intro-card .types { display: flex; gap: 10px; margin: 14px 0; flex-wrap: wrap; justify-content: center; }
+#intro-popup .intro-card .type-tag {
+  padding: 10px 16px; border-radius: 12px;
+  font-size: 13px; text-align: center;
+}
+.type-tag.terrestrial { background: rgba(255,150,80,0.2); border: 1px solid rgba(255,150,80,0.4); }
+.type-tag.gas { background: rgba(255,180,100,0.2); border: 1px solid rgba(255,180,100,0.4); }
+.type-tag.ice { background: rgba(80,160,255,0.2); border: 1px solid rgba(80,160,255,0.4); }
+#intro-popup .intro-card button {
+  margin-top: 16px; padding: 12px 32px;
+  border-radius: 12px; border: none;
+  background: #ff8800; color: #fff;
+  font-size: 16px; cursor: pointer; font-family: inherit;
+}
+
+/* ========== 排行榜 ========== */
+#rank-panel {
+  position: fixed; left: 20px; top: 50%; transform: translateY(-50%); z-index: 10;
+  background: rgba(10,10,30,0.85); backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px; padding: 16px;
+  color: #fff; font-size: 13px;
+  transition: opacity 0.3s; opacity: 0; pointer-events: none;
+  width: 180px;
+}
+#rank-panel.show { opacity: 1; pointer-events: auto; }
+#rank-panel h3 { font-size: 14px; color: #ffaa00; margin-bottom: 10px; text-align: center; }
+#rank-panel .rank-item { padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; }
+#rank-panel .rank-item .medal { margin-right: 4px; }
+#rank-toggle {
+  position: fixed; left: 20px; bottom: 100px; z-index: 10;
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(10,10,30,0.85); color: #ddd;
+  font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ========== 响应式 ========== */
+@media (max-width: 768px) {
+  .popup-level1 { right: 4px; width: calc(100vw - 16px); padding: 20px 16px 16px; }
+  .popup-level1 .popup-emoji { font-size: 36px; }
+  .popup-level1 .popup-title { font-size: 18px; }
+  #controls-bar { padding: 8px 12px; gap: 6px; bottom: 10px; border-radius: 30px; }
+  #controls-bar button { width: 32px; height: 32px; font-size: 14px; }
+  #controls-bar .nav-btn { width: 34px; height: 34px; font-size: 12px; }
+  #controls-bar .speed-slider { width: 60px; }
+  #rank-panel { left: 4px; width: 150px; font-size: 11px; padding: 12px; }
+  #rank-toggle { left: 4px; bottom: 90px; width: 32px; height: 32px; }
+  #title-bar { top: 10px; left: 12px; }
+  #title-bar h1 { font-size: 18px; }
+}
+</style>
+</head>
+<body>
+
+<!-- 加载页 -->
+<div id="loading"><div class="loader-ring"></div><p>正在加载太阳系...</p></div>
+
+<!-- 降级页 -->
+<div id="fallback">
+  <h1>🪐 太阳系探索之旅</h1>
+  <p style="text-align:center;color:#aaa;margin-bottom:24px">您的浏览器不支持 WebGL 3D 渲染，以下为图文版科普内容</p>
+  <div class="fb-grid" id="fallback-grid"></div>
+</div>
+
+<!-- 标题 -->
+<div id="title-bar"><h1>🪐 太阳系探索之旅</h1><div class="subtitle">点击天体开始探索</div></div>
+
+<!-- 画布 -->
+<div id="canvas-container"></div>
+
+<!-- 一级弹窗 -->
+<div class="popup-level1" id="popup-level1">
+  <span class="popup-emoji" id="p1-emoji"></span>
+  <h2 class="popup-title" id="p1-title"></h2>
+  <p class="popup-tagline" id="p1-tagline"></p>
+  <div class="popup-data" id="p1-data"></div>
+  <div class="popup-buttons" id="p1-buttons">
+    <button class="btn-detail" id="p1-btn-detail">📖 完整科普</button>
+    <button class="btn-close-popup" id="p1-btn-close">✕ 关闭</button>
+  </div>
+</div>
+
+<!-- 二级弹窗 -->
+<div class="popup-level2" id="popup-level2">
+  <div class="overlay"></div>
+  <div class="detail-card" id="detail-card">
+    <button class="btn-close-detail" id="btn-close-detail">✕</button>
+    <h2 id="p2-title"></h2>
+    <div id="p2-content"></div>
+  </div>
+</div>
+
+<!-- 前置科普 -->
+<div id="intro-popup">
+  <div class="intro-card">
+    <h2>🌌 欢迎来到太阳系 —— 我们的宇宙家园</h2>
+    <p style="color:#ccc;margin-bottom:12px">太阳系，是银河系中一个普通的恒星系统，却因为孕育了地球生命而无比特殊。它诞生于约45.7亿年前，由一片巨大的分子云在引力作用下坍缩形成。</p>
+    <hr style="border-color:rgba(255,255,255,0.08);margin:14px 0">
+    <h3>📐 太阳系基本构成</h3>
+    <p style="color:#bbb;padding-left:12px">1 颗恒星 —— 太阳（占据全系 99.86% 的总质量）<br>
+    8 颗行星 —— 按轨道由内到外依次排列<br>
+    200+ 颗天然卫星 —— 环绕行星运转<br>
+    1 条小行星带 —— 位于火星和木星轨道之间<br>
+    数万颗彗星 —— 来自太阳系边缘的"冰封信使"</p>
+    <hr style="border-color:rgba(255,255,255,0.08);margin:14px 0">
+    <h3>🪨 类地岩石行星（内太阳系四兄弟）</h3>
+    <p style="color:#bbb;font-size:13px">成员：水星、金星、地球、火星<br>共同特征：体积偏小，密度较大；外壳由坚硬的硅酸盐岩石构成；拥有明确的固态地表；卫星数量极少</p>
+    <h3>💨 气态巨行星（太阳系巨人）</h3>
+    <p style="color:#bbb;font-size:13px">成员：木星、土星<br>共同特征：无固态地面，为流体星球；主体由氢气（约90%）和氦气（约10%）构成；自转速度极快</p>
+    <h3>🧊 冰巨行星（遥远边疆的蓝色世界）</h3>
+    <p style="color:#bbb;font-size:13px">成员：天王星、海王星<br>共同特征：大气深处封存大量水冰、甲烷冰和氨冰；表面温度极低（-200°C左右）；甲烷赋予星体独特的蓝-青色外观</p>
+    <div style="text-align:center;margin-top:20px">
+    <button onclick="document.getElementById('intro-popup').classList.add('hidden')">🚀 开始探索</button>
+    </div>
+  </div>
+</div>
+
+<!-- 排行榜按钮 + 面板 -->
+<button id="rank-toggle" title="行星排行榜">🏆</button>
+<div id="rank-panel">
+  <h3>🏆 行星排行榜</h3>
+  <div id="rank-content"></div>
+</div>
+
+<!-- 底部控制栏 -->
+<div id="controls-bar">
+  <button id="btn-pause" title="暂停/播放">⏯️</button>
+  <button id="btn-slower" title="减速">⏪</button>
+  <input type="range" class="speed-slider" id="speed-slider" min="0" max="200" value="100" title="速度">
+  <button id="btn-faster" title="加速">⏩</button>
+  <span class="speed-label" id="speed-label">1×</span>
+  <span class="divider"></span>
+  <button class="nav-btn" data-planet="sun" title="太阳">☀️</button>
+  <button class="nav-btn" data-planet="mercury" title="水星">☿</button>
+  <button class="nav-btn" data-planet="venus" title="金星">♀</button>
+  <button class="nav-btn" data-planet="earth" title="地球">🌍</button>
+  <button class="nav-btn" data-planet="mars" title="火星">♂</button>
+  <button class="nav-btn" data-planet="jupiter" title="木星">♃</button>
+  <button class="nav-btn" data-planet="saturn" title="土星">♄</button>
+  <button class="nav-btn" data-planet="uranus" title="天王星">⛢</button>
+  <button class="nav-btn" data-planet="neptune" title="海王星">♆</button>
+  <span class="divider"></span>
+  <button id="btn-reset" title="重置视角">🔄</button>
+  <span class="divider"></span>
+  <button id="btn-voice" title="语音播报">🔊</button>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "/three/three.module.js",
+    "three/addons/": "/three/addons/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ==================== WebGL 检测 ====================
+function hasWebGL() {
+  try { const c = document.createElement('canvas'); return !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl'))); }
+  catch(e) { return false; }
+}
+
+if (!hasWebGL()) {
+  document.getElementById('loading').classList.add('hidden');
+  document.getElementById('fallback').classList.add('show');
+  // 填充降级内容
+  const grid = document.getElementById('fallback-grid');
+  const fbData = [
+    { t:'☀️ 太阳', d:'太阳系中心恒星，直径139万公里，表面5500°C。太阳光飞到地球需8分20秒。' },
+    { t:'☿ 水星', d:'最小行星，直径4879km，距太阳最近。没有大气层，昼夜温差达610°C。' },
+    { t:'♀ 金星', d:'最热行星，地表462°C。逆向自转，太阳从西边升起。浓厚二氧化碳大气造成温室效应。' },
+    { t:'🌍 地球', d:'我们的家园，直径12756km，71%表面被水覆盖。目前已知唯一有生命存在的星球。' },
+    { t:'🌙 月球', d:'地球卫星，直径3476km，始终同一面朝向地球。引潮力造成海洋潮汐。' },
+    { t:'♂ 火星', d:'红色星球，直径6792km。红色来自氧化铁。拥有太阳系最高山——奥林帕斯山。' },
+    { t:'♃ 木星', d:'最大行星，直径14.3万km。大红斑是刮了300多年的超级风暴。拥有95颗已知卫星。' },
+    { t:'♄ 土星', d:'标志性光环，光环由冰块、岩石碎屑、甲烷冰组成。密度比水低。拥有145颗卫星。' },
+    { t:'⛢ 天王星', d:'冰巨行星，自转轴倾斜98°，侧躺着自转。用望远镜发现的第一颗行星。' },
+    { t:'♆ 海王星', d:'最远行星，风速超2100km/h。先由数学计算预测，再用望远镜发现。' },
+  ];
+  fbData.forEach(d => {
+    const card = document.createElement('div'); card.className = 'fb-card';
+    card.innerHTML = `<h3>${d.t}</h3><p>${d.d}</p>`;
+    grid.appendChild(card);
+  });
+  throw new Error('WebGL not supported — fallback shown');
+}
+
+// ==================== 数据配置 ====================
+// 方便定位每个行星数据块的标记 —— 搜索 ☀️ ☿ ♀ 🌍 🌙 ♂ ♃ ♄ ⛢ ♆
+const planetData = {
+  // ☀️
+  sun: {
+    key: 'sun', name: '太阳', emoji: '☀️', type: 'star',
+    orbitRadius: 0, orbitEcc: 0, size: 1.6, color: 0xffaa00,
+    revPeriod: 0, rotPeriod: 10,
+    title1: '太阳 —— 赋予地球生命的恒星',
+    tagline1: '太阳是太阳系当之无愧的王者。它独自占据了整个太阳系99.86%的总质量，相当于把其余所有行星、卫星、小行星加在一起，再乘以700倍，才能和太阳比质量。它每秒将约400万吨物质转化为能量，这些能量以光和热的形式洒向整个太阳系，地球接收到的仅仅是其中二十亿分之一。',
+    data1: [
+      ['直径', '139.2 万公里（约 109 个地球并排）'],
+      ['质量', '地球的 33 万倍'],
+      ['表面温度', '5,500°C'],
+      ['核心温度', '1,500 万°C'],
+      ['恒星年龄', '45.7 亿年'],
+      ['距银心', '约 2.6 万光年']
+    ],
+    detail: [
+      ['一、基础信息', '太阳是一颗光谱类型为 G2V 的黄矮星，位于太阳系的绝对几何中心。它是太阳系中唯一能够依靠核聚变自主发光发热的天体，地球接收到的每一缕阳光，都源于太阳核心氢原子核聚变为氦原子核时释放的巨大能量。太阳的引力范围半径约 1-2 光年，远超冥王星轨道。太阳和整个太阳系共同诞生于约 45.7 亿年前。'],
+      ['二、天文数据', `<table><tr><th>数据项</th><th>数值</th><th>趣味对比</th></tr>
+<tr><td>直径</td><td>139.2 万 km</td><td>地球直径的 109 倍</td></tr>
+<tr><td>质量</td><td>1.989 × 10³⁰ kg</td><td>地球质量的 33 万倍</td></tr>
+<tr><td>表面温度</td><td>约 5,500°C</td><td>铁的熔点仅为 1,538°C</td></tr>
+<tr><td>核心温度</td><td>约 1,500 万°C</td><td>—</td></tr>
+<tr><td>与银心距离</td><td>约 2.6 万光年</td><td>银河系半径约 5 万光年</td></tr>
+<tr><td>年龄</td><td>45.7 亿年</td><td>处于恒星"中年"</td></tr>
+<tr><td>总预期寿命</td><td>约 100 亿年</td><td>还剩约 50 亿年</td></tr>
+<tr><td>光到地球耗时</td><td>约 8 分 20 秒</td><td>光速：30 万 km/s</td></tr>
+</table>`],
+      ['三、课堂核心考点', '• 太阳是恒星，不是行星：恒星的定义就是能够通过核聚变自主发光发热。行星只能反射恒星的光。<br>• 地球能量之源：地球的昼夜交替、四季更替、生物圈的全部能量来源，归根到底都来自太阳辐射。<br>• 光速延迟：我们看到的太阳永远是"8分20秒前的太阳"。如果太阳瞬间熄灭，地球要等8分多钟后才会陷入黑暗。<br>• 太阳光谱：阳光看起来是白色的，但实际上包含了从红外到紫外的全部波段。<br>• 太阳活动：太阳有约11年的活动周期，活跃期会出现大量太阳黑子和耀斑，可能干扰地球通讯和电网。'],
+      ['四、拓展冷知识', '①太阳的真实颜色是白色：在太空中观看，太阳是一颗纯白色的恒星。我们在地面上看到它偏黄色，是因为地球大气层对蓝光散射更强（这也是天空是蓝色的原因）。<br>②太阳的终极命运：约50亿年后，太阳将膨胀为红巨星，其外层可能吞没水星和金星，甚至逼近地球轨道。之后核心坍缩为一颗白矮星。<br>③太阳黑子不是"黑洞"：黑子只是太阳表面温度相对较低的区域（约3,500-4,500°C），所以看起来暗。如果单独取出来，它依然比电弧焊光还亮。<br>④太阳每秒钟"瘦身"400万吨：核聚变中氢原子核结合成氦原子核时会损失约0.7%的质量，这部分质量按E=mc²转化为能量。<br>⑤太阳也在绕银河系中心公转：以每秒约220公里的速度绕银河系中心飞奔，绕一圈大约需要2.25亿年（一个"银河年"）。'],
+      ['五、常见认知误区', `<table class="myth-table"><tr><th>❌ 误区</th><th>✅ 真相</th></tr>
+<tr><td>太阳和地球年龄都是46亿年</td><td>太阳系整体形成于45.7亿年前；地球随后经历巨型撞击重塑，现有地壳年龄约45.4亿年，二者有微小但确实的时间差</td></tr>
+<tr><td>太阳是颗"燃烧的大火球"</td><td>太阳不是化学燃烧，而是核聚变。如果太阳是煤炭燃烧，几千年就会烧光</td></tr>
+<tr><td>太阳表面是固体</td><td>太阳是一颗等离子体球，没有固体表面，从核心到外层大气全是流动的带电粒子</td></tr>
+<tr><td>太阳离地球很近</td><td>太阳距地球1.5亿公里。以民航客机速度（900km/h）飞行，需要约19年才能到达</td></tr>
+</table>`]
+    ]
+  },
+
+  // ☿
+  mercury: {
+    key: 'mercury', name: '水星', emoji: '☿', type: 'terrestrial',
+    orbitRadius: 4, orbitEcc: 0.03, size: 0.18, color: 0xb0a8a0,
+    revPeriod: 2.5, rotPeriod: 50,
+    title1: '水星 —— 冰火两重天的小个子',
+    tagline1: '太阳系中最小、最靠近太阳的行星。如果你站在水星表面看太阳，太阳会比在地球上看到的大约3倍。但它的背阳面可以冷到-180°C，因为没有大气层来留住热量。水星一天（日出到下一个日出）长达176个地球日，比它的一年（88个地球日）还要长两倍多。',
+    data1: [
+      ['直径', '4,879 km（比月球大不了太多）'],
+      ['距太阳', '5,790 万 km（平均）'],
+      ['地表温度', '-180°C ~ 430°C（昼夜温差 610°C）'],
+      ['大气层', '几乎没有'],
+      ['天然卫星', '0 颗'],
+      ['公转周期', '88 地球日'],
+      ['自转周期', '59 地球日']
+    ],
+    detail: [
+      ['一、基础信息', '水星是太阳系中体积最小、最靠近太阳的行星。它是类地岩石行星中最"迷你"的成员——甚至比木星最大的卫星"木卫三"和土星最大的卫星"土卫六"还要小。水星绕太阳一圈只需88个地球日，是八大行星中公转最快的。但它的自转却极慢，自转一周要59个地球日。这种特殊的转速比例（3:2轨道共振）意味着水星上一个"太阳日"长达176个地球日——比水星的一年还要长两倍多。'],
+      ['二、天文数据', `<table><tr><th>数据项</th><th>数值</th><th>趣味对比</th></tr>
+<tr><td>直径</td><td>4,879 km</td><td>地球的38%，比月球大不了太多</td></tr>
+<tr><td>与太阳平均距离</td><td>5,790 万 km</td><td>地球到太阳距离的39%</td></tr>
+<tr><td>地表温度区间</td><td>-180°C ~ 430°C</td><td>昼夜温差高达610°C</td></tr>
+<tr><td>大气层</td><td>几乎无（外逸层极稀薄）</td><td>密度不到地球大气的万亿分之一</td></tr>
+<tr><td>天然卫星</td><td>0 颗</td><td>—</td></tr>
+<tr><td>太阳日长度</td><td>176 地球日</td><td>一昼夜比一年还长</td></tr>
+<tr><td>内核占比</td><td>约85%的星球半径</td><td>铁核巨大</td></tr>
+</table>`],
+      ['三、课堂核心考点', '• 无大气、无保温：水星缺乏大气层，无法通过温室效应保存热量。白天太阳直射面高达430°C（足以熔化铅和锌），夜晚热量迅速散失，温度骤降至-180°C。<br>• 遍布陨石坑：没有大气层的保护，水星表面遭受了数十亿年的陨石撞击，地貌类似月球。<br>• 轨道共振：水星不是1:1潮汐锁定（不像月球永远同一面对地球），而是3:2共振，这是它与太阳引力复杂互动的结果。<br>• 巨大的铁核：水星的金属铁核占星球半径的约85%，是太阳系中占比最高的。科学家猜测水星原本更大，但早期经历了一次巨型撞击，外层被剥离。'],
+      ['四、拓展冷知识', '①"水星"名称不带水：水星的中文名称取自五行中的"水"，但实际上整个星球内部和表面完全不存在液态水。极地环形山的永久阴影区可能有少量水冰，但从未被直接证实有液态水。<br>②水星的"长尾巴"：太阳风不断吹拂水星极稀薄的外逸层，将钠等原子吹向太空，形成一条类似彗星的"尾巴"，长度可达数百万公里。<br>③水星探测极其困难：由于距离太阳太近，探测器飞向水星需要克服太阳的巨大引力。迄今为止只有两艘探测器到达过水星——NASA的"信使号"和欧日合作的"贝皮可伦坡号"。<br>④水星的天空是黑色的：即使是在白天，因为没有大气散射阳光，水星的天空永远是漆黑的，可以直接看到星星。<br>⑤水星有"皱纹"：水星表面分布着大量弧形悬崖（称为"叶状陡崖"），这些是水星内核冷却收缩时，地壳挤压形成的"皱纹"，有些长达数百公里。'],
+      ['五、常见认知误区', `<table class="myth-table"><tr><th>❌ 误区</th><th>✅ 真相</th></tr>
+<tr><td>离太阳最近就是最热的行星</td><td>水星缺少大气保温，背阳面极寒（-180°C）；金星有浓厚二氧化碳大气形成温室效应，表面恒温462°C，才是太阳系最热行星</td></tr>
+<tr><td>水星上有水</td><td>名称带"水"纯属巧合（五行命名法），星球表面完全没有液态水</td></tr>
+<tr><td>水星永远以同一面朝向太阳</td><td>并非潮汐锁定，水星以3:2轨道共振自转，有昼夜交替，只是极慢</td></tr>
+<tr><td>水星和月球差不多</td><td>水星有巨大的铁核和全球性磁场残余，内部结构与月球完全不同</td></tr>
+</table>`]
+    ]
+  },
+
+  // ♀
+  venus: {
+    key: 'venus', name: '金星', emoji: '♀', type: 'terrestrial',
+    orbitRadius: 6, orbitEcc: 0.02, size: 0.32, color: 0xe8d5a0,
+    revPeriod: 4.5, rotPeriod: -42,
+    title1: '金星 —— 太阳系最热的"地狱行星"',
+    tagline1: '金星是夜空中亮度仅次于月球的天体，古人称它为"启明星"或"长庚星"。但它美丽的外表下是极端恶劣的环境：厚重的二氧化碳大气产生了失控的温室效应，地表温度常年维持在462°C——热得足以熔化铅。更奇特的是，金星是太阳系唯一逆向自转的行星。如果你站在金星上，太阳从西方升起，东方落下。',
+    data1: [
+      ['直径', '12,104 km（和地球几乎一样大）'],
+      ['距太阳', '1.08 亿 km'],
+      ['地表恒温', '462°C（全星球统一高温）'],
+      ['大气压强', '地球的 92 倍'],
+      ['自转周期', '243 地球日（自转比公转还慢）'],
+      ['公转周期', '225 地球日'],
+      ['天然卫星', '0 颗'],
+      ['自转方向', '逆向（太阳西升东落）']
+    ],
+    detail: [
+      ['一、基础信息', '金星是夜空中亮度仅次于月球的天体，在日出前出现在东方时叫"启明星"，日落后出现在西方时叫"长庚星"。金星如此明亮的原因有二：一是距离地球相对较近，二是厚重的云层反射了约75%的太阳光。金星被称为地球的"姊妹星"，但它的大气压强是地球的92倍（相当于水下900米的压力），大气中约96.5%是二氧化碳，造成了失控的温室效应。金星还是太阳系中唯一逆向自转的行星。'],
+      ['二、天文数据', `<table><tr><th>数据项</th><th>数值</th><th>趣味对比</th></tr>
+<tr><td>直径</td><td>12,104 km</td><td>地球的95%，几乎一样大</td></tr>
+<tr><td>与太阳平均距离</td><td>1.08 亿 km</td><td>地球距离的72%</td></tr>
+<tr><td>地表恒温</td><td>462°C（全球统一）</td><td>铅的熔点是327°C</td></tr>
+<tr><td>大气压强</td><td>92 个地球大气压</td><td>相当于水下900米</td></tr>
+<tr><td>大气成分</td><td>约96.5%二氧化碳</td><td>氮气约3.5%</td></tr>
+<tr><td>云层成分</td><td>硫酸云滴</td><td>会下硫酸雨，但雨未落地就蒸发</td></tr>
+<tr><td>自转周期</td><td>243 地球日（逆向）</td><td>自转比公转还慢</td></tr>
+</table>`],
+      ['三、课堂核心考点', '• 温室效应的极端案例：金星的二氧化碳大气层让热量只能进不能出——这是理解地球温室效应的绝佳对照实验。<br>• 自转比公转慢：金星自转一圈要243天，而绕太阳公转一圈只需225天。这意味着金星的"一天"比"一年"还长。<br>• 逆向自转的成因：主流假说认为金星早期遭受过一次巨大的撞击，直接把它撞"翻"了，导致自转方向反转。<br>• 硫酸云：金星大气中的黄色云层是硫酸液滴。云层会下硫酸雨，但由于地表温度极高，硫酸雨在下落过程中就被蒸发。'],
+      ['四、拓展冷知识', '①金星白天肉眼可见：在天空清澈的日子里，金星甚至在白天也能用肉眼直接看到，它是除太阳和月亮外唯一能做到这一点的天体。<br>②苏联的光辉战绩：1970-1980年代，苏联"金星13号"在462°C和92个大气压的极端环境下，成功在金星表面工作了127分钟，传回了人类第一张金星地表彩色照片。<br>③金星地表极其平坦：金星地表的陨石坑非常少，因为它浓厚的大气层会烧毁大部分小型陨石。金星表面以广阔的火山平原为主，火山数量多达1,600多座。<br>④金星没有卫星，也没有磁场：它是太阳系中唯一一颗既没有天然卫星、也没有内源磁场的岩石行星。<br>⑤金星公转轨道最"圆"：在八大行星中，金星的公转轨道是最接近正圆的（轨道偏心率仅0.007）。'],
+      ['五、常见认知误区', `<table class="myth-table"><tr><th>❌ 误区</th><th>✅ 真相</th></tr>
+<tr><td>水星离太阳更近，所以水星最热</td><td>金星有厚重的二氧化碳大气锁住热量，地表恒温462°C，是太阳系最热的行星，比水星最高温还高出约32°C</td></tr>
+<tr><td>金星和地球是"双胞胎"</td><td>大小质量相近，但环境天差地别：一个孕育生命，一个是地表温度足以熔化金属的极端行星</td></tr>
+<tr><td>金星地表有海洋</td><td>金星地表没有任何液态水。科学家推测它数十亿年前可能有过海洋，但温室效应失控后全部蒸发殆尽</td></tr>
+<tr><td>金星是启明星，是单独的一颗星</td><td>启明星和长庚星是同一颗金星——早晚不同时段出现而已</td></tr>
+</table>`]
+    ]
+  },
+
+  // 🌍
+  earth: {
+    key: 'earth', name: '地球', emoji: '🌍', type: 'terrestrial',
+    orbitRadius: 8, orbitEcc: 0.04, size: 0.34, color: 0x3388ff,
+    revPeriod: 6, rotPeriod: 5,
+    hasMoon: true,
+    title1: '地球 —— 已知宇宙中唯一的生命绿洲',
+    tagline1: '在太阳系八大行星中，地球是目前已知唯一存在生命的天体。它恰好处于太阳的"宜居带"——不太近（水被蒸干），不太远（水永久结冰），温度刚刚好让液态水可以在表面稳定存在。地球的磁场像一面无形的盾牌，偏转致命的太阳风和宇宙射线；大气层则像一床保暖的被子，让地表温度维持在生命适宜的范围内。',
+    data1: [
+      ['直径', '12,756 km'],
+      ['距太阳', '1.5 亿 km = 1 天文单位（AU）'],
+      ['地表水域', '71% 被海洋覆盖'],
+      ['天然卫星', '1 颗 —— 月球'],
+      ['年龄', '45.4 亿年（地壳年龄）'],
+      ['自转周期', '23 小时 56 分'],
+      ['公转周期', '365.25 天'],
+      ['大气成分', '氮气78%、氧气21%、其他1%']
+    ],
+    detail: [
+      ['一、基础信息', '地球，太阳系由内向外第三颗行星，也是人类已知宇宙中唯一确认存在生命的天体。它恰好处于太阳系的"宜居带"——距离不远不近，温度让液态水可以在表面稳定存在数亿年。三个关键条件完美配合：全球磁场像无形的力场盾牌偏转太阳风、稳定的大气层保温并提供氧气、丰富的液态水覆盖71%的表面。地球形成于约45.4亿年前（地壳年龄），早期曾遭受一次火星大小的天体撞击（"忒伊亚撞击假说"），撞击碎片后来聚合形成了月球。'],
+      ['二、天文数据', `<table><tr><th>数据项</th><th>数值</th><th>趣味对比</th></tr>
+<tr><td>直径</td><td>12,756 km</td><td>—</td></tr>
+<tr><td>赤道周长</td><td>40,075 km</td><td>光速绕地球一圈约0.13秒</td></tr>
+<tr><td>与太阳平均距离</td><td>1.5亿km = 1 AU</td><td>"天文单位"的定义基准</td></tr>
+<tr><td>地表水覆盖</td><td>约71%</td><td>陆地仅约29%</td></tr>
+<tr><td>天然卫星</td><td>1颗（月球）</td><td>—</td></tr>
+<tr><td>年龄（地壳）</td><td>约45.4亿年</td><td>—</td></tr>
+<tr><td>自转轴倾角</td><td>23.44°</td><td>倾角带来了四季更替</td></tr>
+<tr><td>密度</td><td>5.51 g/cm³</td><td>太阳系类地行星中密度最高</td></tr>
+</table>`],
+      ['三、课堂核心考点', '• 液态水是关键：天文学家寻找地外生命时，首先问的就是"那里有液态水吗？"。地球是已知唯一表面长期存在液态水海洋的天体。<br>• 四季是怎么来的：地球公转轨道形状不是四季的成因。四季的真凶是23.44°的自转轴倾角。北半球倾向太阳时是夏天，远离太阳时是冬天。<br>• 昼夜交替：地球自转一周约24小时。注意区分"太阳日"（24小时）和"恒星日"（23小时56分）。<br>• 磁场是生命保护伞：如果没有磁场，太阳风会在数亿年内剥离地球大气层——火星就是一个失去了磁场后大气被剥离的案例。<br>• 月亮稳定了地轴：月球的引力作用让地球自转轴的倾角长期稳定在22-24.5°之间。没有月亮，地轴倾角会在0-85°之间剧烈摆动。'],
+      ['四、拓展冷知识', '①地球不是正球体：受自转离心力影响，赤道半径比极半径多出约21公里。地球是一个微微扁平的椭球体。<br>②每天都有宇宙尘埃雨：地球每天接收约100吨来自太空的微小尘埃和陨石碎片。<br>③地球的内核是固态铁：尽管内核温度高达5,000-6,000°C，但由于压力高达350万个大气压，铁被"压"成了固态。<br>④板块构造是地球的独家技能：在太阳系已知天体中，地球是唯一具有活跃板块构造的行星。<br>⑤地球是太阳系中密度最高的天体：平均密度5.51 g/cm³，高于水星、金星和火星。'],
+      ['五、常见认知误区', `<table class="myth-table"><tr><th>❌ 误区</th><th>✅ 真相</th></tr>
+<tr><td>太阳和地球的年龄完全一样</td><td>太阳系整体形成45.7亿年前，地球经历巨型撞击重塑后，地壳年龄约45.4亿年，二者有约3,000万年的微小差值</td></tr>
+<tr><td>四季交替是因为地球离太阳忽近忽远</td><td>地球轨道的椭圆程度不大（偏心率仅0.017），四季的真正成因是自转轴23.44°的倾角</td></tr>
+<tr><td>地球上的水来自地球本身</td><td>当前主流假说认为，地球上的水大部分是由含水的彗星和小行星撞击带来的</td></tr>
+<tr><td>人类已经探索了全部海洋</td><td>人类只探索了约5-20%的海洋，地球海洋的绝大部分仍是未知领域。我们对火星表面的了解，甚至超过对地球深海的了解</td></tr>
+</table>`]
+    ]
+  },
+
+  // 🌙
+  moon: {
+    key: 'moon', name: '月球', emoji: '🌙', type: 'moon',
+    orbitRadius: 8, orbitEcc: 0, size: 0.09, color: 0xcccccc,
+    revPeriod: 0, rotPeriod: 15,
+    title1: '月球 —— 地球永恒的伴侣',
+    tagline1: '月球是地球唯一的天然卫星，也是人类至今唯一踏足过的地外天体。它默默陪伴地球超过40亿年，用自己的引力为地球带来海洋潮汐，稳定了地球的自转轴倾角，让地球气候保持相对稳定。月球永远以同一面朝向地球——这叫"潮汐锁定"。人类直到1959年苏联"月球3号"探测器飞越月球背面，才第一次看到月亮的"后脑勺"。',
+    data1: [
+      ['直径', '3,476 km（约地球的 1/4）'],
+      ['地月距离', '38.4 万 km（光速约 1.3 秒）'],
+      ['公转周期', '27.3 天'],
+      ['表面温度', '-173°C ~ 127°C（温差 300°C）'],
+      ['大气层', '几乎没有（外逸层极稀薄）'],
+      ['液态水', '无']
+    ],
+    detail: [
+      ['一、基础信息', '月球是地球唯一的天然卫星，也是太阳系中第五大卫星。它陪伴地球已有约45亿年之久。目前最被广泛接受的月球起源假说是"大撞击假说"：约45亿年前，一颗火星大小的原行星"忒伊亚"与原始地球发生碰撞，溅射出的大量碎片在地球轨道上聚集，最终形成了月球。月球通过引力与地球深度互动，最显而易见的是海洋潮汐。潮汐锁定让月球始终以同一面朝向地球。'],
+      ['二、天文数据', `<table><tr><th>数据项</th><th>数值</th><th>趣味对比</th></tr>
+<tr><td>直径</td><td>3,476 km</td><td>地球的27%（约1/4）</td></tr>
+<tr><td>地月平均距离</td><td>384,400 km</td><td>光速约1.28秒</td></tr>
+<tr><td>公转周期</td><td>27.32天（恒星月）</td><td>朔望月29.53天</td></tr>
+<tr><td>表面温度区间</td><td>-173°C ~ 127°C</td><td>昼夜温差300°C</td></tr>
+<tr><td>表面重力</td><td>地球的16.5%</td><td>50kg的人仅重8.25kg</td></tr>
+<tr><td>反照率</td><td>约0.12</td><td>只反射12%的太阳光</td></tr>
+<tr><td>远离地球速度</td><td>约3.8 cm/年</td><td>相当于指甲生长的速度</td></tr>
+</table>`],
+      ['三、课堂核心考点', '• 潮汐锁定：月球因为长期受地球引力作用，自转周期与公转周期完全同步，始终以同一面朝向地球。<br>• 月球引力主导潮汐：月球的引力是地球海洋潮汐的主要驱动力，太阳的潮汐力约为月球的一半。<br>• 月球不发光：月光是反射的太阳光。由于月球表面颜色偏暗（反照率仅12%），它实际上是一个相当暗淡的天体。<br>• 月相变化：月球绕地球公转，不同时间我们看到太阳照亮月球的不同比例，形成新月→上弦月→满月→下弦月的循环。<br>• 日食和月食：日食发生在朔日（月球在地球和太阳之间），月食发生在望日（地球在月球和太阳之间）。'],
+      ['四、拓展冷知识', '①登月脚印可以留存数百万年：月球没有大气、没有风、没有水循环，所以没有风化作用。阿姆斯特朗1969年踩下的那个著名脚印，可能几百万年后还完好如初。<br>②月球正在"逃跑"：由于地球潮汐与月球引力复杂的能量交换，月球每年以约3.8厘米的速度远离地球。<br>③月球地震（月震）：阿波罗任务在月球表面布设了地震仪，记录到了多种月震，一次月震的震动能持续超过10分钟。<br>④月球背面并不永远是"暗面"：月球背面和正面一样，也会经历白天和黑夜。<br>⑤月球的"海洋"是干的：月球表面暗色区域叫"月海"，但里面一滴水都没有。它们是远古火山喷发的玄武岩熔岩流填充巨大撞击盆地后冷却形成的平原。<br>⑥地月系是独特的：在太阳系中，地球-月球的体积比是最接近"双行星"的。'],
+      ['五、常见认知误区', `<table class="myth-table"><tr><th>❌ 误区</th><th>✅ 真相</th></tr>
+<tr><td>月球能自己发光</td><td>月球本身不发光，月光是反射的太阳光。月球反射率仅12%（和旧沥青路面差不多暗）</td></tr>
+<tr><td>月球背面永远是黑暗的</td><td>月球背面同样有昼夜交替，一个完整的太阳日照和夜晚各约14个地球日</td></tr>
+<tr><td>人类只在月球上登陆过一次</td><td>Apollo 11-17共7次登月尝试，其中6次成功（Apollo 13因事故返回），共12人踏上月面</td></tr>
+<tr><td>月球上没有重力</td><td>月球有重力，约为地球的1/6。宇航员能跳得很高，但最终还是会落下来</td></tr>
+</table>`]
+    ]
+  },
+
+  // ♂
+  mars: {
+    key: 'mars', name: '火星', emoji: '♂', type: 'terrestrial',
+    orbitRadius: 11, orbitEcc: 0.05, size: 0.24, color: 0xd45a3a,
+    revPeriod: 8, rotPeriod: 4.8,
+    title1: '火星 —— 红色星球的诱惑',
+    tagline1: '火星是地球的"邻居"，也是人类最感兴趣的行星之一。它表面的氧化铁（铁锈的主要成分）让整颗星球呈现出迷人的橙红色。这里是人类发射探测器最多的地方——从1976年的"海盗号"到今天的"毅力号"火星车，人类一直在问同一个问题：火星上是否曾经存在过生命？',
+    data1: [
+      ['直径', '6,792 km（约为地球的一半）'],
+      ['距太阳', '2.28 亿 km'],
+      ['平均温度', '-65°C（和地球南极内陆差不多）'],
+      ['大气密度', '仅为地球的 1%'],
+      ['天然卫星', '2 颗（火卫一、火卫二）'],
+      ['公转周期', '687 地球日（约 1.9 年）'],
+      ['自转周期', '24 小时 37 分（和地球非常接近）']
+    ],
+    detail: [
+      ['一、基础信息', '火星，这颗橙红色的星球是人类发射探测器最多的地外天体。火星表面广泛分布着氧化铁（铁锈的主要成分），这让整颗星球呈现出标志性的锈红色。火星的自转周期（24小时37分）和自转轴倾角（25.2°）都与地球非常接近，所以火星上也有四季变化。然而，火星大气密度只有地球海平面的约1%，液态水无法在表面稳定存在。尽管如此，科学家已经在火星极地和地下探测到了大量固态水冰，火星远古河谷和湖泊沉积岩也证明，数十亿年前的火星曾经温暖湿润。'],
+      ['二、天文数据', `<table><tr><th>数据项</th><th>数值</th><th>趣味对比</th></tr>
+<tr><td>直径</td><td>6,792 km</td><td>地球的53%，约为地球的一半</td></tr>
+<tr><td>与太阳平均距离</td><td>2.28亿km</td><td>地球距离的1.52倍</td></tr>
+<tr><td>地表平均温度</td><td>-65°C</td><td>赤道夏季正午可达舒适的20°C</td></tr>
+<tr><td>大气密度</td><td>地球的1%</td><td>主要成分CO₂（95%）</td></tr>
+<tr><td>天然卫星</td><td>2颗（火卫一、火卫二）</td><td>可能是捕获的小行星</td></tr>
+<tr><td>最高山峰</td><td>奥林帕斯山21.2km</td><td>珠穆朗玛峰的约2.5倍</td></tr>
+<tr><td>最大峡谷</td><td>水手号峡谷4,000km</td><td>长度接近中国东西宽度</td></tr>
+</table>`],
+      ['三、课堂核心考点', '• 红色的来源：火星地表的橙红色来自广泛分布的氧化铁（铁锈）。和地球上铁栏杆生锈的化学反应完全一样。<br>• 大气稀薄的后果：无法保温（昼夜温差极大）、无法阻挡紫外线和宇宙射线、液态水在表面无法稳定存在。<br>• 火星的天空：由于大气层稀薄且悬浮着大量氧化铁尘埃，火星白天的天空呈黄褐色，日落时天空反而呈蓝色——和地球完全颠倒。<br>• 液态水的证据：火星轨道探测器和火星车发现了大量远古液态水存在过的地貌证据：干涸的河床、三角洲沉积层、湖泊粘土矿物。<br>• 火星曾经像地球：约35-40亿年前，火星拥有浓厚大气层、全球磁场和地表液态水。后来火星内核冷却、磁场消失，太阳风剥离了大气层。'],
+      ['四、拓展冷知识', '①奥林帕斯山——太阳系最高的山：高达21.2公里，是珠峰的约2.5倍。底部面积相当于整个法国。之所以能长这么高，是因为火星重力低、地壳稳定（没有板块运动）。<br>②水手号峡谷——太阳系最大的峡谷：长度超过4,000公里，最深处7公里。放在地球上，可以从北京延伸到拉萨。<br>③火星的"土豆卫星"：火卫一和火卫二形状不规则，像两颗大土豆。火卫一正在极其缓慢地螺旋坠向火星，大约5,000万年后将被撕裂成火星环。<br>④火星上的日落是蓝色的：由于火星大气层极薄且含有不同大小的尘埃颗粒，日落时蓝色光散射更少、穿透更直接，所以火星日落是蓝色的。<br>⑤火星的沙尘暴可以覆盖全球：每隔几年就会出现一次全球性沙尘暴，整个星球笼罩在赭色阴霾中，持续数月。<br>⑥火星上有甲烷的季节性"打嗝"：好奇号火星车探测到了甲烷浓度的季节性变化——在地球上，甲烷常与生物活动相关。'],
+      ['五、常见认知误区', `<table class="myth-table"><tr><th>❌ 误区</th><th>✅ 真相</th></tr>
+<tr><td>火星环境和地球差不多，人类可以直接登陆</td><td>火星大气极稀薄（无法呼吸）、气压极低（体液会沸腾）、温度极寒、无臭氧层（紫外线致命），人类必须全程穿戴宇航服</td></tr>
+<tr><td>火星上的"运河"是智慧生物建的</td><td>这是19世纪末天文学家观测时的误读和翻译错误，"运河"只是光学错觉和想象力过度的结果</td></tr>
+<tr><td>火星是红色的，所以很热</td><td>红色来自氧化铁（铁锈），跟温度无关。火星平均温度-65°C，比地球冷得多</td></tr>
+<tr><td>人类很快就能移民火星</td><td>火星没有可呼吸的空气、液态水、磁场防护和适宜温度，建立自给自足的永久定居点至少需要数十年甚至上百年的技术积累</td></tr>
+</table>`]
+    ]
+  },
+
+  // ♃
+  jupiter: {
+    key: 'jupiter', name: '木星', emoji: '♃', type: 'gas',
+    orbitRadius: 17, orbitEcc: 0.03, size: 0.85, color: 0xd4b896,
+    revPeriod: 20, rotPeriod: 2,
+    title1: '木星 —— 太阳系的无冕之王',
+    tagline1: '木星是太阳系中体积最大、质量最大的行星。把其他七颗行星的质量全部加起来，再乘以2.5，才能和木星比——它就是这么大。木星的巨大引力像一台"宇宙吸尘器"，大量飞向内侧行星的小行星和彗星被它拦截或抛射出去。如果没有木星，地球遭受毁灭性撞击的概率会高出很多。',
+    data1: [
+      ['直径', '14.3 万 km（约 11 个地球并排）'],
+      ['质量', '地球的 318 倍'],
+      ['距太阳', '7.78 亿 km'],
+      ['自转周期', '9 小时 55 分（太阳系自转最快）'],
+      ['公转周期', '12 地球年'],
+      ['已知卫星', '95 颗（截至2024年统计）'],
+      ['大红斑', '持续至少 350 年']
+    ],
+    detail: [
+      ['一、基础信息', '木星是太阳系中体积最大、质量最大的行星，其质量是全部其他七颗行星质量总和的2.5倍。木星是一颗气态巨行星，它没有固态表面。从外层大气往下，氢气和氦气逐渐被巨大的压力压缩成液态金属氢。木星对地球而言有一个重要的"守护者"角色——它强大的引力会拦截或弹射大量来自外太阳系的小行星和彗星。1994年苏梅克-列维9号彗星被木星引力撕裂后撞入木星大气，让人类首次现场目击了天体撞击事件。'],
+      ['二、天文数据', `<table><tr><th>数据项</th><th>数值</th><th>趣味对比</th></tr>
+<tr><td>直径</td><td>142,984 km</td><td>地球的11.2倍</td></tr>
+<tr><td>质量</td><td>1.898×10²⁷kg</td><td>地球的318倍</td></tr>
+<tr><td>体积</td><td>地球的1,321倍</td><td>可装下1,321个地球</td></tr>
+<tr><td>自转周期</td><td>9小时55分</td><td>太阳系自转最快——"一天"不到10小时</td></tr>
+<tr><td>公转周期</td><td>11.86地球年</td><td>—</td></tr>
+<tr><td>已知卫星</td><td>95颗</td><td>四颗伽利略卫星最大最著名</td></tr>
+<tr><td>大红斑尺寸</td><td>宽约16,000km</td><td>可以装下1-2个地球</td></tr>
+<tr><td>磁场强度</td><td>地球的20,000倍</td><td>太阳系最强磁场</td></tr>
+</table>`],
+      ['三、课堂核心考点', '• 气态巨行星=没有地面：木星不是一个可以站上去的球，从外到内逐渐从气态过渡到液态，没有清晰的固体表面。<br>• 木星是"失败"的恒星吗？木星的成分和太阳非常接近（氢+氦），但它的质量远远不够触发核聚变。要成为最小的恒星，木星至少需要80倍于自身的质量。<br>• 自转速度惊人：木星自转一圈不到10小时。如此高速的自转让木星的赤道区域明显向外凸出，极直径比赤道直径少了约9,000公里。<br>• 木星保护地球？木星强大的引力确实能偏转或捕获来自外太阳系的天体。但近年来也有研究认为，木星引力也可能扰动小行星带的岩石天体。<br>• 伽利略卫星：1610年伽利略用自制的望远镜发现了木星的四颗大卫星，这直接证明了并非所有天体都绕地球运行。'],
+      ['四、拓展冷知识', '①大红斑——一场350年的超级风暴：木星大红斑是一个反气旋风暴，至少已持续了350年以上。它的大小正在缓慢缩小——100年前它宽约40,000km（可容纳3个地球），现在只有约16,000km。<br>②木星的极光比地球的壮丽百倍：木星拥有太阳系中最强大的极光，覆盖面积比整个地球还大。<br>③木星也有光环：1979年旅行者1号发现木星也有一圈暗淡的行星环。它主要由微小的尘埃颗粒组成，反光率极低。<br>④木星发出比接收更多的热量：木星向外辐射的热量比它从太阳接收的还多约60%。多余的热能来自木星形成时残留的原始热量。<br>⑤木星的内部压力可以将氢压缩成金属：在木星内部深处，巨大的压力将氢原子压得电子脱离，形成"液态金属氢"。这层金属氢的流动是木星强大磁场的来源。'],
+      ['五、常见认知误区', `<table class="myth-table"><tr><th>❌ 误区</th><th>✅ 真相</th></tr>
+<tr><td>木星全是气体所以很轻</td><td>木星是太阳系质量最大的行星（地球的318倍），体积的庞大远超大气的稀薄</td></tr>
+<tr><td>木星是"失败的恒星"</td><td>虽然成分接近太阳，但质量远远不够。要成为恒星需要质量至少达到木星的80倍。木星是当之无愧的行星之王</td></tr>
+<tr><td>你可以"穿过"木星</td><td>木星内部压力和温度极高，任何探测器在进入大气后不久就会被压碎、熔化和蒸发</td></tr>
+<tr><td>木星上所有地方风速都很快</td><td>木星的条带结构意味着不同纬度风速差异极大，赤道附近风速很快，但不是整个星球都刮狂风</td></tr>
+</table>`]
+    ]
+  },
+
+  // ♄
+  saturn: {
+    key: 'saturn', name: '土星', emoji: '♄', type: 'gas',
+    orbitRadius: 22, orbitEcc: 0.04, size: 0.7, color: 0xf0d890,
+    revPeriod: 28, rotPeriod: 2.5,
+    hasRing: true,
+    title1: '土星 —— 自带光环的星空明星',
+    tagline1: '土星是太阳系中最容易辨认的行星——那圈宽阔明亮的光环让它成为天文望远镜中最受喜爱的观测目标。土星还有一个著名的特质：它的平均密度比水还低。如果你能找到一个足够大的水池，土星理论上可以漂浮在水面上。',
+    data1: [
+      ['直径', '12.1 万 km（约 9.5 个地球并排）'],
+      ['距太阳', '14.3 亿 km'],
+      ['光环宽度', '28 万 km（地月距离的 70%）'],
+      ['光环厚度', '仅 10 米 ~ 1 公里'],
+      ['平均密度', '0.69 g/cm³（低于水的 1.0 g/cm³）'],
+      ['已知卫星', '145 颗（截至2024年，太阳系最多）'],
+      ['公转周期', '29.5 地球年']
+    ],
+    detail: [
+      ['一、基础信息', '土星，毋庸置疑是太阳系中最具视觉辨识度的行星。那圈宽阔明亮的光环让它成为任何天文科普中最引人注目的明星。土星和木星一样是气态巨行星，主要由氢和氦构成，没有固态地面。但土星有一个任何行星都无法比拟的特征：平均密度仅0.69 g/cm³——低于液态水。土星的光环不是一整块固体圆盘，而是由数以万亿计的冰粒、岩石碎屑和尘埃组成。光环总宽度达28万公里，但其厚度却极其惊人地薄——最薄处仅10米左右。'],
+      ['二、天文数据', `<table><tr><th>数据项</th><th>数值</th><th>趣味对比</th></tr>
+<tr><td>直径</td><td>120,536 km</td><td>地球的9.5倍</td></tr>
+<tr><td>平均密度</td><td>0.69 g/cm³</td><td>低于液态水</td></tr>
+<tr><td>与太阳平均距离</td><td>14.3亿km</td><td>地球距离的9.5倍</td></tr>
+<tr><td>光环总宽度</td><td>约28万km</td><td>约为地月距离的70%</td></tr>
+<tr><td>光环厚度</td><td>10米~1公里</td><td>极其纤薄</td></tr>
+<tr><td>光环主成分</td><td>水冰+岩石碎屑+尘埃</td><td>—</td></tr>
+<tr><td>公转周期</td><td>29.5地球年</td><td>—</td></tr>
+<tr><td>已知卫星</td><td>145颗</td><td>太阳系最多（截至2024年）</td></tr>
+</table>`],
+      ['三、课堂核心考点', '• 光环的本质：土星光环由无数独立绕行的粒子构成，并非一个整体固体盘。如果光环是固体，不同半径处的转速不同会将它撕碎。<br>• 光环为什么这么亮：主成分是干净的水冰，反照率很高。相比之下，木星和天王星的光环以暗色尘埃为主，所以暗淡难辨。<br>• 密度比水低：这是土星最著名的"冷知识"——平均密度0.69g/cm³，比淡水都低。但注意，这只是"平均密度"，土星核心的密度还是很大的。<br>• 光环从何而来：主流假说认为，土星光环来自一颗或多颗被土星引力撕裂的冰质卫星——卫星一旦跨过"洛希极限"，就会被撕成碎片。<br>• 光环会消失吗：会。光环物质正在以"环雨"的形式缓慢坠入土星大气。按目前的速率估计，光环可能在未来1-3亿年内消失。'],
+      ['四、拓展冷知识', '①土卫六——太阳系最独特的卫星：土卫六（泰坦）是太阳系中唯一拥有稠密大气层的卫星，也是除地球外已知唯一表面存在稳定液态湖泊和河流的天体——只不过里面流淌的是液态甲烷和乙烷。<br>②土卫二——冰下海洋：土卫二的南极区域有巨大的水冰喷泉喷向太空，证明冰层下方存在全球性的液态咸水海洋。这里被科学家认为是太阳系中最有可能找到地外生命的地方之一。<br>③土星的"六边形"：土星北极有一个完美的六边形云层结构，每边长约13,800公里（比地球直径还大）。<br>④土星环有"辐条"：旅行者号首次发现土星的B环中会出现神秘的暗色辐射状结构（像自行车轮辐条）。<br>⑤土星光环可能很"年轻"：根据卡西尼号探测器的数据，土星环可能只有1,000万到1亿年的历史——恐龙灭绝时，土星可能还没有光环。'],
+      ['五、常见认知误区', `<table class="myth-table"><tr><th>❌ 误区</th><th>✅ 真相</th></tr>
+<tr><td>只有土星有行星环</td><td>木星、天王星、海王星都有环。但其余三个光环暗淡（暗色尘埃为主），肉眼和普通望远镜都看不到</td></tr>
+<tr><td>土星光环是一整块固体</td><td>由数万亿独立绕行的水冰/岩石/尘埃微粒组成，每颗粒子都是一颗独立的小卫星</td></tr>
+<tr><td>土星可以真的"浮在水面上"</td><td>这是个理论上的比喻——土星没有固体表面，你根本无法把它放进水里。这句话实际是说土星平均密度低于水</td></tr>
+<tr><td>土星环永远都在</td><td>光环正在消失——环物质以"环雨"的形式每分钟坠落数吨物质到土星大气中，估计未来1-3亿年内会消失</td></tr>
+</table>`]
+    ]
+  },
+
+  // ⛢
+  uranus: {
+    key: 'uranus', name: '天王星', emoji: '⛢', type: 'ice',
+    orbitRadius: 27, orbitEcc: 0.04, size: 0.48, color: 0x88ccdd,
+    revPeriod: 42, rotPeriod: 3, tilt: 98,
+    title1: '天王星 —— 太阳系最"懒"的行星',
+    tagline1: '天王星的自转轴倾斜了整整98°，就像被人推倒了一样横躺在轨道上旋转。正因如此，它的极点会轮流面对太阳：一个极点享受连续42年的白昼，另一个极点则陷入42年的漫漫长夜。天王星是1781年由威廉·赫歇尔用望远镜发现的，这是人类历史上第一次用望远镜找到一颗新行星。',
+    data1: [
+      ['直径', '5.1 万 km（约 4 个地球并排）'],
+      ['距太阳', '28.7 亿 km'],
+      ['表面温度', '-197°C'],
+      ['自转轴倾角', '98°（近乎"躺着转"）'],
+      ['已知卫星', '27 颗'],
+      ['公转周期', '84 地球年'],
+      ['行星分类', '冰巨行星']
+    ],
+    detail: [
+      ['一、基础信息', '天王星是人类历史上第一颗通过望远镜发现的行星。1781年3月13日，业余天文学家威廉·赫歇尔在英国巴斯的自家花园中，用自制望远镜发现了这颗当时以为是彗星的天体。天王星是冰巨行星——内部封存了大量的水冰、甲烷冰和氨冰。大气中的甲烷吸收了太阳光中的红光成分，所以天王星呈现出柔和的淡青蓝色。天王星最著名的特征是自转轴倾角高达98°——几乎完全"躺平"了。'],
+      ['二、天文数据', `<table><tr><th>数据项</th><th>数值</th><th>趣味对比</th></tr>
+<tr><td>直径</td><td>50,724 km</td><td>地球的4.0倍</td></tr>
+<tr><td>质量</td><td>地球的14.5倍</td><td>比木星和土星轻得多</td></tr>
+<tr><td>与太阳平均距离</td><td>28.7亿km</td><td>地球距离的19.2倍</td></tr>
+<tr><td>云顶温度</td><td>约-197°C</td><td>—</td></tr>
+<tr><td>自转轴倾角</td><td>97.77°</td><td>近乎横躺</td></tr>
+<tr><td>公转周期</td><td>84地球年</td><td>一个人的一生几乎就是天王星上的一年</td></tr>
+<tr><td>已知卫星</td><td>27颗</td><td>—</td></tr>
+<tr><td>发现年份</td><td>1781年</td><td>首次用望远镜发现的行星</td></tr>
+</table>`],
+      ['三、课堂核心考点', '• 躺着转，不是躺着公转：天王星的公转轨道和其他行星一样在同一个近似平面上，是自转轴大幅倾斜。它是在自转时"躺着"，而不是整个轨道翻倒了。<br>• 冰巨行星≠全是冰："冰"在此是天文术语，指水、甲烷、氨等挥发性分子的超临界流体状态，而非你冰箱里的冰块。<br>• 甲烷显色：天王星大气中的甲烷气体吸收太阳光中的红色波段，反射蓝绿色波段，所以行星整体呈淡青色。<br>• 极端的季节：由于自转轴极度倾斜，天王星的极地会连续42年处于日照或黑暗中。'],
+      ['四、拓展冷知识', '①赫歇尔差点给天王星起名"乔治之星"：发现者赫歇尔本想将这颗新行星命名为"乔治星"（Georgium Sidus），以纪念他的赞助人英王乔治三世。最终德国天文学家波德提议的"乌拉诺斯"被采纳。<br>②天王星也有光环：1977年，天文学家在观测天王星掩星时意外发现了它的光环——恒星在还没被行星遮住之前就闪了几下，原来是被天王星的窄光环遮挡了。<br>③天王星极地可能有钻石雨：根据实验室模拟，天王星和海王星内部极端的高温高压条件，可能将甲烷分解，碳原子结晶形成钻石。<br>④航天器只造访过一次：到目前为止，只有NASA的"旅行者2号"在1986年飞越了天王星。<br>⑤天王星是太阳系中最"无趣"的行星（外表上）：当旅行者2号飞越时，天王星的大气呈现出一种几乎毫无特征的均匀蓝色。'],
+      ['五、常见认知误区', `<table class="myth-table"><tr><th>❌ 误区</th><th>✅ 真相</th></tr>
+<tr><td>天王星躺着公转</td><td>天王星的公转轨道是正常的，是它的自转轴躺在公转平面上（倾斜98°）。它在"躺着自转"，不是"躺着公转"</td></tr>
+<tr><td>天王星是太阳系最冷的行星</td><td>天王星云顶温度-197°C，而海王星是-214°C，海王星更冷</td></tr>
+<tr><td>天王星是蓝色因为海洋</td><td>没有海洋。天王星的淡蓝色来自大气层中的甲烷气体吸收红光</td></tr>
+<tr><td>天王星的卫星用神话命名</td><td>天王星的卫星大多以莎士比亚和蒲柏作品中的人物命名（如米兰达、泰坦尼亚、奥伯龙），而不是希腊罗马神话</td></tr>
+</table>`]
+    ]
+  },
+
+  // ♆
+  neptune: {
+    key: 'neptune', name: '海王星', emoji: '♆', type: 'ice',
+    orbitRadius: 31, orbitEcc: 0.03, size: 0.45, color: 0x3355dd,
+    revPeriod: 55, rotPeriod: 3.5,
+    title1: '海王星 —— 笔尖上发现的行星',
+    tagline1: '海王星是天文学史上最传奇的发现之一。19世纪，天文学家发现天王星的轨道存在异常扰动，法国数学家勒维耶通过万有引力定律反推出：在更远的地方，一定还存在一颗未知的行星。他把计算结果寄给柏林天文台，当晚，天文学家就在他预测的位置找到了海王星——人类智慧的伟大胜利。',
+    data1: [
+      ['直径', '4.95 万 km（约 3.9 个地球并排）'],
+      ['距太阳', '45 亿 km（是地球到太阳距离的 30 倍）'],
+      ['表面温度', '-214°C（太阳系最冷行星）'],
+      ['最高风速', '2,100 km/h（太阳系最强风暴）'],
+      ['已知卫星', '14 颗'],
+      ['公转周期', '165 地球年'],
+      ['行星分类', '冰巨行星']
+    ],
+    detail: [
+      ['一、基础信息', '海王星是太阳系最外侧的行星（自2006年冥王星被重新分类为矮行星后）。它是深蓝色的冰巨行星，和天王星在大小、成分上非常相似。但海王星的历史比它的外观更引人入胜——它是天文学历史上第一颗通过数学计算"预测"而非直接观测发现的行星。法国数学家勒维耶于1846年推算出了这颗未知行星的轨道和天区位置，柏林天文台当晚就在预测位置找到了这颗星——理论与实测相差不到1°。这是牛顿力学最辉煌的胜利。'],
+      ['二、天文数据', `<table><tr><th>数据项</th><th>数值</th><th>趣味对比</th></tr>
+<tr><td>直径</td><td>49,528 km</td><td>地球的3.9倍</td></tr>
+<tr><td>质量</td><td>地球的17.1倍</td><td>比天王星质量略大</td></tr>
+<tr><td>与太阳平均距离</td><td>45亿km</td><td>地球距离的30倍</td></tr>
+<tr><td>云顶温度</td><td>约-214°C</td><td>太阳系最冷的行星</td></tr>
+<tr><td>最高风速</td><td>约2,100km/h</td><td>太阳系风速最快</td></tr>
+<tr><td>公转周期</td><td>约165地球年</td><td>发现迄今（1846年）才刚满一周</td></tr>
+<tr><td>已知卫星</td><td>14颗（海卫一最大）</td><td>—</td></tr>
+<tr><td>发现方式</td><td>数学预测（1846）</td><td>—</td></tr>
+</table>`],
+      ['三、课堂核心考点', '• 数理学发现的典范：海王星的发现直接验证了牛顿万有引力定律的正确性和预测能力。人类第一次仅凭纸笔计算就"提前找到了"一颗行星。<br>• 风速之王：海王星拥有太阳系中最快的风速，最高可达2,100km/h（地球17级飓风风速约为200km/h）。在如此远离太阳的地方，哪里来的能量驱动如此狂暴的大气？目前科学家仍未完全解开这个谜。<br>• 蓝色更深：和天王星一样，海王星的蓝色也来自大气甲烷对红光的吸收。海王星的蓝色更深、更鲜艳。<br>• 海王星也有"大红斑"：海王星的"大暗斑"是一个和地球差不多大的巨型风暴系统。和木星大红斑持续数百年不同，海王星大暗斑似乎只有数年寿命。'],
+      ['四、拓展冷知识', '①海王星的一年比人类文明还长：海王星绕太阳一圈需要165个地球年。从1846年被发现以来，海王星在2011年才刚刚完成了被人类知晓后的第一个完整公转周期。<br>②海王星的内部热量是个谜：海王星虽然距离太阳极远，但它内部产生的热量却比从太阳接收的还要多2.6倍。<br>③海卫一是太阳系最冷的天体之一：海王星最大的卫星海卫一表面温度仅有-235°C，是太阳系中实测温度最低的天体之一。它也是一个"逆行"卫星，暗示它很可能是一颗被捕获的柯伊伯带天体。<br>④海王星上也在下钻石雨：和天王星一样，海王星内部的极端条件可能将甲烷分解、将碳压成钻石。<br>⑤海卫一正在螺旋坠落：大约36亿年后它将到达海王星的洛希极限并被撕裂，海王星届时可能会获得一组壮观的新光环。<br>⑥勒维耶和亚当斯的"竞赛"：除了勒维耶，英国数学家亚当斯也在独立计算这颗未知行星的位置。但由于英国天文台的疏忽，亚当斯的工作没有及时得到观测验证。'],
+      ['五、常见认知误区', `<table class="myth-table"><tr><th>❌ 误区</th><th>✅ 真相</th></tr>
+<tr><td>天王星是最冷的行星</td><td>海王星地表平均温度-214°C，比天王星的-197°C还要低约17°C，是太阳系最冷的行星</td></tr>
+<tr><td>海王星因为最远所以最冷</td><td>距离只是因素之一。天王星比海王星更靠近太阳却更"温暖"，部分原因可能是天王星自转轴倾斜带来的气候效应，以及二者散热机制的差异</td></tr>
+<tr><td>海王星就是一颗普通的蓝色星球</td><td>海王星具有太阳系最狂暴的大气——风速高达2,100km/h，驱动机制至今未完全破解</td></tr>
+<tr><td>冥王星还在行星之列</td><td>2006年国际天文联合会（IAU）将冥王星重新分类为"矮行星"，海王星成为太阳系最外侧的正式行星</td></tr>
+</table>`]
+    ]
+  }
+};
+
+// ==================== 场景初始化 ====================
+const container = document.getElementById('canvas-container');
+const scene = new THREE.Scene();
+
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.5, 200);
+camera.position.set(15, 22, 35);
+camera.lookAt(0, 0, 0);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+container.appendChild(renderer.domElement);
+
+// 禁用右键菜单（全面拦截，含捕获阶段）
+renderer.domElement.addEventListener('contextmenu', e => { e.preventDefault(); e.stopPropagation(); }, true);
+container.addEventListener('contextmenu', e => e.preventDefault());
+// 全局兜底：非 UI 区域均禁用右键
+document.addEventListener('contextmenu', e => {
+  if (e.target.closest('#controls-bar') || e.target.closest('.popup-level1') ||
+      e.target.closest('.popup-level2') || e.target.closest('#intro-popup') ||
+      e.target.closest('#rank-toggle') || e.target.closest('#rank-panel')) return;
+  e.preventDefault();
+});
+
+// 光照 —— 高环境光消除星球暗面，营造均匀明亮的科普展示效果
+const ambientLight = new THREE.AmbientLight(0xffffff, 4.5);
+scene.add(ambientLight);
+const sunLight = new THREE.PointLight(0xffeedd, 30, 100, 0.3);
+sunLight.position.set(0, 0, 0);
+scene.add(sunLight);
+
+// OrbitControls
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.autoRotate = false;
+controls.minDistance = 3;
+controls.maxDistance = 80;
+controls.target.set(0, 0, 0);
+controls.update();
+
+// ==================== 纹理生成 ====================
+function createGlowTexture(innerColor, outerColor) {
+  const size = 512;
+  const canvas = document.createElement('canvas');
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const g = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+  g.addColorStop(0, innerColor);
+  g.addColorStop(0.15, innerColor);
+  g.addColorStop(0.4, outerColor);
+  g.addColorStop(0.7, 'rgba(0,0,0,0)');
+  g.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, size, size);
+  return new THREE.CanvasTexture(canvas);
+}
+
+// 简易伪随机（种子确定性）
+function seededRand(x, y, s) {
+  const n = Math.sin(x * 12.9898 + y * 78.233 + s) * 43758.5453;
+  return n - Math.floor(n);
+}
+
+function createPlanetTexture(baseColor, features) {
+  const w = 512, h = 256;
+  const canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext('2d');
+
+  const r0 = (baseColor >> 16) & 0xff;
+  const g0 = (baseColor >> 8) & 0xff;
+  const b0 = baseColor & 0xff;
+
+  if (features === 'sun') {
+    // 太阳：强烈径向渐变 + 表面米粒组织
+    const grad = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, w/2);
+    grad.addColorStop(0, '#ffffcc');
+    grad.addColorStop(0.2, '#ffe880');
+    grad.addColorStop(0.5, '#ffaa00');
+    grad.addColorStop(0.8, '#ff6600');
+    grad.addColorStop(1, '#cc3300');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+    // 米粒组织（granulation）
+    for (let i = 0; i < 3000; i++) {
+      const x = Math.random() * w, y = Math.random() * h;
+      const s = Math.random() * 8 + 1;
+      const bright = Math.random() > 0.5;
+      ctx.fillStyle = bright
+        ? `rgba(255,255,220,${Math.random() * 0.5})`
+        : `rgba(255,180,50,${Math.random() * 0.3})`;
+      ctx.beginPath(); ctx.arc(x, y, s, 0, Math.PI*2); ctx.fill();
+    }
+  } else if (features === 'mercury') {
+    // 水星：深灰基底 + 大量明显陨石坑
+    ctx.fillStyle = '#8a8a82';
+    ctx.fillRect(0, 0, w, h);
+    // 色调变化
+    for (let y = 0; y < h; y++) {
+      ctx.fillStyle = `rgba(${130+Math.random()*40},${128+Math.random()*40},${120+Math.random()*40},0.15)`;
+      ctx.fillRect(0, y, w, 1);
+    }
+    // 大陨石坑
+    for (let i = 0; i < 40; i++) {
+      const cx = Math.random() * w, cy = Math.random() * h;
+      const r = 8 + Math.random() * 30;
+      const grad = ctx.createRadialGradient(cx, cy, r*0.3, cx, cy, r);
+      grad.addColorStop(0, '#4a4a44');
+      grad.addColorStop(0.4, '#6a6a62');
+      grad.addColorStop(0.7, '#9a9a90');
+      grad.addColorStop(1, '#7a7a72');
+      ctx.fillStyle = grad;
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
+    }
+    // 小陨石坑
+    for (let i = 0; i < 600; i++) {
+      const cx = Math.random() * w, cy = Math.random() * h;
+      const r = 1 + Math.random() * 5;
+      const shade = 60 + Math.random() * 60;
+      ctx.fillStyle = `rgb(${shade},${shade},${shade})`;
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
+      if (Math.random() > 0.5) {
+        ctx.strokeStyle = `rgba(180,180,175,0.6)`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  } else if (features === 'venus') {
+    // 金星：淡黄奶油色 + 云层旋涡
+    ctx.fillStyle = '#e8d8a8';
+    ctx.fillRect(0, 0, w, h);
+    for (let i = 0; i < 30; i++) {
+      const cx = Math.random() * w, cy = Math.random() * h;
+      const rx = 30 + Math.random() * 100, ry = 15 + Math.random() * 40;
+      ctx.fillStyle = `rgba(${220+Math.random()*35},${200+Math.random()*40},${150+Math.random()*35},0.35)`;
+      ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, Math.random()*Math.PI, 0, Math.PI*2); ctx.fill();
+    }
+    for (let i = 0; i < 15; i++) {
+      const cx = Math.random() * w, cy = Math.random() * h;
+      const rx = 50 + Math.random() * 150, ry = 8 + Math.random() * 15;
+      ctx.strokeStyle = `rgba(250,235,200,0.25)`;
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI*2); ctx.stroke();
+    }
+  } else if (features === 'earth') {
+    // 地球：深蓝海洋 + 清晰绿色大陆 + 白色云层 + 冰盖
+    ctx.fillStyle = '#1144aa';
+    ctx.fillRect(0, 0, w, h);
+    // 海洋深浅变化
+    for (let y = 0; y < h; y++) {
+      ctx.fillStyle = `rgba(${10+Math.random()*30},${50+Math.random()*40},${140+Math.random()*80},0.3)`;
+      ctx.fillRect(0, y, w, 1);
+    }
+    // 大陆块（更明确的形状）
+    const continents = [
+      { cx:260, cy:75, rx:50, ry:85, c:'#3a9940' },      // 非洲
+      { cx:270, cy:50, rx:130, ry:48, c:'#4a8a30' },      // 欧亚
+      { cx:85, cy:45, rx:60, ry:70, c:'#3d8830' },        // 北美
+      { cx:125, cy:130, rx:22, ry:42, c:'#3a9035' },      // 南美
+      { cx:395, cy:140, rx:22, ry:16, c:'#c89440' },      // 澳洲
+      { cx:480, cy:55, rx:35, ry:25, c:'#ffffff' },       // 格陵兰
+      { cx:490, cy:200, rx:40, ry:35, c:'#f0f0f0' },      // 南极洲
+      { cx:350, cy:35, rx:30, ry:20, c:'#558840' },       // 东南亚群岛
+      { cx:160, cy:80, rx:18, ry:30, c:'#44aa50' },       // 中美洲
+    ];
+    continents.forEach(({cx,cy,rx,ry,c}) => {
+      ctx.fillStyle = c;
+      ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, Math.random()*0.2, 0, Math.PI*2); ctx.fill();
+      // 内陆颜色变化
+      ctx.fillStyle = c.replace('3a','4a').replace('3d','4d').replace('c8','b8');
+      ctx.beginPath(); ctx.ellipse(cx-3, cy-2, rx*0.6, ry*0.5, Math.random()*0.2, 0, Math.PI*2); ctx.fill();
+    });
+    // 白色云层
+    for (let i = 0; i < 300; i++) {
+      ctx.fillStyle = `rgba(255,255,255,${Math.random()*0.25})`;
+      ctx.beginPath(); ctx.arc(Math.random()*w, Math.random()*h, Math.random()*18+2, 0, Math.PI*2); ctx.fill();
+    }
+  } else if (features === 'mars') {
+    // 火星：铁锈红 + 暗色区域 + 极冠
+    ctx.fillStyle = '#c84a2a';
+    ctx.fillRect(0, 0, w, h);
+    for (let y = 0; y < h; y++) {
+      const r2 = 180 + Math.sin(y * 0.03) * 30 + Math.random() * 20;
+      const g2 = 50 + Math.random() * 25;
+      const b2 = 20 + Math.random() * 15;
+      ctx.fillStyle = `rgba(${r2},${g2},${b2},0.25)`;
+      ctx.fillRect(0, y, w, 1);
+    }
+    // 大型暗色区域
+    for (let i = 0; i < 15; i++) {
+      const cx = Math.random() * w, cy = Math.random() * h;
+      ctx.fillStyle = `rgba(120,30,15,0.3)`;
+      ctx.beginPath(); ctx.ellipse(cx, cy, 20+Math.random()*80, 15+Math.random()*40, Math.random()*Math.PI, 0, Math.PI*2); ctx.fill();
+    }
+    // 极冠
+    ctx.fillStyle = 'rgba(255,250,240,0.7)';
+    ctx.fillRect(0, 0, w, 18);
+    ctx.fillStyle = 'rgba(255,250,240,0.5)';
+    ctx.fillRect(0, h-14, w, 14);
+    // 陨石坑
+    for (let i = 0; i < 200; i++) {
+      const cx = Math.random() * w, cy = Math.random() * h;
+      const r = 2 + Math.random() * 8;
+      ctx.fillStyle = `rgba(160,50,20,0.5)`;
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = `rgba(210,80,40,0.4)`;
+      ctx.lineWidth = 0.5; ctx.stroke();
+    }
+  } else if (features === 'jupiter') {
+    // 木星：高对比度条纹 + 大红斑
+    const bands = [
+      { y:0, h:20, c:'#c8a878' }, { y:20, h:15, c:'#ddc090' },
+      { y:35, h:12, c:'#b89060' }, { y:47, h:18, c:'#d4b880' },
+      { y:65, h:10, c:'#a07848' }, { y:75, h:16, c:'#ccb078' },
+      { y:91, h:14, c:'#ba9060' }, { y:105, h:12, c:'#d8c090' },
+      { y:117, h:18, c:'#c09868' }, { y:135, h:8, c:'#a88050' },
+      { y:143, h:16, c:'#d0b880' }, { y:159, h:12, c:'#b89058' },
+      { y:171, h:20, c:'#c8a870' }, { y:191, h:10, c:'#dcc898' },
+      { y:201, h:15, c:'#b08848' }, { y:216, h:18, c:'#c8b078' },
+      { y:234, h:12, c:'#d4c090' }, { y:246, h:10, c:'#a88050' },
+    ];
+    bands.forEach(b => {
+      const grad = ctx.createLinearGradient(0, b.y, 0, b.y+b.h);
+      grad.addColorStop(0, b.c);
+      grad.addColorStop(0.5, b.c.replace('8','a').replace('6','8').replace('4','6'));
+      grad.addColorStop(1, b.c);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, b.y, w, b.h);
+    });
+    // 紊流细节
+    for (let i = 0; i < 2000; i++) {
+      const x = Math.random() * w, y = Math.random() * h;
+      ctx.fillStyle = `rgba(${180+Math.random()*75},${100+Math.random()*80},${40+Math.random()*50},0.15)`;
+      ctx.beginPath(); ctx.ellipse(x, y, Math.random()*12+1, Math.random()*3+1, Math.random()*Math.PI, 0, Math.PI*2); ctx.fill();
+    }
+    // 大红斑
+    const grsX = w * 0.55, grsY = h * 0.48;
+    const grsG = ctx.createRadialGradient(grsX, grsY, 3, grsX, grsY, 38);
+    grsG.addColorStop(0, '#f06040');
+    grsG.addColorStop(0.3, '#e05030');
+    grsG.addColorStop(0.6, '#d87050');
+    grsG.addColorStop(0.85, '#c89870');
+    grsG.addColorStop(1, 'rgba(200,160,120,0)');
+    ctx.fillStyle = grsG;
+    ctx.beginPath(); ctx.ellipse(grsX, grsY, 38, 18, 0.05, 0, Math.PI*2); ctx.fill();
+    // 小红斑
+    const grsX2 = w * 0.3, grsY2 = h * 0.52;
+    const grsG2 = ctx.createRadialGradient(grsX2, grsY2, 2, grsX2, grsY2, 12);
+    grsG2.addColorStop(0, '#f08060');
+    grsG2.addColorStop(1, 'rgba(200,140,100,0)');
+    ctx.fillStyle = grsG2;
+    ctx.beginPath(); ctx.ellipse(grsX2, grsY2, 12, 7, 0, 0, Math.PI*2); ctx.fill();
+  } else if (features === 'saturn') {
+    // 土星：柔和金黄 + 淡纹
+    for (let y = 0; y < h; y++) {
+      const t = y / h;
+      const r2 = 220 + Math.sin(t * 20) * 20 + Math.sin(t * 35) * 10;
+      const g2 = 195 + Math.sin(t * 15 + 1) * 18;
+      const b2 = 140 + Math.sin(t * 12 + 2) * 20;
+      ctx.fillStyle = `rgb(${r2},${g2},${b2})`;
+      ctx.fillRect(0, y, w, 1);
+    }
+    // 细微紊流
+    for (let i = 0; i < 800; i++) {
+      const x = Math.random() * w, y = Math.random() * h;
+      ctx.fillStyle = `rgba(${210+Math.random()*45},${185+Math.random()*40},${130+Math.random()*35},0.12)`;
+      ctx.beginPath(); ctx.ellipse(x, y, Math.random()*8+1, Math.random()*2+1, 0, 0, Math.PI*2); ctx.fill();
+    }
+  } else if (features === 'uranus') {
+    // 天王星：均匀淡青蓝色
+    ctx.fillStyle = '#88ccdd';
+    ctx.fillRect(0, 0, w, h);
+    for (let y = 0; y < h; y++) {
+      const t = y / h;
+      ctx.fillStyle = `rgba(${120+Math.sin(t*6)*15},${190+Math.sin(t*6+1)*15},${210+Math.sin(t*6+2)*15},0.25)`;
+      ctx.fillRect(0, y, w, 1);
+    }
+    for (let i = 0; i < 200; i++) {
+      ctx.fillStyle = `rgba(180,220,235,${Math.random()*0.12})`;
+      ctx.beginPath(); ctx.arc(Math.random()*w, Math.random()*h, Math.random()*20+3, 0, Math.PI*2); ctx.fill();
+    }
+  } else if (features === 'neptune') {
+    // 海王星：深海蓝 + 风暴
+    ctx.fillStyle = '#2244cc';
+    ctx.fillRect(0, 0, w, h);
+    for (let y = 0; y < h; y++) {
+      const t = y / h;
+      ctx.fillStyle = `rgba(${20+Math.sin(t*8)*15},${40+Math.sin(t*8+2)*20},${180+Math.sin(t*8+1)*40},0.3)`;
+      ctx.fillRect(0, y, w, 1);
+    }
+    // 风暴特征
+    for (let i = 0; i < 10; i++) {
+      const cx = Math.random() * w, cy = Math.random() * h;
+      ctx.fillStyle = `rgba(100,160,240,${Math.random()*0.3})`;
+      ctx.beginPath(); ctx.ellipse(cx, cy, 8+Math.random()*30, 4+Math.random()*12, Math.random()*Math.PI, 0, Math.PI*2); ctx.fill();
+    }
+    // 大暗斑
+    const dsX = w * 0.3, dsY = h * 0.45;
+    const dsG = ctx.createRadialGradient(dsX, dsY, 2, dsX, dsY, 25);
+    dsG.addColorStop(0, '#0a1a66');
+    dsG.addColorStop(0.7, '#1a3aaa');
+    dsG.addColorStop(1, 'rgba(30,60,180,0)');
+    ctx.fillStyle = dsG;
+    ctx.beginPath(); ctx.ellipse(dsX, dsY, 25, 10, 0, 0, Math.PI*2); ctx.fill();
+  } else if (features === 'moon') {
+    // 月球：灰色 + 大量明显陨石坑 + 月海
+    ctx.fillStyle = '#c8c8c4';
+    ctx.fillRect(0, 0, w, h);
+    for (let y = 0; y < h; y++) {
+      ctx.fillStyle = `rgba(${180+Math.random()*50},${178+Math.random()*50},${172+Math.random()*50},0.2)`;
+      ctx.fillRect(0, y, w, 1);
+    }
+    // 月海（暗色区域）
+    for (let i = 0; i < 8; i++) {
+      const cx = Math.random() * w, cy = Math.random() * h;
+      ctx.fillStyle = `rgba(140,138,134,0.35)`;
+      ctx.beginPath(); ctx.ellipse(cx, cy, 30+Math.random()*70, 25+Math.random()*50, Math.random()*Math.PI, 0, Math.PI*2); ctx.fill();
+    }
+    // 大型陨石坑
+    for (let i = 0; i < 25; i++) {
+      const cx = Math.random() * w, cy = Math.random() * h;
+      const r = 10 + Math.random() * 25;
+      const grad = ctx.createRadialGradient(cx, cy, r*0.2, cx, cy, r);
+      grad.addColorStop(0, '#a0a09c');
+      grad.addColorStop(0.5, '#b8b8b4');
+      grad.addColorStop(0.8, '#d0d0cc');
+      grad.addColorStop(1, '#c0c0bc');
+      ctx.fillStyle = grad;
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
+    }
+    // 中小陨石坑
+    for (let i = 0; i < 400; i++) {
+      const cx = Math.random() * w, cy = Math.random() * h;
+      const r = 1 + Math.random() * 6;
+      ctx.fillStyle = `rgb(${130+Math.random()*50},${128+Math.random()*50},${124+Math.random()*50})`;
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
+      if (Math.random() > 0.7) {
+        ctx.strokeStyle = `rgba(220,218,214,0.5)`;
+        ctx.lineWidth = 0.5; ctx.stroke();
+      }
+    }
+  } else {
+    // fallback: base color with variation
+    ctx.fillStyle = `rgb(${r0},${g0},${b0})`;
+    ctx.fillRect(0, 0, w, h);
+  }
+
+  // 极地区域稍暗
+  const poleGrad = ctx.createLinearGradient(0, 0, 0, h);
+  poleGrad.addColorStop(0, 'rgba(0,0,0,0.12)');
+  poleGrad.addColorStop(0.12, 'rgba(0,0,0,0)');
+  poleGrad.addColorStop(0.88, 'rgba(0,0,0,0)');
+  poleGrad.addColorStop(1, 'rgba(0,0,0,0.12)');
+  ctx.fillStyle = poleGrad;
+  ctx.fillRect(0, 0, w, h);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+// ==================== 星空 ====================
+function createStarfield(count, radius, colorHex) {
+  const positions = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    const r = radius * (0.7 + Math.random() * 0.3);
+    positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+    positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+    positions[i * 3 + 2] = r * Math.cos(phi);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const mat = new THREE.PointsMaterial({ color: colorHex, size: 0.08, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false });
+  return new THREE.Points(geo, mat);
+}
+
+const farStars = createStarfield(1500, 60, 0x8899cc);
+const nearStars = createStarfield(500, 35, 0xaaccff);
+scene.add(farStars);
+scene.add(nearStars);
+
+// 流星（少量）
+const meteorGroup = new THREE.Group();
+scene.add(meteorGroup);
+const meteors = [];
+for (let i = 0; i < 5; i++) {
+  const geo = new THREE.BufferGeometry();
+  const len = 0.3 + Math.random() * 0.5;
+  geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array([0,0,0, -len, len*0.3, -len*0.3]), 3));
+  const mat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending });
+  const line = new THREE.Line(geo, mat);
+  line.visible = false;
+  meteorGroup.add(line);
+  meteors.push({
+    line,
+    life: 0,
+    maxLife: 3 + Math.random() * 4,
+    cooldown: Math.random() * 8,
+    direction: new THREE.Vector3(-1 + Math.random()*0.3, -0.3 + Math.random()*0.2, -0.5 + Math.random()).normalize()
+  });
+}
+
+// ==================== 天体创建 ====================
+const planets = {};
+const clickableObjects = [];
+// 轨道线
+function createOrbitLine(radiusX, radiusZ) {
+  const points = [];
+  const segments = 256;
+  for (let i = 0; i <= segments; i++) {
+    const a = (i / segments) * Math.PI * 2;
+    points.push(new THREE.Vector3(Math.cos(a) * radiusX, 0, Math.sin(a) * radiusZ));
+  }
+  const geo = new THREE.BufferGeometry().setFromPoints(points);
+  const mat = new THREE.LineDashedMaterial({ color: 0x334466, dashSize: 0.8, gapSize: 0.4, transparent: true, opacity: 0.5 });
+  const line = new THREE.Line(geo, mat);
+  line.computeLineDistances();
+  return line;
+}
+
+// 标签精灵
+function createLabel(text) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 128; canvas.height = 48;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 20px "Microsoft YaHei","PingFang SC",sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(text, 64, 30);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.minFilter = THREE.LinearFilter;
+  const spriteMat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false, depthWrite: false });
+  const sprite = new THREE.Sprite(spriteMat);
+  sprite.scale.set(2, 0.75, 1);
+  return sprite;
+}
+
+// 太阳
+const sunTex = createPlanetTexture(0xffaa00, 'sun');
+const sunGeo = new THREE.SphereGeometry(1.6, 64, 64);
+const sunMat = new THREE.MeshBasicMaterial({ map: sunTex });
+const sunMesh = new THREE.Mesh(sunGeo, sunMat);
+scene.add(sunMesh);
+clickableObjects.push(sunMesh);
+
+// 太阳光晕（Sprite）
+const glowTex = createGlowTexture('rgba(255,200,50,1)', 'rgba(255,100,0,0.3)');
+const glowSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.7, depthWrite: false }));
+glowSprite.scale.set(8, 8, 1);
+scene.add(glowSprite);
+
+// 第二层更大更淡的光晕
+const glowTex2 = createGlowTexture('rgba(255,180,30,0.5)', 'rgba(255,60,0,0.1)');
+const glowSprite2 = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex2, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.35, depthWrite: false }));
+glowSprite2.scale.set(14, 14, 1);
+scene.add(glowSprite2);
+
+planets.sun = { key:'sun', mesh: sunMesh, group: null, angle: 0, size: 1.6 };
+
+// 创建行星
+const planetDefs = [
+  { key:'mercury', tex:'mercury' },
+  { key:'venus', tex:'venus' },
+  { key:'earth', tex:'earth' },
+  { key:'mars', tex:'mars' },
+  { key:'jupiter', tex:'jupiter' },
+  { key:'saturn', tex:'saturn' },
+  { key:'uranus', tex:'uranus' },
+  { key:'neptune', tex:'neptune' },
+];
+
+planetDefs.forEach(def => {
+  const data = planetData[def.key];
+  const tex = createPlanetTexture(data.color, def.tex);
+  const geo = new THREE.SphereGeometry(data.size, 48, 48);
+  const mat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.55, metalness: 0.05 });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.castShadow = true;
+
+  const group = new THREE.Group();
+  group.add(mesh);
+  scene.add(group);
+  clickableObjects.push(mesh);
+
+  // 标签
+  const label = createLabel(data.name);
+  label.position.y = data.size + 0.5;
+  group.add(label);
+
+  // 轨道线
+  const ecc = data.orbitEcc || 0;
+  const rx = data.orbitRadius * (1 + ecc);
+  const rz = data.orbitRadius * (1 - ecc);
+  const orbitLine = createOrbitLine(rx, rz);
+  scene.add(orbitLine);
+
+  planets[def.key] = {
+    ...data,
+    mesh,
+    group,
+    label,
+    angle: Math.random() * Math.PI * 2,
+    orbitRx: rx,
+    orbitRz: rz,
+  };
+
+  // 土星环
+  if (data.hasRing) {
+    const ringGeo = new THREE.RingGeometry(data.size * 1.3, data.size * 2.1, 80);
+    const ringMat = new THREE.MeshStandardMaterial({
+      color: 0xe8d880, side: THREE.DoubleSide, roughness: 0.6,
+      transparent: true, opacity: 0.75, depthWrite: true
+    });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    // RingGeometry 创建在 XY 平面，旋转到 XZ 平面 + 约 26° 倾斜（土星环倾角）
+    ring.rotation.x = -Math.PI / 2 + THREE.MathUtils.degToRad(26);
+    group.add(ring);
+    clickableObjects.push(ring);
+    planets[def.key].ring = ring;
+  }
+
+  // 天王星倾斜
+  if (data.tilt) {
+    mesh.rotation.z = THREE.MathUtils.degToRad(data.tilt);
+    if (planets[def.key].ring) {
+      planets[def.key].ring.rotation.z = THREE.MathUtils.degToRad(data.tilt);
+    }
+  }
+});
+
+// 月球
+const moonData = planetData.moon;
+const moonTex = createPlanetTexture(moonData.color, 'moon');
+const moonGeo = new THREE.SphereGeometry(moonData.size, 32, 32);
+const moonMat = new THREE.MeshStandardMaterial({ map: moonTex, roughness: 0.55, metalness: 0.05 });
+const moonMesh = new THREE.Mesh(moonGeo, moonMat);
+const moonGroup = new THREE.Group();
+moonGroup.add(moonMesh);
+scene.add(moonGroup);
+clickableObjects.push(moonMesh);
+
+const moonLabel = createLabel('月球');
+moonLabel.position.y = moonData.size + 0.3;
+moonGroup.add(moonLabel);
+
+planets.moon = {
+  ...moonData,
+  mesh: moonMesh,
+  group: moonGroup,
+  label: moonLabel,
+  angle: Math.random() * Math.PI * 2,
+  moonOrbitRadius: 1.0,
+};
+
+// ==================== 相机飞行 ====================
+let flyTarget = null;
+let flyTargetPos = new THREE.Vector3();
+let flyLookAt = new THREE.Vector3();
+let isFlying = false;
+
+function flyToPlanet(key) {
+  const p = planets[key];
+  if (!p || key === 'sun') {
+    // 飞到太阳附近
+    const dir = new THREE.Vector3(1, 0.5, 1).normalize();
+    flyTargetPos.copy(dir).multiplyScalar(4);
+    flyLookAt.set(0, 0, 0);
+  } else if (key === 'moon') {
+    const earthPos = planets.earth.group.position.clone();
+    const moonPos = moonGroup.position.clone();
+    const dir = moonPos.clone().sub(earthPos).normalize();
+    flyTargetPos.copy(moonPos).add(dir.multiplyScalar(1.5));
+    flyLookAt.copy(moonPos);
+  } else {
+    const pos = p.group.position.clone();
+    const dist = p.size * 3 + 1.5;
+    const dir = pos.clone().normalize();
+    flyTargetPos.copy(pos).add(dir.multiplyScalar(dist));
+    // 确保不在行星内部
+    if (flyTargetPos.length() < p.size * 1.1) {
+      flyTargetPos.copy(pos).add(dir.multiplyScalar(p.size * 1.5));
+    }
+    flyLookAt.copy(pos);
+  }
+  flyTarget = key;
+  isFlying = true;
+  // 弹出弹窗
+  showLevel1Popup(key);
+}
+
+// ==================== 弹窗管理 ====================
+let currentPopupKey = null;
+let popupLevel = 0;
+let lastClickTime = 0;
+const DEBOUNCE_MS = 500;
+
+function showLevel1Popup(key) {
+  const now = Date.now();
+  if (key === currentPopupKey && popupLevel === 1 && now - lastClickTime < DEBOUNCE_MS) return;
+  lastClickTime = now;
+
+  const data = planetData[key];
+  if (!data) return;
+
+  const popup = document.getElementById('popup-level1');
+  document.getElementById('p1-emoji').textContent = data.emoji;
+  document.getElementById('p1-title').textContent = data.title1;
+  document.getElementById('p1-tagline').textContent = data.tagline1;
+
+  const dataDiv = document.getElementById('p1-data');
+  dataDiv.innerHTML = data.data1.map(([label, value]) =>
+    `<div class="popup-data-item"><span class="label">${label}</span><span class="value">${value}</span></div>`
+  ).join('');
+
+  const btnsDiv = document.getElementById('p1-buttons');
+  btnsDiv.innerHTML = '';
+  const detailBtn = document.createElement('button');
+  detailBtn.className = 'btn-detail';
+  detailBtn.textContent = '📖 完整科普';
+  detailBtn.onclick = () => showLevel2Popup(key);
+  btnsDiv.appendChild(detailBtn);
+
+  if (key === 'earth') {
+    const moonBtn = document.createElement('button');
+    moonBtn.className = 'btn-moon';
+    moonBtn.textContent = '🌙 查看月球';
+    moonBtn.onclick = () => { flyToPlanet('moon'); };
+    btnsDiv.appendChild(moonBtn);
+  }
+  if (key === 'moon') {
+    const earthBtn = document.createElement('button');
+    earthBtn.className = 'btn-earth';
+    earthBtn.textContent = '🌍 返回地球';
+    earthBtn.onclick = () => { flyToPlanet('earth'); };
+    btnsDiv.appendChild(earthBtn);
+  }
+
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'btn-close-popup';
+  closeBtn.textContent = '✕ 关闭';
+  closeBtn.onclick = hidePopups;
+  btnsDiv.appendChild(closeBtn);
+
+  document.getElementById('popup-level2').classList.remove('show');
+  popup.classList.add('show');
+  currentPopupKey = key;
+  popupLevel = 1;
+
+  // 语音播报
+  speakPlanetSummary(key);
+}
+
+function showLevel2Popup(key) {
+  const data = planetData[key];
+  if (!data) return;
+
+  stopSpeaking();
+  document.getElementById('p2-title').textContent = `${data.emoji} ${data.title1}`;
+  const contentDiv = document.getElementById('p2-content');
+  contentDiv.innerHTML = data.detail.map(([title, text]) => `
+    <div class="section">
+      <div class="section-title">📌 ${title}</div>
+      <div class="section-content">${text}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('popup-level2').classList.add('show');
+  popupLevel = 2;
+}
+
+function hidePopups() {
+  document.getElementById('popup-level1').classList.remove('show');
+  document.getElementById('popup-level2').classList.remove('show');
+  currentPopupKey = null;
+  popupLevel = 0;
+  stopSpeaking();
+}
+
+// ==================== 语音播报 ====================
+let voiceEnabled = true;
+let selectedVoice = null;
+let chineseVoices = [];
+let voiceIndex = 0;
+const synth = window.speechSynthesis;
+
+// 语音质量评分：neural=100, premium=70, standard=40, 其他=10
+function voiceScore(v) {
+  const name = v.name + v.lang;
+  // Edge 神经语音 —— 最佳选择
+  if (/Xiaoxiao|Xiaohan|Xiaochen|Xiaomeng/i.test(name)) return 100; // 女声
+  if (/Yunxi|Yunyang|Yunfeng|Yunye/i.test(name))  return 95;  // 男声
+  if (/Xiaobei|Xiaoni|Xiaoshuang/i.test(name))     return 92;
+  if (/Neural/i.test(name)) return 90;
+  // Google 在线语音
+  if (/Google.*普通话/i.test(name)) return 85;
+  // macOS 高质量语音
+  if (/Ting-?ting/i.test(name)) return 82;
+  // 其他 premium
+  if (/Premium/i.test(name)) return 70;
+  if (/Microsoft.*(Huihui|Yaoyao|Kangkang)/i.test(name)) return 55;
+  // 标准语音
+  if (/zh-CN|zh_CN|cmn|Mandarin|Chinese/i.test(name + v.lang)) return 40;
+  if (v.lang.startsWith('zh')) return 30;
+  return 0;
+}
+
+function loadAllVoices() {
+  const allVoices = synth.getVoices();
+  // 筛选中文语音并按质量排序
+  chineseVoices = allVoices
+    .filter(v => {
+      const key = (v.name + v.lang).toLowerCase();
+      return key.includes('zh') || key.includes('chinese') ||
+             key.includes('mandarin') || key.includes('cmn') ||
+             key.includes('普通话') || key.includes('中文');
+    })
+    .sort((a, b) => voiceScore(b) - voiceScore(a));
+
+  if (chineseVoices.length === 0) {
+    // 完全找不到中文，用系统默认
+    chineseVoices = allVoices.filter(v => v.lang.startsWith('zh'));
+  }
+  if (chineseVoices.length === 0) {
+    chineseVoices = allVoices;
+  }
+
+  // 选最高分
+  voiceIndex = 0;
+  selectedVoice = chineseVoices[0] || null;
+
+  if (selectedVoice) {
+    console.log('🎤 当前语音:', selectedVoice.name,
+      voiceScore(selectedVoice) >= 80 ? '⭐ 高质量' :
+      voiceScore(selectedVoice) >= 50 ? '👍 标准质量' : '💬 基础质量');
+    if (chineseVoices.length > 1) {
+      console.log('🔄 可用语音:', chineseVoices.map(v => v.name).join(', '));
+      console.log('💡 点击语音按钮可切换');
+    }
+  }
+}
+
+// 切换语音
+function cycleVoice() {
+  if (chineseVoices.length <= 1) return;
+  voiceIndex = (voiceIndex + 1) % chineseVoices.length;
+  selectedVoice = chineseVoices[voiceIndex];
+  console.log('🎤 已切换语音:', selectedVoice.name);
+  // 如果当前在播报中，重新播一次以听效果
+  if (currentPopupKey && voiceEnabled) {
+    stopSpeaking();
+    speakPlanetSummary(currentPopupKey);
+  }
+}
+
+// 语音列表异步加载
+if (synth) {
+  synth.onvoiceschanged = loadAllVoices;
+  loadAllVoices();
+}
+
+function sanitizeForSpeech(text) {
+  return text
+    .replace(/\bkm\b/gi, '公里')
+    .replace(/°C/gi, '摄氏度')
+    .replace(/km\/h/gi, '公里每小时')
+    .replace(/\bAU\b/g, '天文单位')
+    .replace(/g\/cm³/gi, '克每立方厘米')
+    .replace(/cm\/年/gi, '厘米每年')
+    .replace(/H₂/g, '氢气')
+    .replace(/He/g, '氦气')
+    .replace(/CH₄/g, '甲烷')
+    .replace(/CO₂/g, '二氧化碳')
+    .replace(/Fe₂O₃/g, '氧化铁')
+    .replace(/N₂/g, '氮气')
+    .replace(/O₂/g, '氧气')
+    .replace(/E=mc²/g, '质能方程')
+    .replace(/%/g, '百分之')
+    .replace(/×/g, '乘')
+    .replace(/[\³\²\¹\⁰]/g, '')
+    .replace(/[₁₂₃₄₅₆₇₈₉₀]/g, '')
+    .replace(/[①-⑳❶-❿]/g, '')
+    .replace(/[—→☆★⚠️🪐☀️☿♀🌍🌙♂♃♄⛢♆]/g, '')
+    .replace(/[【】《》「」『』]/g, '')
+    .replace(/[（()）]/g, '，')
+    .replace(/[～~]/g, '到')
+    .replace(/\s+/g, '')
+    .replace(/(\d),(\d)/g, '$1万$2');
+}
+
+function speak(text) {
+  if (!voiceEnabled || !synth) return;
+  synth.cancel();
+  const cleanText = sanitizeForSpeech(text);
+  const utterance = new SpeechSynthesisUtterance(cleanText);
+  utterance.lang = 'zh-CN';
+  utterance.rate = 0.88;
+  utterance.pitch = 1.05;
+  utterance.volume = 0.95;
+  if (selectedVoice) utterance.voice = selectedVoice;
+  // 修复 Chrome 长时间不播报会卡住的 bug
+  utterance.onend = () => {};
+  utterance.onerror = () => {};
+  synth.speak(utterance);
+}
+
+function stopSpeaking() {
+  if (synth) { synth.cancel(); }
+}
+
+function speakPlanetSummary(key) {
+  const data = planetData[key];
+  if (!data) return;
+  const text = `${data.name}。${data.tagline1}。${data.data1.map(([l,v]) => l + '：' + v).join('；')}`;
+  speak(text);
+}
+
+const btnVoice = document.getElementById('btn-voice');
+function updateVoiceBtn() {
+  if (!voiceEnabled) {
+    btnVoice.textContent = '🔇';
+    btnVoice.title = '语音已关闭';
+    btnVoice.classList.add('active');
+  } else if (chineseVoices.length > 1) {
+    btnVoice.textContent = '🔊';
+    btnVoice.title = '语音播报中 | 点击切换语音';
+    btnVoice.classList.remove('active');
+  } else {
+    btnVoice.textContent = '🔊';
+    btnVoice.title = '语音播报中';
+    btnVoice.classList.remove('active');
+  }
+}
+updateVoiceBtn();
+
+btnVoice.addEventListener('click', () => {
+  if (!voiceEnabled) {
+    voiceEnabled = true;
+    if (chineseVoices.length === 0) loadAllVoices();
+    updateVoiceBtn();
+    return;
+  }
+  // 已开启：短按切换语音，长按关闭
+  if (chineseVoices.length > 1) {
+    cycleVoice();
+  } else {
+    voiceEnabled = false;
+    stopSpeaking();
+    updateVoiceBtn();
+  }
+});
+
+// 双击按钮关闭语音
+btnVoice.addEventListener('dblclick', (e) => {
+  e.preventDefault();
+  voiceEnabled = false;
+  stopSpeaking();
+  updateVoiceBtn();
+});
+
+document.getElementById('btn-close-detail').addEventListener('click', () => {
+  document.getElementById('popup-level2').classList.remove('show');
+  popupLevel = 1;
+});
+document.getElementById('popup-level2').querySelector('.overlay').addEventListener('click', () => {
+  document.getElementById('popup-level2').classList.remove('show');
+  popupLevel = 1;
+});
+
+// ==================== Raycaster ====================
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+let hoveredObject = null;
+
+function updateRaycaster(event) {
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+
+  const intersects = raycaster.intersectObjects(clickableObjects);
+  if (intersects.length > 0) {
+    const obj = intersects[0].object;
+    if (hoveredObject !== obj) {
+      if (hoveredObject) resetHighlight(hoveredObject);
+      hoveredObject = obj;
+      highlightObject(obj);
+      document.body.style.cursor = 'pointer';
+    }
+  } else {
+    if (hoveredObject) {
+      resetHighlight(hoveredObject);
+      hoveredObject = null;
+    }
+    document.body.style.cursor = '';
+  }
+}
+
+function highlightObject(obj) {
+  // MeshBasicMaterial (太阳): 提亮颜色
+  if (obj.material && obj.material.isMeshBasicMaterial) {
+    obj.userData._origColor = obj.material.color.getHex();
+    obj.userData._highlighted = true;
+    const c = obj.material.color;
+    obj.material.color = new THREE.Color(Math.min(1, c.r * 1.3), Math.min(1, c.g * 1.3), Math.min(1, c.b * 1.3));
+    return;
+  }
+  // MeshStandardMaterial (行星、月球、土星环): 使用 emissive 发光
+  if (obj.material && obj.material.emissive) {
+    obj.userData._origEmissive = obj.material.emissive.getHex();
+    obj.userData._origEmissiveIntensity = obj.material.emissiveIntensity;
+    obj.material.emissive = new THREE.Color(0x555555);
+    obj.material.emissiveIntensity = 0.5;
+  }
+}
+
+function resetHighlight(obj) {
+  // MeshBasicMaterial
+  if (obj.userData._highlighted && obj.userData._origColor !== undefined) {
+    obj.material.color.setHex(obj.userData._origColor);
+    obj.userData._highlighted = false;
+    return;
+  }
+  // MeshStandardMaterial
+  if (obj.material && obj.material.emissive && obj.userData._origEmissive !== undefined) {
+    obj.material.emissive.setHex(obj.userData._origEmissive);
+    obj.material.emissiveIntensity = obj.userData._origEmissiveIntensity || 0;
+  }
+}
+
+function findPlanetKeyByMesh(mesh) {
+  // Check if mesh is a ring -> saturn
+  for (const [key, p] of Object.entries(planets)) {
+    if (p.mesh === mesh) return key;
+    if (p.ring === mesh) return 'saturn';
+  }
+  if (mesh === sunMesh) return 'sun';
+  if (mesh === moonMesh) return 'moon';
+  return null;
+}
+
+window.addEventListener('mousemove', updateRaycaster);
+window.addEventListener('click', (event) => {
+  // Ignore clicks on UI elements
+  if (event.target.closest('#controls-bar') || event.target.closest('.popup-level1') ||
+      event.target.closest('.popup-level2') || event.target.closest('#intro-popup') ||
+      event.target.closest('#rank-toggle') || event.target.closest('#rank-panel')) return;
+
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(clickableObjects);
+  if (intersects.length > 0) {
+    const key = findPlanetKeyByMesh(intersects[0].object);
+    if (key) flyToPlanet(key);
+  }
+});
+
+// 触屏支持
+window.addEventListener('touchstart', (event) => {
+  if (event.target.closest('#controls-bar') || event.target.closest('.popup-level1') ||
+      event.target.closest('.popup-level2') || event.target.closest('#intro-popup') ||
+      event.target.closest('#rank-toggle') || event.target.closest('#rank-panel')) return;
+
+  const touch = event.touches[0];
+  mouse.x = (touch.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(clickableObjects);
+  if (intersects.length > 0) {
+    const key = findPlanetKeyByMesh(intersects[0].object);
+    if (key) flyToPlanet(key);
+  }
+});
+
+// ==================== 速度控制 ====================
+let speedMultiplier = 1.0;
+let isPaused = false;
+
+const speedSlider = document.getElementById('speed-slider');
+const speedLabel = document.getElementById('speed-label');
+
+speedSlider.addEventListener('input', () => {
+  speedMultiplier = speedSlider.value / 100;
+  speedLabel.textContent = speedMultiplier.toFixed(1) + '×';
+});
+
+document.getElementById('btn-pause').addEventListener('click', function() {
+  isPaused = !isPaused;
+  this.classList.toggle('active', isPaused);
+});
+document.getElementById('btn-slower').addEventListener('click', () => {
+  speedMultiplier = Math.max(0.1, speedMultiplier - 0.2);
+  speedSlider.value = speedMultiplier * 100;
+  speedLabel.textContent = speedMultiplier.toFixed(1) + '×';
+});
+document.getElementById('btn-faster').addEventListener('click', () => {
+  speedMultiplier = Math.min(3.0, speedMultiplier + 0.2);
+  speedSlider.value = speedMultiplier * 100;
+  speedLabel.textContent = speedMultiplier.toFixed(1) + '×';
+});
+document.getElementById('btn-reset').addEventListener('click', () => {
+  flyTarget = null; isFlying = false;
+  camera.position.set(15, 22, 35);
+  controls.target.set(0, 0, 0);
+  controls.update();
+  hidePopups();
+});
+
+// 底部导航按钮
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const key = btn.dataset.planet;
+    if (key) flyToPlanet(key);
+  });
+});
+
+// ==================== 排行榜 ====================
+const rankToggle = document.getElementById('rank-toggle');
+const rankPanel = document.getElementById('rank-panel');
+const rankContent = document.getElementById('rank-content');
+
+rankToggle.addEventListener('click', () => {
+  const show = !rankPanel.classList.contains('show');
+  rankPanel.classList.toggle('show', show);
+  if (show) updateRankings();
+});
+
+function updateRankings() {
+  const bodies = Object.entries(planetData).filter(([k]) => k !== 'sun' && k !== 'moon');
+  const sizes = [...bodies].sort((a,b) => b[1].size - a[1].size).slice(0,5);
+  const revs = [...bodies].filter(([,d]) => d.revPeriod > 0).sort((a,b) => a[1].revPeriod - b[1].revPeriod).slice(0,5);
+
+  const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+  rankContent.innerHTML = `
+    <div style="margin-bottom:10px"><strong>📏 大小 Top5</strong></div>
+    ${sizes.map(([k,d],i) => `<div class="rank-item"><span>${medals[i]} ${d.name}</span><span>${d.size.toFixed(2)}</span></div>`).join('')}
+    <div style="margin-top:12px;margin-bottom:10px"><strong>⚡ 公转速度 Top5</strong></div>
+    ${revs.map(([k,d],i) => `<div class="rank-item"><span>${medals[i]} ${d.name}</span><span>${d.revPeriod.toFixed(1)}s</span></div>`).join('')}
+    <div style="margin-top:10px;font-size:11px;color:#888">*速度为动画相对速度</div>
+  `;
+}
+
+// ==================== 动画循环 ====================
+const clock = new THREE.Clock();
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  const dt = Math.min(clock.getDelta(), 0.1);
+  const effectiveDt = isPaused ? 0 : dt * speedMultiplier;
+
+  // 太阳自转 + 光晕脉动
+  sunMesh.rotation.y += effectiveDt * 0.3;
+  const pulse = 1 + Math.sin(Date.now() * 0.002) * 0.04;
+  glowSprite.scale.set(8 * pulse, 8 * pulse, 1);
+  glowSprite2.scale.set(14 * (1 + Math.sin(Date.now() * 0.0015) * 0.03), 14 * (1 + Math.sin(Date.now() * 0.0015) * 0.03), 1);
+
+  // 行星公转 + 自转
+  const planetKeys = ['mercury','venus','earth','mars','jupiter','saturn','uranus','neptune'];
+  planetKeys.forEach(key => {
+    const p = planets[key];
+    if (!p) return;
+    if (p.revPeriod > 0) {
+      p.angle += (2 * Math.PI / p.revPeriod) * effectiveDt;
+      p.group.position.x = Math.cos(p.angle) * p.orbitRx;
+      p.group.position.z = Math.sin(p.angle) * p.orbitRz;
+    }
+    if (p.rotPeriod !== 0) {
+      p.mesh.rotation.y += (2 * Math.PI / p.rotPeriod) * effectiveDt;
+    }
+  });
+
+  // 月球绕地球
+  const earth = planets.earth;
+  const moon = planets.moon;
+  if (earth && moon) {
+    moon.angle += (2 * Math.PI / 8) * effectiveDt; // moon orbit
+    moonGroup.position.x = earth.group.position.x + Math.cos(moon.angle) * moon.moonOrbitRadius;
+    moonGroup.position.z = earth.group.position.z + Math.sin(moon.angle) * moon.moonOrbitRadius;
+    moonGroup.position.y = Math.sin(moon.angle * 0.3) * 0.15;
+    moonMesh.rotation.y += effectiveDt * 0.2;
+  }
+
+  // 近层星空缓慢旋转
+  nearStars.rotation.y += effectiveDt * 0.015;
+  nearStars.rotation.x += effectiveDt * 0.005;
+
+  // 流星
+  meteors.forEach(m => {
+    if (m.life <= 0) {
+      m.cooldown -= dt;
+      if (m.cooldown <= 0) {
+        m.life = m.maxLife;
+        m.cooldown = 8 + Math.random() * 12;
+        m.line.visible = true;
+        const startR = 30;
+        const startAngle = Math.random() * Math.PI * 2;
+        const startY = (Math.random() - 0.5) * 20;
+        const pos = new THREE.Vector3(Math.cos(startAngle)*startR, startY, Math.sin(startAngle)*startR);
+        m.line.position.copy(pos);
+        m.line.material.opacity = 0.9;
+      }
+    } else {
+      m.life -= dt;
+      const progress = m.life / m.maxLife;
+      m.line.position.add(m.direction.clone().multiplyScalar(dt * 8));
+      m.line.material.opacity = progress * 0.8;
+      if (m.life <= 0) {
+        m.line.visible = false;
+        m.line.material.opacity = 0;
+      }
+    }
+  });
+
+  // 相机飞行缓动
+  if (isFlying) {
+    camera.position.lerp(flyTargetPos, 0.06);
+    controls.target.lerp(flyLookAt, 0.06);
+    if (camera.position.distanceTo(flyTargetPos) < 0.1) {
+      isFlying = false;
+    }
+  }
+
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+// ==================== 启动 ====================
+// 隐藏加载页
+setTimeout(() => {
+  document.getElementById('loading').classList.add('hidden');
+}, 600);
+
+animate();
+
+// 窗口大小调整
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+console.log('🚀 太阳系探索之旅已就绪！点击天体开始探索吧~');
+</script>
+</body>
+</html>

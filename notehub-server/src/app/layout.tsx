@@ -5,6 +5,7 @@ import { initDb, seedData, initUserTables } from "@/lib/db";
 export const metadata: Metadata = {
   title: "NoteHub - 知识库",
   description: "个人知识管理与笔记系统",
+  icons: { icon: "/favicon.svg" },
 };
 
 try {

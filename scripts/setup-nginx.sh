@@ -6,7 +6,7 @@
 set -e
 
 DOMAIN=$1
-HUB_DIR="/var/www/notehub/hub"
+HUB_DIR="/var/www/hub"
 
 if [ -z "$DOMAIN" ]; then
   echo "错误：请提供域名"

@@ -176,41 +176,42 @@ export default function DebateTeamHomePage() {
           >
             问候在座各位！
           </p>
-          <div className="flex items-center justify-center gap-4 animate-section delay-1">
+          <div className="flex items-center justify-center gap-8 animate-section delay-1">
             <a
               href="#about"
-              className="px-8 py-3 rounded-lg text-white font-medium transition-all hover:shadow-lg tracking-wide"
+              className="group inline-flex items-center gap-2 px-6 py-2.5 transition-all tracking-wider text-sm"
               style={{
-                backgroundColor: "#9e1b32",
-                boxShadow: "0 2px 12px rgba(158,27,50,0.15)",
+                fontFamily: "var(--font-serif)",
+                color: "#2c1810",
+                borderBottom: "1.5px solid #c4943a",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#7a1527";
-                e.currentTarget.style.boxShadow =
-                  "0 4px 20px rgba(158,27,50,0.25)";
+                e.currentTarget.style.color = "#9e1b32";
+                e.currentTarget.style.borderBottomColor = "#9e1b32";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#9e1b32";
-                e.currentTarget.style.boxShadow =
-                  "0 2px 12px rgba(158,27,50,0.15)";
+                e.currentTarget.style.color = "#2c1810";
+                e.currentTarget.style.borderBottomColor = "#c4943a";
               }}
             >
               了解我们
+              <span className="text-xs transition-transform group-hover:translate-x-0.5" style={{ color: "#c4943a" }}>→</span>
             </a>
             <a
               href="#recruitment"
-              className="px-8 py-3 rounded-lg font-medium transition-all tracking-wide"
+              className="group inline-flex items-center gap-2 px-6 py-2.5 transition-all tracking-wider text-sm"
               style={{
-                backgroundColor: "transparent",
-                color: "#9e1b32",
-                border: "2px solid #9e1b32",
+                fontFamily: "var(--font-serif)",
+                color: "#8b7355",
+                borderBottom: "1.5px solid transparent",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor =
-                  "rgba(158,27,50,0.06)";
+                e.currentTarget.style.color = "#9e1b32";
+                e.currentTarget.style.borderBottomColor = "#9e1b32";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "transparent";
+                e.currentTarget.style.color = "#8b7355";
+                e.currentTarget.style.borderBottomColor = "transparent";
               }}
             >
               加入招新群
@@ -263,7 +264,7 @@ export default function DebateTeamHomePage() {
               className="leading-relaxed"
               style={{ color: "#3d2c24", fontSize: "1.05rem" }}
             >
-              我们打比赛是认真的。队伍常年参加校内"喻晓之巅""新生杯"等赛事，拿过冠亚季军，也有博士学长学姐入选校队、在国际赛场上拿了总冠军。每周固定的模辩和复盘是队里的老传统，备赛的时候大家一起熬夜改稿、反复推攻防——但这些不是门槛，而是一群人一起做一件有意思的事。你不需要一开始就很厉害，每一届的队友进了队都是从零开始，一场一场打上来的。
+              我们打比赛是认真的。队伍常年参加校内"喻晓之巅""新生杯"等赛事，拿过冠亚季军，也有博士学长学姐入选校队、在国际赛场上拿了总冠军。备赛的时候大家一起熬夜改稿、反复推攻防——但这些不是门槛，而是一群人一起做一件有意思的事。你不需要一开始就很厉害，每一届的队友进了队都是从零开始，一场一场打上来的。
             </p>
             <p
               className="leading-relaxed"

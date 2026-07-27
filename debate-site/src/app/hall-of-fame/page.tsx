@@ -291,7 +291,7 @@ export default function HallOfFamePage() {
             className="border-t pt-8 text-center text-sm"
             style={{ borderColor: "rgba(255,255,255,0.06)", color: "#5a3f2e" }}
           >
-            <p>© 2026 华中科技大学物理学院辩论队 版权所有</p>
+            <p>© 2026 华中科技大学物理学院辩论队</p>
           </div>
         </div>
       </footer>

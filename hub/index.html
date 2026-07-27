@@ -4,34 +4,321 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>十三工作室</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Use system fonts instead of Google Fonts (blocked in China) -->
+    <style>
+        /* ===== Theme Variables (switched via body[data-style]) ===== */
+        body {
+            --bg: #0a0a0f;
+            --bg2: #14141f;
+            --text: #f1f5f9;
+            --text2: #94a3b8;
+            --accent: #9e1b32;
+            --accent2: #4A2887;
+            --accent-glow: #6d28d9;
+            --border: rgba(255,255,255,0.06);
+            --card-bg: #14141f;
+            --card-hover: #1a1a2a;
+            --title-grad1: #f1f5f9;
+            --title-grad2: #cbd5e1;
+        }
+
+        /* Style 0: 星际粒子 - Deep space, floating particles */
+        body[data-style="0"] {
+            --bg: #020812;
+            --bg2: #0a1628;
+            --text: #e2e8f0;
+            --text2: #7b9bc4;
+            --accent: #38bdf8;
+            --accent2: #818cf8;
+            --accent-glow: #6366f1;
+            --border: rgba(56,189,248,0.1);
+            --card-bg: rgba(10,22,40,0.8);
+            --card-hover: rgba(16,36,64,0.9);
+            --title-grad1: #e2e8f0;
+            --title-grad2: #38bdf8;
+        }
+
+        /* Style 1: 银河星云 - Rotating nebula, 3D parallax */
+        body[data-style="1"] {
+            --bg: #0a0014;
+            --bg2: #1a0a2e;
+            --text: #f0e6ff;
+            --text2: #b8a0d8;
+            --accent: #d946ef;
+            --accent2: #8b5cf6;
+            --accent-glow: #a855f7;
+            --border: rgba(168,85,247,0.12);
+            --card-bg: rgba(26,10,46,0.7);
+            --card-hover: rgba(40,16,70,0.85);
+            --title-grad1: #f0e6ff;
+            --title-grad2: #d946ef;
+        }
+
+        /* Style 2: 赛博故障 - Glitch, scanlines, neon */
+        body[data-style="2"] {
+            --bg: #000205;
+            --bg2: #050a14;
+            --text: #00ff88;
+            --text2: #00cc66;
+            --accent: #ff2d95;
+            --accent2: #00e5ff;
+            --accent-glow: #00e5ff;
+            --border: rgba(0,229,255,0.15);
+            --card-bg: rgba(0,2,10,0.85);
+            --card-hover: rgba(0,5,20,0.9);
+            --title-grad1: #ff2d95;
+            --title-grad2: #00e5ff;
+            font-family: 'Courier New', 'Noto Sans SC', monospace;
+        }
+
+        /* Style 3: 街头爆炸 - Graffiti, bold, chaotic */
+        body[data-style="3"] {
+            --bg: #1a0a2e;
+            --bg2: #0d0221;
+            --text: #fff;
+            --text2: #e0d0ff;
+            --accent: #ff00ff;
+            --accent2: #ffff00;
+            --accent-glow: #00ffff;
+            --border: rgba(255,0,255,0.2);
+            --card-bg: rgba(26,10,46,0.8);
+            --card-hover: rgba(40,20,70,0.9);
+            --title-grad1: #ff00ff;
+            --title-grad2: #ffff00;
+        }
+
+        /* Style 4: 终端黑客 - Green phosphor, CRT feel */
+        body[data-style="4"] {
+            --bg: #0a0a0a;
+            --bg2: #0f0f0f;
+            --text: #33ff33;
+            --text2: #22aa22;
+            --accent: #33ff33;
+            --accent2: #22aa22;
+            --accent-glow: #33ff33;
+            --border: rgba(51,255,51,0.15);
+            --card-bg: #0d0d0d;
+            --card-hover: #111111;
+            --title-grad1: #33ff33;
+            --title-grad2: #22aa22;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Apply theme to all elements */
+        body { background: var(--bg); color: var(--text); transition: background 0.6s, color 0.6s; }
+        .logo { color: var(--accent); }
+        .nav { display: flex; align-items: center; gap: 16px; }
+        .nav a { color: var(--text2); font-size: 14px; display: flex; align-items: center; }
+        .hero-title {
+            background: linear-gradient(135deg, var(--title-grad1), var(--title-grad2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-subtitle { color: var(--accent); }
+        .section-title { color: var(--text); }
+        .about-card { background: var(--card-bg); border-color: var(--border); }
+        .about-card p { color: var(--text2); }
+        .project-card { background: var(--card-bg); border-color: var(--border); }
+        .project-card:hover { background: var(--card-hover); border-color: var(--accent); box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+        .card-icon { color: var(--accent); }
+        .card-title { color: var(--text); }
+        .card-desc { color: var(--text2); }
+        .card-link { color: var(--accent); }
+        .footer-logo { color: var(--accent); }
+        .footer-brand p,.footer-brand h4 { color: var(--text2); }
+        .footer-links h4 { color: var(--text); }
+        .footer-links a { color: var(--text2); }
+        .header, .about, .footer { background: var(--bg); }
+        .header, .footer { border-color: var(--border); }
+        .about-card, .project-card { border: 1px solid var(--border); }
+        .project-card:hover .card-icon { color: var(--accent-glow); }
+
+        /* Canvas for particles */
+        #fx-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Style dropdown in header */
+        .style-dropdown { position: relative; display: inline-block; margin-left: 16px; }
+        .style-trigger { font-size: 14px; color: var(--text2); cursor: pointer; transition: color 0.3s; display: flex; align-items: center; }
+        .style-trigger:hover { color: var(--text); }
+        .style-menu {
+            display: none;
+            position: absolute;
+            top: 100%; right: 0;
+            padding-top: 4px;
+            z-index: 200;
+        }
+        .style-menu-inner {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 6px;
+            min-width: 160px;
+            backdrop-filter: blur(16px);
+        }
+        .style-dropdown:hover .style-menu { display: block; }
+        .style-menu-inner span {
+            display: block;
+            padding: 8px 14px;
+            font-size: 13px;
+            color: var(--text2);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .style-menu-inner span:hover { background: var(--card-hover); color: var(--text); }
+        .style-menu-inner span.active { color: var(--accent); font-weight: 700; }
+
+        /* Scanlines for cyberpunk/terminal */
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 50;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+            display: none;
+        }
+        body[data-style="2"] .scanlines,
+        body[data-style="4"] .scanlines { display: block; }
+
+        /* Glitch animation for cyberpunk title */
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-3px, 2px); }
+            40% { transform: translate(3px, -1px); }
+            60% { transform: translate(-1px, 3px); }
+            80% { transform: translate(2px, -2px); }
+        }
+        body[data-style="2"] .hero-title {
+            animation: glitch 0.3s infinite;
+            text-shadow: 2px 0 var(--accent), -2px 0 var(--accent2);
+        }
+        @keyframes neonPulse {
+            0%, 100% { text-shadow: 0 0 7px var(--accent), 0 0 20px var(--accent-glow); }
+            50% { text-shadow: 0 0 15px var(--accent), 0 0 40px var(--accent-glow); }
+        }
+        body[data-style="2"] .project-card:hover { animation: neonPulse 1s infinite; }
+        body[data-style="2"] .card-icon { filter: drop-shadow(0 0 8px var(--accent-glow)); }
+        @keyframes cyberFlash { 0%{opacity:1;transform:scale(1)} 100%{opacity:0;transform:scale(3)} }
+        @keyframes cyberBlock { 0%{opacity:1;transform:translate(0,0) rotate(var(--r,0deg))} 100%{opacity:0;transform:translate(0,60px) rotate(var(--r,0deg))} }
+
+        /* Galaxy nebula background */
+        @keyframes nebulaRotate {
+            0% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+            50% { transform: translate(-50%, -50%) rotate(180deg) scale(1.2); }
+            100% { transform: translate(-50%, -50%) rotate(360deg) scale(1); }
+        }
+        .nebula-bg {
+            position: fixed;
+            top: 50%; left: 50%;
+            width: 200vw; height: 200vw;
+            background: radial-gradient(ellipse at center, var(--accent2) 0%, transparent 50%),
+                        radial-gradient(ellipse at 30% 40%, var(--accent) 0%, transparent 40%),
+                        radial-gradient(ellipse at 70% 60%, var(--accent-glow) 0%, transparent 40%);
+            opacity: 0.15;
+            animation: nebulaRotate 30s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+            display: none;
+        }
+        body[data-style="1"] .nebula-bg { display: block; }
+        body[data-style="1"] .hero-title {
+            transition: none;
+            will-change: transform;
+        }
+
+        /* Terminal typewriter cursor */
+        .typewriter-cursor {
+            display: none;
+            animation: blink 0.8s step-end infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        body[data-style="4"] .hero-subtitle::after {
+            content: '█';
+            animation: blink 0.8s step-end infinite;
+            margin-left: 4px;
+        }
+        body[data-style="4"] .project-card {
+            border: 1px solid var(--accent);
+            box-shadow: inset 0 0 30px rgba(51,255,51,0.03);
+        }
+        body[data-style="4"] .card-link::after {
+            content: ' $';
+            color: var(--accent);
+        }
+        body[data-style="4"] .hero-title {
+            font-family: 'Courier New', monospace;
+            -webkit-text-fill-color: var(--accent);
+            text-shadow: 0 0 10px var(--accent);
+        }
+
+        /* Graffiti bounce */
+        @keyframes graffitiBounce {
+            0%, 100% { transform: rotate(-1deg) translateY(0); }
+            25% { transform: rotate(1deg) translateY(-3px); }
+            75% { transform: rotate(-0.5deg) translateY(-1px); }
+        }
+        body[data-style="3"] .hero-title {
+            animation: graffitiBounce 2s ease-in-out infinite;
+            filter: drop-shadow(4px 4px 0 var(--accent2)) drop-shadow(-4px -4px 0 var(--accent-glow));
+        }
+        body[data-style="3"] .project-card {
+            transform: rotate(-0.5deg);
+            border-width: 2px;
+        }
+        body[data-style="3"] .project-card:nth-child(2) { transform: rotate(0.8deg); }
+        body[data-style="3"] .project-card:nth-child(3) { transform: rotate(-0.3deg); }
+        body[data-style="3"] .project-card:hover { transform: rotate(0deg) scale(1.05) !important; }
+
+        /* Confetti - absolute so it scrolls with page */
+        .confetti {
+            position: absolute;
+            pointer-events: none;
+            z-index: 999;
+        }
+        @keyframes confettiFall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+    </style>
 </head>
-<body>
+<body data-style="0">
+    <!-- Effect layers -->
+    <canvas id="fx-canvas"></canvas>
+    <div class="scanlines"></div>
+    <div class="nebula-bg"></div>
+
     <!-- Navigation -->
     <header class="header">
         <div class="header-inner">
-            <span class="logo">十三</span>
+            <span class="logo">XIII Studio</span>
             <nav class="nav">
-                <a href="#projects">项目</a>
+                <span class="style-dropdown">
+                    <span class="style-trigger" id="style-trigger">切换效果 ▾</span>
+                    <span class="style-menu" id="style-menu"></span>
+                </span>
             </nav>
         </div>
     </header>
 
     <!-- Hero Section -->
     <section class="hero">
-        <div class="hero-bg">
-            <div class="orb orb-1"></div>
-            <div class="orb orb-2"></div>
-            <div class="orb orb-3"></div>
-            <div class="ring ring-1"></div>
-            <div class="ring ring-2"></div>
-        </div>
         <div class="hero-content">
             <h1 class="hero-title">十三工作室</h1>
-            <p class="hero-subtitle">创意 · 技术 · 辩论</p>
-            <p class="hero-desc">华中科技大学物理学院旗下技术工作室，专注于辩论生态工具的开发与维护</p>
+            <p class="hero-subtitle">创意 · 技术 · AI</p>
         </div>
     </section>
 
@@ -40,8 +327,8 @@
         <div class="container">
             <h2 class="section-title">关于工作室</h2>
             <div class="about-card">
-                <p>十三工作室隶属于华中科技大学物理学院辩论队，致力于为辩论活动提供数字化支持。我们从计时器、知识库到 AI 辩手，逐步构建完整的辩论技术生态。</p>
-                <p>我们的目标是让每一位辩手都能获得高效、智能的工具辅助，让辩论训练和比赛更加专业。</p>
+                <p>十三工作室旨在召集小登们一起玩耍学习，聚焦于将有趣的想法变成可用的小程序。从知识管理、AI 对话到各种小工具，我们持续探索计算机的使用，不仅仅是打造这个网站，我们也希望能共同钻研科研常用工具，系统学习 LaTeX、COMSOL、VASP、MATLAB、Mathematica、Python 等软件的实操与开发技巧。</p>
+                <p>现在计算机早就成了学习科研离不开的基础工具，课本上学的理论光看不动手很难吃透，大多得靠计算、实操才能真正理解与应用。我们不想只埋头啃书本，工作室希望和感兴趣的小伙伴一起，把脑子里的想法亲手做出来，让专业知识落地成真。</p>
             </div>
         </div>
     </section>
@@ -49,24 +336,22 @@
     <!-- Projects Section -->
     <section class="projects" id="projects">
         <div class="container">
-            <h2 class="section-title">旗下项目</h2>
+            <h2 class="section-title">上线项目</h2>
             <div class="project-grid">
-                <!-- 辩论队官网 -->
-                <a class="project-card" data-port="3000" target="_blank">
+                <a class="project-card" href="http://139.155.142.76:3001" target="_blank">
                     <div class="card-icon">
                         <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                            <rect x="6" y="8" width="36" height="32" rx="3" stroke="currentColor" stroke-width="2.5"/>
-                            <line x1="16" y1="17" x2="32" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            <line x1="16" y1="23" x2="28" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            <line x1="16" y1="29" x2="24" y2="29" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <rect x="4" y="6" width="18" height="18" rx="3" stroke="currentColor" stroke-width="2.5"/>
+                            <rect x="26" y="6" width="18" height="18" rx="3" stroke="currentColor" stroke-width="2.5"/>
+                            <rect x="4" y="28" width="18" height="14" rx="3" stroke="currentColor" stroke-width="2.5"/>
+                            <rect x="26" y="28" width="18" height="14" rx="3" stroke="currentColor" stroke-width="2.5"/>
                         </svg>
                     </div>
-                    <h3 class="card-title">辩论队官网</h3>
-                    <p class="card-desc">华中科技大学物理学院辩论队官方网站，队伍风采展示、赛事成绩、招新信息与辩论计时器。</p>
+                    <h3 class="card-title">创意工坊</h3>
+                    <p class="card-desc">工作室创意小程序集合。按键粒子特效钢琴、辩论计时器，更多创意持续上线中。</p>
                     <span class="card-link">进入网站 →</span>
                 </a>
 
-                <!-- NoteHub -->
                 <a class="project-card" data-port="6001" target="_blank">
                     <div class="card-icon">
                         <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
@@ -79,11 +364,10 @@
                         </svg>
                     </div>
                     <h3 class="card-title">NoteHub</h3>
-                    <p class="card-desc">辩论知识管理平台。Markdown 笔记编辑、PDF 资料库、公开知识探索——为辩手打造的第二大脑。</p>
+                    <p class="card-desc">知识管理、资料共享平台。Markdown 笔记编辑、PDF 资料库、公开知识探索。</p>
                     <span class="card-link">进入网站 →</span>
                 </a>
 
-                <!-- 辩论AI -->
                 <a class="project-card" data-port="8000" target="_blank">
                     <div class="card-icon">
                         <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
@@ -107,23 +391,25 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <span class="footer-logo">十三</span>
+                    <span class="footer-logo">XIII Studio</span>
                     <p>十三工作室 © 2026</p>
                 </div>
                 <div class="footer-links">
                     <h4>快速访问</h4>
-                    <a data-port="3000" target="_blank">辩论队官网</a>
+                    <a href="http://139.155.142.76:3001" target="_blank">创意工坊</a>
                     <a data-port="6001" target="_blank">NoteHub</a>
                     <a data-port="8000" target="_blank">辩论 AI</a>
                 </div>
-            </div>
-            <div class="footer-bottom">
-                <p>华中科技大学物理学院 · 十三工作室</p>
+                <div class="footer-links">
+                    <h4>友情链接</h4>
+                    <a data-port="3000" target="_blank">辩论队官网</a>
+                </div>
             </div>
         </div>
     </footer>
-<script>
-    // 根据当前域名动态设置端口链接
+
+    <script>
+    // ===== Port links =====
     (function() {
         var host = window.location.hostname;
         var links = document.querySelectorAll('[data-port]');
@@ -132,6 +418,723 @@
             links[i].href = 'http://' + host + ':' + port;
         }
     })();
-</script>
+
+    // ===== Style Switcher (header dropdown) =====
+    var styles = [
+        { name: '星际粒子', icon: '🌌', emoji: '✨' },
+        { name: '银河星云', icon: '🌀', emoji: '💫' },
+        { name: '赛博故障', icon: '💾', emoji: '⚡' },
+        { name: '街头爆炸', icon: '💥', emoji: '🎨' },
+        { name: '终端黑客', icon: '⌨️', emoji: '💻' }
+    ];
+    var currentStyle = parseInt(localStorage.getItem('hub-style'), 10);
+    if (isNaN(currentStyle)) currentStyle = 0;
+    document.body.setAttribute('data-style', currentStyle);
+
+    var styleMenu = document.getElementById('style-menu');
+    function buildStyleMenu() {
+        styleMenu.innerHTML = '<div class="style-menu-inner"></div>';
+        var inner = styleMenu.firstChild;
+        for (var i = 0; i < styles.length; i++) {
+            var s = styles[i];
+            var opt = document.createElement('span');
+            opt.textContent = s.icon + ' ' + s.name + ' ' + s.emoji;
+            if (i === currentStyle) opt.className = 'active';
+            opt.setAttribute('data-idx', i);
+            opt.addEventListener('click', function(e) {
+                e.stopPropagation();
+                currentStyle = parseInt(this.getAttribute('data-idx'), 10);
+                localStorage.setItem('hub-style', currentStyle);
+                document.body.setAttribute('data-style', currentStyle);
+                buildStyleMenu();
+                resetEffects();
+                initFx();
+            });
+            inner.appendChild(opt);
+        }
+    }
+    buildStyleMenu();
+
+    // Close dropdown on outside click
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.style-dropdown')) {
+            styleMenu.style.display = 'none';
+            setTimeout(function(){ styleMenu.style.display = ''; }, 50);
+        }
+    });
+
+    // ===== FX Engine =====
+    var canvas = document.getElementById('fx-canvas');
+    var ctx = canvas.getContext('2d');
+    var W, H, mouseX = 0, mouseY = 0;
+    var particles = [];
+    var animationId = null;
+
+    function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    document.addEventListener('mousemove', function(e) {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+
+    var cleanups = [];
+    function resetEffects() {
+        // Run all style-specific cleanups
+        for (var c = 0; c < cleanups.length; c++) { cleanups[c](); }
+        cleanups = [];
+        particles = [];
+        if (animationId) cancelAnimationFrame(animationId);
+        document.body.style.position = '';
+        canvas.style.position = 'fixed';
+        canvas.style.top = '0';
+        canvas.style.left = '0';
+        canvas.style.height = '100%';
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        W = window.innerWidth;
+        H = window.innerHeight;
+        ctx.clearRect(0, 0, W, H);
+        var confetti = document.querySelectorAll('.confetti');
+        for (var i = 0; i < confetti.length; i++) { confetti[i].remove(); }
+    }
+
+    function initFx() {
+        resetEffects();
+        var style = parseInt(document.body.getAttribute('data-style'), 10);
+
+        if (style === 0) { // Starfield
+            var docH = Math.max(document.body.scrollHeight, H);
+            for (var i = 0; i < 120; i++) {
+                particles.push({
+                    x: Math.random() * W,
+                    wy: Math.random() * docH,   // world Y (document space, scrolls with page)
+                    r: Math.random() * 2 + 0.5,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    opacity: Math.random() * 0.6 + 0.4
+                });
+            }
+            var scrollY = 0;
+            var starClick = { active: false, x: 0, y: 0, force: 0 };
+
+            function drawStarfield() {
+                scrollY = window.pageYOffset || document.documentElement.scrollTop;
+                ctx.clearRect(0, 0, W, H);
+                for (var i = 0; i < particles.length; i++) {
+                    var p = particles[i];
+                    var screenY = p.wy - scrollY;
+
+                    // Mouse attraction (in screen space)
+                    var mdx = mouseX - p.x;
+                    var mdy = (mouseY + scrollY) - p.wy;
+                    var mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+                    if (mdist < 220) {
+                        p.vx += mdx / mdist * 0.025;
+                        p.vy += mdy / mdist * 0.025;
+                    }
+
+                    // Click push
+                    if (starClick.active && starClick.force > 0) {
+                        var cdx = p.x - starClick.x;
+                        var cdy = p.wy - starClick.y;
+                        var cdist = Math.sqrt(cdx * cdx + cdy * cdy);
+                        if (cdist < starClick.force * 2) {
+                            var push = (1 - cdist / (starClick.force * 2)) * starClick.force * 0.5;
+                            p.vx += (cdx / (cdist + 0.01)) * push;
+                            p.vy += (cdy / (cdist + 0.01)) * push;
+                        }
+                    }
+
+                    p.vx *= 0.99;
+                    p.vy *= 0.99;
+                    p.x += p.vx;
+                    p.wy += p.vy;
+                    if (p.x < 0) p.x = W;
+                    if (p.x > W) p.x = 0;
+                    if (p.wy < 0) p.wy = docH;
+                    if (p.wy > docH) p.wy = 0;
+
+                    // Only draw if on screen
+                    if (screenY < -20 || screenY > H + 20) continue;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, screenY, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(56,189,248,' + p.opacity + ')';
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(p.x, screenY, p.r * 2, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(99,102,241,' + (p.opacity * 0.3) + ')';
+                    ctx.fill();
+                }
+                // Connections between nearby on-screen particles
+                for (var i = 0; i < particles.length; i++) {
+                    var si = particles[i].wy - scrollY;
+                    if (si < -20 || si > H + 20) continue;
+                    for (var j = i + 1; j < particles.length; j++) {
+                        var sj = particles[j].wy - scrollY;
+                        if (sj < -20 || sj > H + 20) continue;
+                        var dx = particles[i].x - particles[j].x;
+                        var dy = si - sj;
+                        var dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 80) {
+                            ctx.strokeStyle = 'rgba(56,189,248,' + (0.08 * (1 - dist/80)) + ')';
+                            ctx.lineWidth = 0.5;
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, si);
+                            ctx.lineTo(particles[j].x, sj);
+                            ctx.stroke();
+                        }
+                    }
+                }
+                // Mouse glow
+                var grad = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, 80);
+                grad.addColorStop(0, 'rgba(56,189,248,0.15)');
+                grad.addColorStop(1, 'rgba(56,189,248,0)');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(mouseX, mouseY, 80, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Decay click push
+                if (starClick.active) {
+                    starClick.force *= 0.92;
+                    if (starClick.force < 0.1) starClick.active = false;
+                }
+                animationId = requestAnimationFrame(drawStarfield);
+            }
+            drawStarfield();
+
+            // Click push - register once, filter by style
+            var starClickHandler = function(e) {
+                if (parseInt(document.body.getAttribute('data-style'), 10) !== 0) return;
+                starClick.active = true;
+                starClick.x = e.clientX;
+                starClick.y = e.clientY + window.pageYOffset;
+                starClick.force = 15;
+            };
+            document.removeEventListener('click', starClickHandler);
+            document.addEventListener('click', starClickHandler);
+        } else if (style === 1) { // Galaxy - floating orbs
+            for (var i = 0; i < 40; i++) {
+                particles.push({
+                    x: Math.random() * W,
+                    y: Math.random() * H,
+                    r: Math.random() * 3 + 1,
+                    vx: (Math.random() - 0.5) * 0.3,
+                    vy: (Math.random() - 0.5) * 0.3,
+                    hue: Math.random() < 0.5 ? 280 : 310,
+                    opacity: Math.random() * 0.5 + 0.3
+                });
+            }
+            function drawGalaxy() {
+                ctx.clearRect(0, 0, W, H);
+                for (var i = 0; i < particles.length; i++) {
+                    var p = particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.x < -20) p.x = W + 20;
+                    if (p.x > W + 20) p.x = -20;
+                    if (p.y < -20) p.y = H + 20;
+                    if (p.y > H + 20) p.y = -20;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = 'hsla(' + p.hue + ', 80%, 70%, ' + p.opacity + ')';
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r * 2.5, 0, Math.PI * 2);
+                    ctx.fillStyle = 'hsla(' + p.hue + ', 80%, 70%, ' + (p.opacity * 0.2) + ')';
+                    ctx.fill();
+                }
+                animationId = requestAnimationFrame(drawGalaxy);
+            }
+            drawGalaxy();
+
+        } else if (style === 2) { // Cyberpunk - digital rain/glitch lines
+            for (var i = 0; i < 10; i++) {
+                particles.push({
+                    x: Math.random() * W,
+                    y: Math.random() * H,
+                    len: Math.random() * 80 + 30,
+                    speed: Math.random() * 3 + 1,
+                    opacity: Math.random() * 0.3 + 0.1
+                });
+            }
+            function drawCyber() {
+                ctx.clearRect(0, 0, W, H);
+                for (var i = 0; i < particles.length; i++) {
+                    var p = particles[i];
+                    p.y += p.speed;
+                    if (p.y > H + p.len) { p.y = -p.len; p.x = Math.random() * W; }
+                    var grad = ctx.createLinearGradient(p.x, p.y, p.x, p.y + p.len);
+                    grad.addColorStop(0, 'rgba(0,229,255,' + p.opacity + ')');
+                    grad.addColorStop(1, 'rgba(0,229,255,0)');
+                    ctx.strokeStyle = grad;
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(p.x, p.y + p.len);
+                    ctx.stroke();
+                }
+                animationId = requestAnimationFrame(drawCyber);
+            }
+            drawCyber();
+
+            // === Cyberpunk interactive effects ===
+
+            // 1. Crosshair - green lines following mouse across screen
+            var crosshairV = document.createElement('div');
+            crosshairV.style.cssText = 'position:fixed;pointer-events:none;z-index:49;background:rgba(0,229,255,0.25);width:1px;height:100vh;top:0;display:none';
+            var crosshairH = document.createElement('div');
+            crosshairH.style.cssText = 'position:fixed;pointer-events:none;z-index:49;background:rgba(0,229,255,0.25);height:1px;width:100vw;left:0;display:none';
+            document.body.appendChild(crosshairV);
+            document.body.appendChild(crosshairH);
+            crosshairV.style.display = 'block';
+            crosshairH.style.display = 'block';
+            var cyberCrosshairActive = true;
+
+            // 2. Text scramble on hover - hero title + about + cards
+            var scrambleChars = '!@#$%^&*()_+-=[]{}|;:,.<>?/~`ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            var scrambleTimers = {};
+            function scrambleText(el) {
+                var orig = el.textContent;
+                if (!orig) return;
+                var iterations = 0;
+                clearInterval(scrambleTimers[el]);
+                scrambleTimers[el] = setInterval(function() {
+                    iterations++;
+                    if (iterations > 8) { el.textContent = orig; clearInterval(scrambleTimers[el]); return; }
+                    var s = '';
+                    for (var i = 0; i < orig.length; i++) {
+                        s += Math.random() < 0.5 ? scrambleChars[Math.floor(Math.random()*scrambleChars.length)] : orig[i];
+                    }
+                    el.textContent = s;
+                }, 40);
+            }
+            function unscrambleText(el) {
+                clearInterval(scrambleTimers[el]);
+                var orig = el.getAttribute('data-orig');
+                if (orig) el.textContent = orig;
+            }
+
+            // Hero title "十三工作室" - only when hovering the text itself
+            var heroTitle = document.querySelector('.hero-title');
+            if (heroTitle) {
+                heroTitle.setAttribute('data-orig', heroTitle.textContent);
+                heroTitle.addEventListener('mouseenter', function() {
+                    if (parseInt(document.body.getAttribute('data-style'), 10) !== 2) return;
+                    scrambleText(heroTitle);
+                });
+                heroTitle.addEventListener('mouseleave', function() { unscrambleText(heroTitle); });
+            }
+
+            // Project cards
+            document.querySelectorAll('.project-card').forEach(function(card) {
+                var title = card.querySelector('.card-title');
+                var desc = card.querySelector('.card-desc');
+                if (title) title.setAttribute('data-orig', title.textContent);
+                if (desc) desc.setAttribute('data-orig', desc.textContent);
+                card.addEventListener('mouseenter', function() {
+                    if (parseInt(document.body.getAttribute('data-style'), 10) !== 2) return;
+                    if (title) scrambleText(title);
+                    if (desc) scrambleText(desc);
+                });
+                card.addEventListener('mouseleave', function() {
+                    if (title) unscrambleText(title);
+                    if (desc) unscrambleText(desc);
+                });
+            });
+
+            // 4. Scanline density on card hover
+            var scanlinesEl = document.querySelector('.scanlines');
+            document.querySelectorAll('.project-card').forEach(function(card) {
+                card.addEventListener('mouseenter', function() {
+                    if (parseInt(document.body.getAttribute('data-style'), 10) !== 2) return;
+                    if (scanlinesEl) scanlinesEl.style.background = 'repeating-linear-gradient(0deg,transparent,transparent 1px,rgba(0,0,0,0.08) 1px,rgba(0,0,0,0.08) 2px)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    if (scanlinesEl) scanlinesEl.style.background = 'repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px)';
+                });
+            });
+
+            // 4. Random screen glitch - entire page flickers
+            var glitchOverlay = document.createElement('div');
+            glitchOverlay.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:98;display:none;mix-blend-mode:difference';
+            document.body.appendChild(glitchOverlay);
+            var glitchInterval = setInterval(function() {
+                if (parseInt(document.body.getAttribute('data-style'), 10) !== 2) return;
+                if (Math.random() > 0.3) return;
+                // Flash the overlay with random color
+                glitchOverlay.style.display = 'block';
+                glitchOverlay.style.background = 'rgba('+Math.floor(Math.random()*255)+','+Math.floor(Math.random()*255)+','+Math.floor(Math.random()*255)+','+(Math.random()*0.15+0.05)+')';
+                // Random horizontal shift on header or hero
+                var target = Math.random() > 0.5 ? document.querySelector('.header') : document.querySelector('.hero');
+                if (target) {
+                    target.style.transform = 'translateX('+(Math.random()*16-8)+'px)';
+                    target.style.transition = 'none';
+                }
+                setTimeout(function() {
+                    glitchOverlay.style.display = 'none';
+                    if (target) {
+                        target.style.transform = '';
+                        target.style.transition = '';
+                    }
+                }, 80);
+            }, 2000);
+
+            // Store cleanup refs for this style
+            var cyberCleanup = function() {
+                cyberCrosshairActive = false;
+                crosshairV.style.display = 'none';
+                crosshairH.style.display = 'none';
+                if (crosshairV.parentNode) crosshairV.remove();
+                if (crosshairH.parentNode) crosshairH.remove();
+                if (glitchOverlay.parentNode) glitchOverlay.remove();
+                clearInterval(glitchInterval);
+                for (var key in scrambleTimers) clearInterval(scrambleTimers[key]);
+                if (scanlinesEl) scanlinesEl.style.background = 'repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px)';
+            };
+
+            // Register cleanup
+            cleanups.push(cyberCleanup);
+
+            // Draw crosshair on canvas each frame via existing drawCyber loop
+            var origDrawCyber = drawCyber;
+            drawCyber = function() {
+                origDrawCyber();
+                if (!cyberCrosshairActive) return;
+                if (parseInt(document.body.getAttribute('data-style'), 10) !== 2) return;
+                ctx.strokeStyle = 'rgba(0,229,255,0.25)';
+                ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.moveTo(mouseX, 0); ctx.lineTo(mouseX, H); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(0, mouseY); ctx.lineTo(W, mouseY); ctx.stroke();
+            };
+
+        } else if (style === 3) { // Graffiti - canvas scrolls with page
+            // Make body positioned so absolute canvas is relative to scrollable body
+            document.body.style.position = 'relative';
+            canvas.style.position = 'absolute';
+            canvas.style.top = '0';
+            canvas.style.left = '0';
+            canvas.style.height = document.body.scrollHeight + 'px';
+            canvas.width = window.innerWidth;
+            canvas.height = document.body.scrollHeight;
+            W = canvas.width;
+            H = canvas.height;
+
+            var graffitiHolding = false;
+            var gConfettiTimer = null;
+            var gLastCX = 0, gLastCY = 0;
+            var gColors = ['#ff00ff', '#ffff00', '#00ffff', '#ff6600', '#ff0088', '#00ff88'];
+            // Permanent colorful DOM blocks - stay forever as graffiti trail
+            function spawnBlock(sx, sy) {
+                var c = document.createElement('div');
+                c.className = 'confetti';
+                c.style.left = sx + 'px';
+                c.style.top = sy + 'px';
+                c.style.width = (Math.random() * 14 + 6) + 'px';
+                c.style.height = (Math.random() * 14 + 6) + 'px';
+                c.style.background = gColors[Math.floor(Math.random() * gColors.length)];
+                c.style.borderRadius = Math.random() > 0.7 ? '50%' : (Math.random() > 0.5 ? '4px' : '0');
+                c.style.transform = 'rotate(' + (Math.random()*30-15) + 'deg)';
+                c.style.opacity = '0.85';
+                document.body.appendChild(c);
+            }
+
+            var gmousedown = function(e) {
+                if (parseInt(document.body.getAttribute('data-style'), 10) !== 3) return;
+                e.preventDefault();
+                graffitiHolding = true;
+                document.body.style.userSelect = 'none';
+                document.body.style.webkitUserSelect = 'none';
+                gLastCX = e.clientX;
+                gLastCY = e.clientY + window.scrollY;
+                spawnBlock(gLastCX, gLastCY);
+                gConfettiTimer = setInterval(function() {
+                    if (!graffitiHolding) { clearInterval(gConfettiTimer); gConfettiTimer = null; return; }
+                    spawnBlock(gLastCX + (Math.random()-0.5)*12, gLastCY + (Math.random()-0.5)*12);
+                }, 40);
+            };
+            var gmousemove = function(e) {
+                if (!graffitiHolding) return;
+                if (parseInt(document.body.getAttribute('data-style'), 10) !== 3) return;
+                gLastCX = e.clientX;
+                gLastCY = e.clientY + window.scrollY;
+                spawnBlock(gLastCX, gLastCY);
+            };
+            var gmouseup = function() {
+                graffitiHolding = false;
+                document.body.style.userSelect = '';
+                document.body.style.webkitUserSelect = '';
+                if (gConfettiTimer) { clearInterval(gConfettiTimer); gConfettiTimer = null; }
+            };
+            document.removeEventListener('mousedown', gmousedown);
+            document.removeEventListener('mousemove', gmousemove);
+            document.removeEventListener('mouseup', gmouseup);
+            document.addEventListener('mousedown', gmousedown);
+            document.addEventListener('mousemove', gmousemove);
+            document.addEventListener('mouseup', gmouseup);
+
+        } else if (style === 4) { // Terminal - subtle green floating characters
+            var chars = '01ABCDEF><_/\\|{}[]#@$%';
+            for (var i = 0; i < 60; i++) {
+                particles.push({
+                    x: Math.random() * W,
+                    y: Math.random() * H,
+                    char: chars[Math.floor(Math.random() * chars.length)],
+                    speed: Math.random() * 1.5 + 0.3,
+                    opacity: Math.random() * 0.15 + 0.03
+                });
+            }
+            function drawTerminal() {
+                ctx.clearRect(0, 0, W, H);
+                ctx.font = '12px Courier New, monospace';
+                for (var i = 0; i < particles.length; i++) {
+                    var p = particles[i];
+                    p.y += p.speed;
+                    if (p.y > H + 20) { p.y = -20; p.x = Math.random() * W; }
+                    ctx.fillStyle = 'rgba(51,255,51,' + p.opacity + ')';
+                    ctx.fillText(p.char, p.x, p.y);
+                }
+                animationId = requestAnimationFrame(drawTerminal);
+            }
+            drawTerminal();
+
+            // === Terminal keyboard interactions ===
+
+            // Command line at bottom
+            var cmdLine = document.createElement('div');
+            cmdLine.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:60;background:#0a0a0a;border-top:1px solid rgba(51,255,51,0.2);padding:12px 20px;font-family:"Courier New",monospace;font-size:14px;color:#33ff33;display:flex;align-items:center;gap:8px';
+            cmdLine.innerHTML = '<span style="color:#22aa22">guest@xiii:~$</span> <span id="cmd-text"></span><span id="cmd-cursor" style="animation:blink 0.8s step-end infinite;color:#33ff33">█</span>';
+            document.body.appendChild(cmdLine);
+
+            var cmdBuffer = '';
+            var cmdTextEl = document.getElementById('cmd-text');
+
+            // Keyboard echo: floating chars on keypress
+            var termEchoChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?/~';
+            function spawnEchoChar(ch) {
+                var el = document.createElement('span');
+                el.textContent = ch;
+                el.setAttribute('data-term-echo', '1');
+                el.style.cssText = 'position:fixed;pointer-events:none;z-index:59;font-family:"Courier New",monospace;font-size:16px;color:#33ff33;left:'+(Math.random()*80+10)+'%;top:'+(Math.random()*60+10)+'%;opacity:0.7;transition:all 1.5s ease-out';
+                document.body.appendChild(el);
+                requestAnimationFrame(function() {
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(-80px)';
+                });
+                setTimeout(function(){ el.remove(); }, 1600);
+            }
+
+            // Screen flicker helper
+            function termFlicker() {
+                var f = document.createElement('div');
+                f.style.cssText = 'position:fixed;inset:0;z-index:200;pointer-events:none;background:#33ff33;opacity:0.08';
+                document.body.appendChild(f);
+                setTimeout(function(){ f.remove(); }, 60);
+            }
+
+            // Ctrl+C explosion: spew characters everywhere
+            function ctrlCExplosion() {
+                for (var i = 0; i < 60; i++) {
+                    var ch = termEchoChars[Math.floor(Math.random()*termEchoChars.length)];
+                    var el = document.createElement('span');
+                    el.textContent = ch;
+                    el.setAttribute('data-term-echo', '1');
+                    var sx = Math.random()*90+5, sy = Math.random()*70+10;
+                    el.style.cssText = 'position:fixed;pointer-events:none;z-index:59;font-family:"Courier New",monospace;font-size:18px;color:#33ff33;left:'+sx+'%;top:'+sy+'%;opacity:1;transition:all 2s ease-out';
+                    document.body.appendChild(el);
+                    requestAnimationFrame(function() {
+                        el.style.opacity = '0';
+                        el.style.transform = 'translate('+(Math.random()*400-200)+'px,'+(Math.random()*300-150)+'px) rotate('+(Math.random()*720-360)+'deg)';
+                    });
+                    setTimeout(function(){ el.remove(); }, 2100);
+                }
+                termFlicker();
+            }
+
+            // Keyboard handler
+            var helpSprayInterval = null;
+
+            var termKeyHandler = function(e) {
+                if (parseInt(document.body.getAttribute('data-style'), 10) !== 4) return;
+
+                // Ctrl+C
+                if (e.ctrlKey && e.key === 'c') {
+                    e.preventDefault();
+                    ctrlCExplosion();
+                    return;
+                }
+
+                // Enter
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    var cmd = cmdBuffer.trim().toLowerCase();
+                    // Hidden commands
+                    if (cmd === 'help') {
+                        if (helpSprayInterval) { clearInterval(helpSprayInterval); helpSprayInterval = null; cmdTextEl.textContent = ''; cmdBuffer = ''; return; }
+                        helpSprayInterval = setInterval(function() {
+                            spawnEchoChar(termEchoChars[Math.floor(Math.random()*termEchoChars.length)]);
+                        }, 80);
+                    } else if (cmd === 'clear') {
+                        if (helpSprayInterval) { clearInterval(helpSprayInterval); helpSprayInterval = null; }
+                        document.querySelectorAll('[data-term-echo]').forEach(function(e){ e.remove(); });
+                    } else if (cmd === 'hack') {
+                        // Intensify rain for 3 seconds
+                        for (var i = 0; i < particles.length; i++) {
+                            particles[i].speed *= 4;
+                            particles[i].opacity = Math.min(1, particles[i].opacity * 3);
+                        }
+                        setTimeout(function() {
+                            for (var i = 0; i < particles.length; i++) {
+                                particles[i].speed /= 4;
+                                particles[i].opacity = Math.min(0.15, particles[i].opacity / 3);
+                            }
+                        }, 3000);
+                    } else if (cmd === 'xiii' || cmd === '十三') {
+                        for (var i = 0; i < 20; i++) {
+                            setTimeout(function(){ spawnEchoChar(termEchoChars[Math.floor(Math.random()*termEchoChars.length)]); }, i*30);
+                        }
+                    }
+                    cmdBuffer = '';
+                    cmdTextEl.textContent = '';
+                    termFlicker();
+                    return;
+                }
+
+                // Backspace
+                if (e.key === 'Backspace') {
+                    e.preventDefault();
+                    cmdBuffer = cmdBuffer.slice(0, -1);
+                    cmdTextEl.textContent = cmdBuffer;
+                    return;
+                }
+
+                // Printable chars
+                if (e.key.length === 1) {
+                    e.preventDefault();
+                    cmdBuffer += e.key;
+                    cmdTextEl.textContent = cmdBuffer;
+                    spawnEchoChar(e.key);
+                }
+            };
+            document.addEventListener('keydown', termKeyHandler);
+
+            // Register cleanup
+            cleanups.push(function() {
+                document.removeEventListener('keydown', termKeyHandler);
+                if (helpSprayInterval) clearInterval(helpSprayInterval);
+                if (cmdLine.parentNode) cmdLine.remove();
+            });
+        }
+    }
+
+    // ===== 3D card tilt for galaxy style (global mousemove for speed) =====
+    var allCards = document.querySelectorAll('.project-card');
+    document.addEventListener('mousemove', function(e) {
+        if (parseInt(document.body.getAttribute('data-style'), 10) !== 1) return;
+        for (var i = 0; i < allCards.length; i++) {
+            var card = allCards[i];
+            var rect = card.getBoundingClientRect();
+            if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) {
+                if (card._tilting) { card.style.transform = ''; card._tilting = false; }
+                continue;
+            }
+            card._tilting = true;
+            var x = e.clientX - rect.left;
+            var y = e.clientY - rect.top;
+            var rx = (y / rect.height - 0.5) * -44;
+            var ry = (x / rect.width - 0.5) * 44;
+            card.style.transform = 'perspective(400px) rotateX(' + rx + 'deg) rotateY(' + ry + 'deg) translateY(-8px) scale(1.03)';
+        }
+    });
+    // Reset all cards when mouse leaves document
+    document.addEventListener('mouseleave', function() {
+        for (var i = 0; i < allCards.length; i++) {
+            allCards[i].style.transform = '';
+            allCards[i]._tilting = false;
+        }
+    });
+
+    // ===== Title physics engine (galaxy style) =====
+    var titleEl = document.querySelector('.hero-title');
+    var heroEl = document.querySelector('.hero');
+    var titleRX = 0, titleRY = 0;    // current rotation
+    var titleVX = 0, titleVY = 0;    // angular velocity
+    var titleEnabled = false;
+
+    function updateTitlePhysics() {
+        if (parseInt(document.body.getAttribute('data-style'), 10) === 1) {
+            if (!titleEnabled) {
+                titleEnabled = true;
+                titleRX = titleRY = titleVX = titleVY = 0;
+            }
+            // Spring toward mouse with damping
+            var rect = heroEl.getBoundingClientRect();
+            var cx = rect.left + rect.width / 2;
+            var cy = rect.top + rect.height / 2;
+            var hoverX = (mouseX - cx) / (rect.width / 2);    // -1 to 1
+            var hoverY = (mouseY - cy) / (rect.height / 2);   // -1 to 1
+
+            // Gentle torque toward mouse
+            var maxAngle = 25;
+            var targetRX = -hoverY * maxAngle;
+            var targetRY = hoverX * maxAngle;
+
+            // Spring force
+            var spring = 0.003;
+            titleVX += (targetRX - titleRX) * spring;
+            titleVY += (targetRY - titleRY) * spring;
+
+            // Damping
+            titleVX *= 0.95;
+            titleVY *= 0.95;
+
+            titleRX += titleVX;
+            titleRY += titleVY;
+
+            titleEl.style.transform = 'perspective(500px) rotateX(' + titleRX + 'deg) rotateY(' + titleRY + 'deg)';
+        } else {
+            if (titleEnabled) {
+                titleEnabled = false;
+                titleEl.style.transform = '';
+            }
+        }
+        requestAnimationFrame(updateTitlePhysics);
+    }
+    updateTitlePhysics();
+
+    // Click impulse for title physics
+    document.addEventListener('click', function(e) {
+        if (parseInt(document.body.getAttribute('data-style'), 10) !== 1) return;
+        var rect = heroEl.getBoundingClientRect();
+        var cx = rect.left + rect.width / 2;
+        var cy = rect.top + rect.height / 2;
+        var dx = (e.clientX - cx) / (rect.width / 2);   // -1 to 1
+        var dy = (e.clientY - cy) / (rect.height / 2);  // -1 to 1
+        // Impulse: push away from click point, stronger near center
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 1.5) {
+            var power = 8 * (1 - dist / 1.5);
+            var angle = Math.atan2(dy, dx);
+            titleVX += -Math.sin(angle) * power;
+            titleVY += Math.cos(angle) * power;
+        }
+    });
+
+    // ===== Start effects =====
+    initFx();
+
+    // Save PM2 on resize
+    window.addEventListener('resize', function() {
+        resize();
+        resetEffects();
+        initFx();
+    });
+    </script>
 </body>
 </html>

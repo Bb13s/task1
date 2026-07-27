@@ -106,7 +106,7 @@ async function loadDebates() {
 
         document.getElementById("debate-list").innerHTML = `
             <table>
-                <tr><th>时间</th><th>辩题</th><th>立场</th><th>消息数</th><th>点评</th><th></th></tr>
+                <tr><th>时间</th><th>辩题</th><th>立场</th><th>消息数</th><th>点评</th><th></th><th></th></tr>
                 ${debates.map(d => `
                     <tr>
                         <td>${(d.created || "").slice(0,16)}</td>
@@ -115,6 +115,7 @@ async function loadDebates() {
                         <td>${d.messages}</td>
                         <td>${d.has_feedback ? "✅" : "-"}</td>
                         <td><button class="btn-sm" onclick="viewDebate('${d.id}')">查看</button></td>
+                        <td><button class="btn-sm" style="color:#f87171" onclick="deleteDebate('${d.id}')">删除</button></td>
                     </tr>
                 `).join("")}
             </table>
@@ -136,7 +137,7 @@ async function viewDebate(id) {
         for (const [round, msgs] of Object.entries(data.rounds || {})) {
             html += `<h4>${round}</h4>`;
             for (const m of msgs) {
-                const speaker = m.speaker === "ai" ? "徐经纬" : "你";
+                const speaker = m.speaker === "ai" ? "小B" : "你";
                 html += `<p><strong>${speaker}：</strong>${m.content}</p>`;
             }
         }
@@ -154,5 +155,20 @@ async function viewDebate(id) {
         detail.scrollIntoView();
     } catch (e) {
         alert("加载失败");
+    }
+}
+
+async function deleteDebate(id) {
+    if (!confirm("确定删除这场辩论吗？")) return;
+    try {
+        const res = await fetch(`/api/debates/${id}`, { method: "DELETE" });
+        const data = await res.json();
+        if (data.status === "ok") {
+            loadDebates();
+        } else {
+            alert("删除失败: " + (data.error || ""));
+        }
+    } catch (e) {
+        alert("删除失败");
     }
 }

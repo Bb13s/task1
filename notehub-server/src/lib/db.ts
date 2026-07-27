@@ -613,6 +613,7 @@ export interface SearchResultItem {
   author: string;
   album_name: string | null;
   album_id: number | null;
+  filename: string | null;
 }
 
 export function searchExplore(
@@ -652,13 +653,13 @@ export function searchExplore(
   const total = countResult.total;
 
   const dataSql = `SELECT * FROM (
-    SELECT 'note' AS type, n.id AS item_id, n.title, u.username AS author, a.name AS album_name, n.album_id
+    SELECT 'note' AS type, n.id AS item_id, n.title, u.username AS author, a.name AS album_name, n.album_id, NULL AS filename
     FROM notes n
     LEFT JOIN users u ON n.author = u.username
     LEFT JOIN albums a ON n.album_id = a.id
     WHERE n.is_public = 1
     UNION ALL
-    SELECT 'pdf' AS type, f.id AS item_id, f.original_name AS title, u.username AS author, a.name AS album_name, f.album_id
+    SELECT 'pdf' AS type, f.id AS item_id, f.original_name AS title, u.username AS author, a.name AS album_name, f.album_id, f.filename
     FROM files f
     LEFT JOIN users u ON f.uploaded_by = u.username
     LEFT JOIN albums a ON f.album_id = a.id

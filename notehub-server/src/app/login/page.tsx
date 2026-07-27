@@ -95,7 +95,7 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-6 text-center text-sm text-gray-500">
-          <span className="text-gray-400">账号注册功能已关闭</span>
+          没有账号？<Link href="/register" className="text-[#9e1b32] hover:text-[#7a1527] font-medium ml-1">立即注册</Link>
         </div>
 
         <div className="mt-4 text-center">

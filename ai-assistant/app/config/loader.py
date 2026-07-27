@@ -20,5 +20,5 @@ def init():
 
     return {
         "settings": _load_yaml(CONFIG_DIR / "settings.yaml"),
-        "character": _load_yaml(CONFIG_DIR / "characters" / "default.yaml"),
+        "character": _load_yaml(BASE_DIR / "app" / "character_data" / "徐经纬" / "style.yaml"),
     }

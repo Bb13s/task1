@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 十三工作室
 
-## Getting Started
+**主控页**：http://139.155.142.76
 
-First, run the development server:
+## 项目结构
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+note-hub/
+├── hub/                     # 十三工作室主控页 (static HTML, nginx :80)
+├── debate-site/             # 辩论队官网 (Next.js 14, :3000)
+├── notehub-server/          # NoteHub 知识库 (Next.js 14, :6001)
+├── ai-assistant/            # 辩论 AI (Python FastAPI, :8000)
+└── scripts/                 # 部署脚本
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 项目入口
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| 项目 | 地址 | 说明 |
+|------|------|------|
+| 十三工作室 | http://139.155.142.76 | 主控入口 |
+| 辩论队官网 | http://139.155.142.76:3000 | 队伍品牌 + 名人堂 + 计时器 |
+| NoteHub | http://139.155.142.76:6001 | Markdown 笔记 + PDF 管理 |
+| 辩论 AI | http://139.155.142.76:8000 | AI 辩论对手，DeepSeek 驱动 |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 本地开发
 
-## Learn More
+```bash
+# 辩论队官网
+cd debate-site && npm install && npm run dev
 
-To learn more about Next.js, take a look at the following resources:
+# NoteHub
+cd notehub-server && npm install && npm run dev
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# 辩论 AI
+cd ai-assistant && pip install -r requirements.txt && uvicorn app.main:app --reload
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 部署
 
-## Deploy on Vercel
+```bash
+ssh ubuntu@139.155.142.76
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# 辩论队官网
+cd /var/www/debate-site && sudo git pull && sudo npm install && sudo npm run build && sudo pm2 restart debate-site
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# NoteHub
+cd /var/www/notehub-server && sudo git pull && sudo npm install && sudo npm run build && sudo pm2 restart notehub-server
+
+# 主控页 (静态文件，无需构建)
+cd /var/www/hub && sudo git pull
+
+# 辩论 AI
+cd /var/www/ai-assistant && sudo git pull && sudo pm2 restart debate-ai
+```
+
+## 技术栈
+
+- **前端**：Next.js 14 + Tailwind CSS + TypeScript
+- **数据库**：SQLite（better-sqlite3）
+- **AI 服务**：Python FastAPI + WebSocket + DeepSeek API
+- **部署**：Ubuntu + PM2 + Nginx
